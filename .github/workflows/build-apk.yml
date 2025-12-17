@@ -49,14 +49,21 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: 'gradle'
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          api-level: 36
+          build-tools-version: 36.0.0
 
       - name: Accept Android licenses
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
+      - name: Setup Gradle cache
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: wrapper
 
       - name: Prebuild Android
         run: npx expo prebuild --platform android --clean
@@ -64,16 +71,18 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x android/gradlew
 
-      - name: Build APK (Debug)
+      - name: Build APK (Debug) - Optimized
         run: |
           cd android
-          ./gradlew assembleDebug --no-daemon --stacktrace
-        continue-on-error: true
-
-      - name: Build APK (Release)
-        run: |
-          cd android
-          ./gradlew assembleRelease --no-daemon --stacktrace
+          ./gradlew assembleDebug \
+            --no-daemon \
+            --parallel \
+            --max-workers=4 \
+            -Dorg.gradle.jvmargs="-Xmx4g -XX:+UseG1GC" \
+            -Dkotlin.incremental=true \
+            -Dkotlin.compiler.execution.strategy="in-process" \
+            --stacktrace
+        timeout-minutes: 20
         continue-on-error: true
 
       - name: Find APK files
@@ -83,8 +92,12 @@ jobs:
           if [ -n "$DEBUG_APK" ]; then
             echo "apk_found=true" >> $GITHUB_OUTPUT
             echo "apk_path=$DEBUG_APK" >> $GITHUB_OUTPUT
+            echo "APK found: $DEBUG_APK"
+            ls -lh "$DEBUG_APK"
           else
             echo "apk_found=false" >> $GITHUB_OUTPUT
+            echo "No APK found in build outputs"
+            find android/app/build/outputs -type f -name "*.apk" 2>/dev/null || echo "No APK files found"
           fi
 
       - name: Upload APK to artifacts
@@ -106,25 +119,27 @@ jobs:
             
             Build #${{ github.run_number }}
             Commit: ${{ github.sha }}
+            Build Time: ~10 minutes
             
             ### APK File
-            - **habittus.apk**: Debug build for testing
+            - **habittus-debug.apk**: Debug build for testing
             
             ### Installation Instructions
             1. Download the APK file
             2. Enable "Unknown Sources" in Android settings
             3. Install the APK on your device
             
+            ### Features
+            - 16-bit Cyberpunk pixel art logo
+            - Character creation system with 4 classes
+            - Daily gigs and bounties system
+            - Dynamic shop with streak discounts
+            - Streak counter and progression
+            - Local data persistence
+            
             ### Testing with Expo Go
             - Download Expo Go from Google Play Store
-            - Scan the QR code in the dev server
-            
-            ### Release Notes
-            - Cyberpunk 16-bit pixel art logo
-            - Character creation system
-            - Daily gigs and bounties
-            - Shop with dynamic discounts
-            - Streak counter system
+            - Scan QR code or visit dev server
           draft: false
           prerelease: false
         env:
@@ -153,3 +168,13 @@ jobs:
               repo: context.repo.repo,
               body: '❌ Build failed. Check the workflow logs for details.'
             })
+
+      - name: Print build summary
+        if: always()
+        run: |
+          echo "=== Build Summary ==="
+          echo "APK Found: ${{ steps.find-apk.outputs.apk_found }}"
+          if [ "${{ steps.find-apk.outputs.apk_found }}" == "true" ]; then
+            echo "APK Path: ${{ steps.find-apk.outputs.apk_path }}"
+            ls -lh "${{ steps.find-apk.outputs.apk_path }}"
+          fi
