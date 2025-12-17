@@ -43,7 +43,8 @@ export function calculateBMI(weightKg: number, heightCm: number): number {
  * Classifica o usuário em uma classe base automaticamente
  */
 export function classifyUser(triage: TriageResponse, biometrics: BiometricData): ClassificationResult {
-  const { objectives, currentTrainingFrequency, primaryTrainingType, activityLevel } = triage;
+  const { objectives, currentTrainingFrequency, primaryTrainingType } = triage;
+  const activityLevel = triage.hoursOfFocusPerDay > 6 ? 'active' : triage.currentTrainingFrequency > 0 ? 'moderate' : 'sedentary';
 
   // Pontuação para cada classe
   let scores = {
@@ -54,13 +55,13 @@ export function classifyUser(triage: TriageResponse, biometrics: BiometricData):
   };
 
   // Análise de objetivos
-  if (objectives.includes('Melhorar produtividade') || objectives.includes('Reduzir estresse')) {
+  if (objectives.includes('productivity') || objectives.includes('habits')) {
     scores.netrunner += 30;
   }
-  if (objectives.includes('Ganhar massa muscular')) {
+  if (objectives.includes('health')) {
     scores.solo += 30;
   }
-  if (objectives.includes('Aumentar flexibilidade') || objectives.includes('Melhorar mobilidade')) {
+  if (objectives.includes('habits')) {
     scores.techie += 30;
   }
   if (objectives.length > 2) {
@@ -104,11 +105,13 @@ export function classifyUser(triage: TriageResponse, biometrics: BiometricData):
 
   // Gera estatísticas iniciais baseado na classe
   const statBoosts = getInitialStatBoosts(selectedClass);
+  const pillarBoosts = getInitialPillarBoosts(selectedClass);
 
   return {
     baseClass: selectedClass,
     reasoning: `Classificado como ${selectedClass.toUpperCase()} baseado em: objetivos (${objectives.join(', ')}), atividade (${activityLevel}), treino (${primaryTrainingType || 'nenhum'})`,
     statBoosts,
+    pillarBoosts,
   };
 }
 
@@ -123,6 +126,7 @@ export function getInitialStatBoosts(classType: ClassType): Partial<UserStats> {
     intelligence: 50,
     wisdom: 50,
     charisma: 50,
+    willpower: 50,
   };
 
   const classBoosts: Record<ClassType, Partial<UserStats>> = {
@@ -189,6 +193,37 @@ export function getInitialStatBoosts(classType: ClassType): Partial<UserStats> {
   };
 
   return classBoosts[classType];
+}
+
+/**
+ * Retorna os boosts de pilares iniciais para cada classe
+ */
+export function getInitialPillarBoosts(classType: ClassType): Partial<any> {
+  const basePillars = {
+    health: 50,
+    nutrition: 50,
+    study: 50,
+    productivity: 50,
+    finance: 50,
+    habits: 50,
+    social: 50,
+  };
+
+  const pillarBoosts: Record<ClassType, Partial<any>> = {
+    netrunner: { study: 70, productivity: 65 },
+    solo: { health: 70, nutrition: 65 },
+    fixer: { finance: 70, social: 65, habits: 60 },
+    techie: { habits: 70, health: 65 },
+    cyborg: { health: 75, habits: 70 },
+    hacker: { study: 75, productivity: 70, finance: 65 },
+    gladiador: { health: 75, finance: 70, social: 65 },
+    ninja: { habits: 75, study: 70 },
+    tita: { health: 80, habits: 75, finance: 70 },
+    mestre: { study: 80, productivity: 75, social: 70 },
+    'ser-supremo': { health: 100, nutrition: 100, study: 100, productivity: 100, finance: 100, habits: 100, social: 100 },
+  };
+
+  return pillarBoosts[classType];
 }
 
 /**

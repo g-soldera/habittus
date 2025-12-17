@@ -115,7 +115,7 @@ export default function TriageScreen() {
 
       // Cria resposta de triagem
       const triageResponse: TriageResponse = {
-        objectives,
+        objectives: objectives as any,
         currentTrainingFrequency: parseInt(trainingFrequency),
         primaryTrainingType: trainingType,
         averageSleepHours: parseInt(sleepHours),

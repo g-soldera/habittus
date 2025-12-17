@@ -201,6 +201,7 @@ export function useGameState() {
     biometrics: BiometricData;
     baseClass: ClassType;
     initialStats: any;
+    pillarStats?: any;
   }) => {
     try {
       const userProfile: UserProfile = {
@@ -215,6 +216,7 @@ export function useGameState() {
           intelligence: data.initialStats.intelligence || 50,
           wisdom: data.initialStats.wisdom || 50,
           charisma: data.initialStats.charisma || 50,
+          willpower: data.initialStats.willpower || 50,
         },
         currentClass: data.baseClass,
         unlockedClasses: [data.baseClass],
