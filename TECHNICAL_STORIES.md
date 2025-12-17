@@ -589,6 +589,7 @@ O usuário cria um personagem que **reflete visualmente** seu progresso real. Co
 - Definir lista de recompensas padrão
 - Implementar compra (deduz Gold, adiciona ao inventário)
 - Armazenar inventário em AsyncStorage
+- Itens do inventário podem ser consumidos e expiram (configurável validade do item em dias ao criar)
 
 ---
 
