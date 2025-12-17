@@ -14,9 +14,9 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { CyberpunkColors } from '@/constants/theme';
 import { useGameState } from '@/hooks/use-game-state';
-import { classifyUser, calculateTMB, calculateTDEE } from '@/lib/biometric-calculator';
+import { classifyUser } from '@/lib/biometric-calculator';
+import { validateAge, validateBiometrics, estimateTmbTdee } from '@/lib/triage-utils';
 import { TriageResponse, Gender, Pillar, BiometricData } from '@/types/biometric';
-import { validateBasicInfo, validateBiometrics } from '@/lib/triage-utils';
 
 export default function TriageScreen() {
   const insets = useSafeAreaInsets();
@@ -37,35 +37,30 @@ export default function TriageScreen() {
   const [age, setAge] = useState('');
   const [gender, setGender] = useState<Gender>('male');
 
+  // Live estimate for TMB/TDEE
+  const [liveEstimate, setLiveEstimate] = useState<{ tmb: number; tdee: number; activityLevel: string } | null>(null);
+
   // Step 2: Body Metrics
   const [heightCm, setHeightCm] = useState('');
   const [weightKg, setWeightKg] = useState('');
   const [bodyFatPercent, setBodyFatPercent] = useState('');
 
-  // Live calculations for feedback
-  const [calculatedTMB, setCalculatedTMB] = useState<number | null>(null);
-  const [calculatedTDEE, setCalculatedTDEE] = useState<number | null>(null);
-
-  // Recalculate TMB/TDEE when biometric inputs change
+  // Update live estimates when biometrics or training frequency change
   useEffect(() => {
-    const h = parseInt(heightCm || '0', 10);
-    const w = parseInt(weightKg || '0', 10);
-    const a = parseInt(age || '0', 10);
-    if (!h || !w || !a) {
-      setCalculatedTMB(null);
-      setCalculatedTDEE(null);
-      return;
-    }
+    const h = parseInt(heightCm);
+    const w = parseInt(weightKg);
+    const a = parseInt(age);
+    const tf = parseInt(trainingFrequency);
 
-    try {
-      const tmb = calculateTMB(w, h, a, gender);
-      const activityLevel = parseInt(trainingFrequency) > 3 ? 'active' : parseInt(trainingFrequency) > 0 ? 'moderate' : 'sedentary';
-      const tdee = calculateTDEE(tmb, activityLevel as any);
-      setCalculatedTMB(Math.round(tmb));
-      setCalculatedTDEE(Math.round(tdee));
-    } catch (e) {
-      setCalculatedTMB(null);
-      setCalculatedTDEE(null);
+    if (!Number.isNaN(h) && !Number.isNaN(w) && !Number.isNaN(a)) {
+      try {
+        const est = estimateTmbTdee(w, h, a, gender, Number.isNaN(tf) ? 0 : tf);
+        setLiveEstimate(est as any);
+      } catch {
+        setLiveEstimate(null);
+      }
+    } else {
+      setLiveEstimate(null);
     }
   }, [heightCm, weightKg, age, gender, trainingFrequency]);
 
@@ -107,15 +102,19 @@ export default function TriageScreen() {
   const handleNext = () => {
     // Validação básica
     if (step === 1) {
-      const validation = validateBasicInfo(characterName, age);
-      if (!validation.valid) {
-        Alert.alert('Erro', validation.reason);
+      const ageNumber = parseInt(age);
+      const ageValidation = validateAge(ageNumber);
+      if (!characterName.trim() || !age || !ageValidation.valid) {
+        Alert.alert('Erro', ageValidation.message || 'Por favor, insira um nome válido e uma idade válida (18-100 anos)');
         return;
       }
     } else if (step === 2) {
-      const validation = validateBiometrics(heightCm, weightKg, bodyFatPercent);
-      if (!validation.valid) {
-        Alert.alert('Erro', validation.reason);
+      const h = parseInt(heightCm);
+      const w = parseInt(weightKg);
+      const bf = parseInt(bodyFatPercent);
+      const biomValidation = validateBiometrics(h, w, bf);
+      if (!heightCm || !weightKg || !bodyFatPercent || !biomValidation.valid) {
+        Alert.alert('Erro', biomValidation.message || 'Por favor, preencha todos os dados biométricos corretamente');
         return;
       }
     } else if (step === 3) {
@@ -137,15 +136,13 @@ export default function TriageScreen() {
       setLoading(true);
 
       // Calcula TMB e TDEE
-      const tmb = calculateTMB(
+      const { tmb, tdee } = estimateTmbTdee(
         parseInt(weightKg),
         parseInt(heightCm),
         parseInt(age),
-        gender
+        gender,
+        parseInt(trainingFrequency) || 0
       );
-
-      const activityLevel = parseInt(trainingFrequency) > 3 ? 'active' : parseInt(trainingFrequency) > 0 ? 'moderate' : 'sedentary';
-      const tdee = calculateTDEE(tmb, activityLevel);
 
       // Cria resposta de triagem
       const triageResponse: TriageResponse = {
@@ -273,7 +270,7 @@ export default function TriageScreen() {
               Insira suas medidas para calcular seu TMB e TDEE.
             </ThemedText>
 
-                  <ThemedText style={styles.label}>Altura (cm)</ThemedText>
+            <ThemedText style={styles.label}>Altura (cm)</ThemedText>
             <TextInput
               style={styles.input}
               placeholder="Ex: 175"
@@ -306,11 +303,17 @@ export default function TriageScreen() {
               placeholderTextColor={CyberpunkColors.darkGray}
             />
 
-            {/* Dynamic feedback: TMB / TDEE */}
-            {calculatedTMB !== null && (
-              <ThemedText style={{ marginTop: 8 }}>
-                TMB estimada: {calculatedTMB} kcal · TDEE estimado: {calculatedTDEE}
-              </ThemedText>
+            {/* Live TMB/TDEE feedback */}
+            {liveEstimate && (
+              <ThemedView style={{ marginTop: 12 }}>
+                <ThemedText style={{ fontSize: 12, color: CyberpunkColors.textSecondary }}>Estimativa</ThemedText>
+                <ThemedText accessibilityLabel={`TMB estimado ${Math.round(liveEstimate.tmb)} calorias`} style={{ color: CyberpunkColors.cyan }}>
+                  TMB: {Math.round(liveEstimate.tmb)} kcal
+                </ThemedText>
+                <ThemedText accessibilityLabel={`TDEE estimado ${Math.round(liveEstimate.tdee)} calorias`} style={{ color: CyberpunkColors.cyan }}>
+                  TDEE: {Math.round(liveEstimate.tdee)} kcal ({liveEstimate.activityLevel})
+                </ThemedText>
+              </ThemedView>
             )}
           </ThemedView>
         );
