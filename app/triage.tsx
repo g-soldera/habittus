@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   View,
   ScrollView,
@@ -20,9 +20,16 @@ import { TriageResponse, Gender, Pillar, BiometricData } from '@/types/biometric
 export default function TriageScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { saveUserProfile } = useGameState();
+  const { saveUserProfile, userProfile, loadingProfile } = useGameState();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
+
+  // If a profile already exists, this is not the first run: redirect to dashboard
+  useEffect(() => {
+    if (!loadingProfile && userProfile) {
+      router.replace('/(tabs)');
+    }
+  }, [loadingProfile, userProfile, router]);
 
   // Step 1: Basic Info
   const [characterName, setCharacterName] = useState('');
@@ -201,6 +208,7 @@ export default function TriageScreen() {
               placeholder="Digite seu nome..."
               value={characterName}
               onChangeText={setCharacterName}
+              accessibilityLabel="Nome do Personagem"
               placeholderTextColor={CyberpunkColors.darkGray}
             />
 
@@ -210,6 +218,7 @@ export default function TriageScreen() {
               placeholder="Ex: 25"
               value={age}
               onChangeText={setAge}
+              accessibilityLabel="Idade"
               keyboardType="numeric"
               placeholderTextColor={CyberpunkColors.darkGray}
             />
@@ -219,12 +228,16 @@ export default function TriageScreen() {
               <Pressable
                 style={[styles.genderButton, gender === 'male' && styles.genderButtonActive]}
                 onPress={() => setGender('male')}
+                accessibilityRole="button"
+                accessibilityLabel="Sexo Masculino"
               >
                 <ThemedText style={styles.genderButtonText}>Masculino</ThemedText>
               </Pressable>
               <Pressable
                 style={[styles.genderButton, gender === 'female' && styles.genderButtonActive]}
                 onPress={() => setGender('female')}
+                accessibilityRole="button"
+                accessibilityLabel="Sexo Feminino"
               >
                 <ThemedText style={styles.genderButtonText}>Feminino</ThemedText>
               </Pressable>
@@ -248,6 +261,7 @@ export default function TriageScreen() {
               placeholder="Ex: 175"
               value={heightCm}
               onChangeText={setHeightCm}
+              accessibilityLabel="Altura em cm"
               keyboardType="numeric"
               placeholderTextColor={CyberpunkColors.darkGray}
             />
@@ -258,6 +272,7 @@ export default function TriageScreen() {
               placeholder="Ex: 75"
               value={weightKg}
               onChangeText={setWeightKg}
+              accessibilityLabel="Peso em kg"
               keyboardType="numeric"
               placeholderTextColor={CyberpunkColors.darkGray}
             />
@@ -268,6 +283,7 @@ export default function TriageScreen() {
               placeholder="Ex: 15"
               value={bodyFatPercent}
               onChangeText={setBodyFatPercent}
+              accessibilityLabel="Percentual de gordura"
               keyboardType="numeric"
               placeholderTextColor={CyberpunkColors.darkGray}
             />
@@ -293,6 +309,8 @@ export default function TriageScreen() {
                     objectives.includes(option.value) && styles.objectiveButtonActive,
                   ]}
                   onPress={() => toggleObjective(option.value)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Selecionar objetivo ${option.label}`}
                 >
                   <ThemedText style={styles.objectiveButtonText}>
                     {option.label}
@@ -330,6 +348,8 @@ export default function TriageScreen() {
                     trainingType === type && styles.trainingTypeButtonActive,
                   ]}
                   onPress={() => setTrainingType(type as any)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Selecionar tipo de treino ${type}`}
                 >
                   <ThemedText style={styles.trainingTypeButtonText}>
                     {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -476,6 +496,8 @@ export default function TriageScreen() {
             <Pressable
               style={styles.backButton}
               onPress={() => setStep(step - 1)}
+              accessibilityRole="button"
+              accessibilityLabel="Voltar"
             >
               <ThemedText style={styles.backButtonText}>← Voltar</ThemedText>
             </Pressable>
@@ -484,6 +506,8 @@ export default function TriageScreen() {
           <Pressable
             style={[styles.nextButton, loading && styles.nextButtonDisabled]}
             onPress={handleNext}
+            accessibilityRole="button"
+            accessibilityLabel={step === 7 ? 'Criar Personagem' : 'Próximo'}
             disabled={loading}
           >
             {loading ? (

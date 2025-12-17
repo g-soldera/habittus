@@ -78,6 +78,8 @@ export default function ShopScreen() {
         <Pressable
           style={[styles.buyButton, !canAfford && styles.buyButtonDisabled]}
           onPress={() => handlePurchase(item.id)}
+          accessibilityRole="button"
+          accessibilityLabel={canAfford ? `Comprar ${item.name}` : `Sem gold ${item.name}`}
           disabled={!canAfford}
         >
           <ThemedText style={styles.buyButtonText}>
@@ -142,6 +144,8 @@ export default function ShopScreen() {
               selectedCategory === cat && styles.categoryButtonActive,
             ]}
             onPress={() => setSelectedCategory(cat)}
+            accessibilityRole="button"
+            accessibilityLabel={`Filtrar por categoria ${cat}`}
           >
             <ThemedText
               style={[
@@ -159,6 +163,8 @@ export default function ShopScreen() {
       <Pressable
         style={styles.addRewardButton}
         onPress={() => router.navigate({pathname: "/add-reward"} as any)}
+        accessibilityRole="button"
+        accessibilityLabel="Adicionar recompensa"
       >
         <ThemedText style={styles.addRewardButtonText}>+ ADICIONAR RECOMPENSA</ThemedText>
       </Pressable>
