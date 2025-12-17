@@ -1,203 +1,142 @@
-# Habittus - Cyberpunk Life RPG | Histórias Técnicas
+#+ Habittus - Cyberpunk Life RPG | Histórias Técnicas
 
-## Visão Geral do Produto
-
-**Habittus** é um Life RPG imersivo que gamifica **7 pilares da vida** do usuário:
-1. **Saúde Física** - Treinos, composição corporal
-2. **Nutrição** - Calorias, macros, hidratação
-3. **Estudo** - Horas estudadas, cursos, livros
-4. **Produtividade** - Tarefas, projetos, foco
-5. **Finanças** - Renda, dívidas, poupança, investimentos
-6. **Hábitos** - Streak, disciplina, meditação, journaling
-7. **Social** - Networking, comunidade, mentoria
-
-O usuário cria um personagem que **reflete visualmente** seu progresso real. Conforme evolui nos 7 pilares, o personagem muda silhueta, musculatura, brilho e aura. Classes são desbloqueadas conforme o usuário excele em áreas específicas. O objetivo final é se tornar um **Ser Supremo** mantendo equilíbrio em TODAS as áreas por 1 ano com streak ininterrupto.
+> **Nota:** as histórias já implementadas foram movidas para `TECHNICAL_STORIES_COMPLETED.md`. Este documento contém apenas as histórias ainda pendentes — siga a ordem dos épicos e histórias como priorizado.
 
 ---
 
-## Epic 1: Sistema de Triagem e Onboarding
+## Epic 1: Sistema de Triagem e Onboarding (PENDÊNCIAS)
 
-### US-1.1: Triagem Inicial - Dados Básicos
-**Como** um novo usuário  
-**Quero** fornecer meus dados básicos (nome, idade, sexo)  
-**Para** criar meu perfil no Habittus
+Obs: triagem básica já implementada; as tarefas abaixo são refinamentos e melhorias de UX/a11y/validação.
 
-**Critérios de Aceitação:**
-- [ ] Tela com campos para Nome, Idade (18-100), Sexo (M/F/Outro)
-- [ ] Validação de campos obrigatórios
-- [ ] Botão "Próximo" leva à etapa 2
-- [ ] Dados salvos em AsyncStorage
+- US-1.1: Triagem Inicial - Dados Básicos  
+	- [ ] Garantir validação de idade (18-100) e mensagens claras de erro (refinar)
+	- [ ] Separar passos em componentes (`TriageStep1.tsx`) e adicionar testes unitários de validação
+	- [ ] Acessibilidade: labels adicionais e ordem de foco
 
-**Tarefas Técnicas:**
-- Criar componente `TriageStep1.tsx` com inputs validados
-- Adicionar tipos TypeScript para dados básicos
-- Integrar com `use-game-state` hook
-- Testar validação de idade (18-100)
+- US-1.2: Triagem - Dados Biométricos  
+	- [ ] Exibir TMB/TDEE calculados dinamicamente na interface (feedback imediato)
+	- [ ] Testes unitários e2e para validação dos cálculos na UI
+
+- US-1.3 a US-1.7: Objetivos, Saúde, Nutrição, Estudo e Finanças  
+	- [ ] Refatorar cada etapa em componentes separados (`TriageStep2..7.tsx`) para facilitar testes e acessibilidade
+	- [ ] Persistir inputs intermediários (salvar progresso da triagem)
 
 ---
 
-### US-1.2: Triagem - Dados Biométricos
-**Como** um novo usuário  
-**Quero** fornecer meus dados biométricos (altura, peso, % gordura corporal)  
-**Para** calcular meu TMB e TDEE
+## Epic 2: Sistema de Status RPG (PENDÊNCIAS)
 
-**Critérios de Aceitação:**
-- [ ] Campos para Altura (cm), Peso (kg), % Gordura Corporal
-- [ ] Cálculo automático de TMB usando fórmula Mifflin-St Jeor
-- [ ] Cálculo automático de TDEE baseado em nível de atividade
-- [ ] Exibição de TMB/TDEE calculados
-- [ ] Botão "Próximo" leva à etapa 3
+- US-2.1: Cálculo de Status Iniciais  
+	- [ ] Documentar fórmulas e ajustar valores iniciais para 10-50 conforme critério do produto
+	- [ ] Implementar exibição visual de status na Dashboard (barras numeradas)
+	- [ ] Adicionar testes para fórmulas críticas
 
-**Tarefas Técnicas:**
-- Criar componente `TriageStep2.tsx`
-- Implementar cálculo de TMB em `lib/biometric-calculator.ts`
-- Implementar cálculo de TDEE
-- Armazenar valores calculados
+- US-2.2 / US-2.3: Decay e Ganho de Status  
+	- [ ] Ajustar decay (revisar percentuais e aplicações por tipo)
+	- [ ] Implementar ganhos por atividades detalhadas e limites diários (cap system)
 
 ---
 
-### US-1.3: Triagem - Objetivos e Pilares
-**Como** um novo usuário  
-**Quero** selecionar meus objetivos nos 7 pilares  
-**Para** personalizar meu progresso no Habittus
+## Epic 3: Sistema de Rastreamento Multi-Dimensional (PENDÊNCIAS)
 
-**Critérios de Aceitação:**
-- [ ] Checkboxes para cada pilar (múltipla seleção)
-- [ ] Descrição de cada pilar
-- [ ] Mínimo 1 pilar deve ser selecionado
-- [ ] Máximo 7 pilares podem ser selecionados
-- [ ] Botão "Próximo" leva à etapa 4
+- US-3.1: Rastreamento de Treinos  
+	- [ ] Refinar UI de `LogWorkout.tsx` (tipo, duração, intensidade) e cálculos de calorias
+	- [ ] Integrar ganho de XP e update de status em tempo real
 
-**Tarefas Técnicas:**
-- Criar componente `TriageStep3.tsx`
-- Definir tipos para objetivos dos 7 pilares
-- Validação de seleção (min 1, max 7)
-- Persistir seleção em AsyncStorage
+- US-3.2: Rastreamento de Nutrição  
+	- [ ] Implementar `LogNutrition.tsx` e integração com API de calorias (USDA)
+	- [ ] Cache de alimentos e fallback
+
+- US-3.3: Rastreamento de Água (melhorias)  
+	- [ ] Botão rápido e histórico diário visual
+
+- US-3.4 / US-3.5 / US-3.6 / US-3.7: Estudo, Tarefas, Finanças, Hábitos  
+	- [ ] Implementar `LogStudy.tsx`, `TaskManager.tsx`, `FinanceTracker.tsx`, `HabitTracker.tsx` com CRUD, histórico e integração com sistema de status
 
 ---
 
-### US-1.4: Triagem - Saúde Física
-**Como** um novo usuário  
-**Quero** informar minha rotina de treinos  
-**Para** que o sistema classifique minha tendência física
+## Epic 4: Sistema Visual do Personagem (PENDÊNCIAS)
 
-**Critérios de Aceitação:**
-- [ ] Seleção de frequência de treino (0x, 1-2x, 3-4x, 5+x por semana)
-- [ ] Seleção de tipo de treino (Força, Cardio, Flexibilidade, Misto)
-- [ ] Seleção de nível de experiência (Iniciante, Intermediário, Avançado)
-- [ ] Botão "Próximo" leva à etapa 5
-
-**Tarefas Técnicas:**
-- Criar componente `TriageStep4.tsx`
-- Definir enums para frequência, tipo e nível
-- Armazenar preferências de treino
-- Usar dados para calcular tendência física
+- US-4.1 a US-4.4  
+	- [ ] `CharacterDisplay.tsx` com sprites 16-bit (placeholders inicialmente)
+	- [ ] Mudança de silhueta por peso, aura/brilho baseado em status, equipamentos e inventário visual
 
 ---
 
-### US-1.5: Triagem - Nutrição
-**Como** um novo usuário  
-**Quero** informar minha rotina de alimentação  
-**Para** que o sistema calcule meu consumo calórico
+## Epic 5: Sistema de Classes e Desbloqueio (PENDÊNCIAS)
 
-**Critérios de Aceitação:**
-- [ ] Seleção de tipo de dieta (Balanceada, Low Carb, Vegana, etc)
-- [ ] Seleção de frequência de refeições (2-3, 4-5, 5+)
-- [ ] Campo para consumo diário de água (copos)
-- [ ] Botão "Próximo" leva à etapa 6
+- US-5.1: 4 Classes Base (melhorias de integração)  
+	- [ ] Integrar bônus de XP nos cálculos de ganho (garantir consistência)
 
-**Tarefas Técnicas:**
-- Criar componente `TriageStep5.tsx`
-- Definir tipos de dieta
-- Armazenar preferências nutricionais
-- Calcular meta de calorias baseado em TMB/TDEE
+- US-5.2 / US-5.3: Classes Secretas e Ser Supremo  
+	- [ ] Validar critérios de desbloqueio e UX de notificação/desbloqueio
 
 ---
 
-### US-1.6: Triagem - Estudo e Produtividade
-**Como** um novo usuário  
-**Quero** informar minha rotina de estudo  
-**Para** que o sistema classifique minha tendência intelectual
+## Epic 6: Sistema de Recompensas e Shop (PENDÊNCIAS)
 
-**Critérios de Aceitação:**
-- [ ] Campo para horas de estudo por semana (0-40+)
-- [ ] Seleção de foco principal (Carreira, Hobby, Pessoal)
-- [ ] Seleção de tipo de aprendizado (Cursos, Livros, Prática)
-- [ ] Botão "Próximo" leva à etapa 7
-
-**Tarefas Técnicas:**
-- Criar componente `TriageStep6.tsx`
-- Definir tipos de foco e aprendizado
-- Armazenar metas de estudo
-- Calcular XP base para estudo
+- US-6.1 / US-6.2 / US-6.3  
+	- [ ] Exibir desconto dinâmico no UI detalhadamente
+	- [ ] Inventário detalhado (consumíveis, expiração)
+	- [ ] Discount UX (mostrar origem e efeito do desconto)
 
 ---
 
-### US-1.7: Triagem - Finanças e Hábitos
-**Como** um novo usuário  
-**Quero** informar minha situação financeira e hábitos  
-**Para** que o sistema classifique minha tendência social/financeira
+## Epic 7: Sistema de Streak e Progressão (PENDÊNCIAS)
 
-**Critérios de Aceitação:**
-- [ ] Campo para renda mensal (estimada)
-- [ ] Campo para dívidas totais
-- [ ] Campo para poupança
-- [ ] Seleção de horas de sono por noite (4-10)
-- [ ] Seleção de hábitos (Meditação, Journaling, Leitura, etc)
-- [ ] Botão "Finalizar" completa triagem
-
-**Tarefas Técnicas:**
-- Criar componente `TriageStep7.tsx`
-- Definir tipos de hábitos
-- Armazenar dados financeiros
-- Calcular classe automática baseado em triagem
+- US-7.1 / US-7.2 / US-7.3  
+	- [ ] Implementar penalidade de streak quebrada (applyStreakPenalty)
+	- [ ] Implementar milestones automáticos e notificações
 
 ---
 
-### US-1.8: Classificação Automática de Classe
-**Como** um novo usuário  
-**Quero** ser classificado automaticamente em uma classe baseado na triagem  
-**Para** começar minha jornada com uma classe que reflete meu perfil
+## Epic 8: Dashboard e Visualização (PENDÊNCIAS)
 
-**Critérios de Aceitação:**
-- [ ] Algoritmo analisa dados da triagem
-- [ ] Classifica em uma das 4 classes base (Netrunner, Solo, Fixer, Techie)
-- [ ] Exibe classe escolhida com descrição
-- [ ] Cria perfil de usuário com todos os dados
-- [ ] Salva em AsyncStorage
-- [ ] Redireciona para Dashboard
-
-**Tarefas Técnicas:**
-- Implementar algoritmo de classificação em `lib/biometric-calculator.ts`
-- Criar função `classifyUserClass(triageData)`
-- Retornar classe e motivo da classificação
-- Integrar com fluxo de triagem
+- US-8.2 / US-8.3  
+	- [ ] Tela `Statistics.tsx` com gráficos responsivos e filtros
+	- [ ] Export CSV e insights automáticos
 
 ---
 
-## Epic 2: Sistema de Status RPG
+## Epic 9: Sistema de Notificações (PENDÊNCIAS)
 
-### US-2.1: Cálculo de Status Iniciais
-**Como** um usuário que completou triagem  
-**Quero** ter meus 7 status RPG calculados baseado em meus dados  
-**Para** começar a jornada com status realistas
+- US-9.1 / US-9.2  
+	- [ ] Agendamento de notificações locais (expo-notifications)
+	- [ ] In-app notifications / toasts com animações
 
-**Status RPG:**
-1. **Força** - Baseado em treino de força, peso
-2. **Destreza** - Baseado em cardio, flexibilidade
-3. **Agilidade** - Baseado em frequência de treino
-4. **Inteligência** - Baseado em horas de estudo
-5. **Sabedoria** - Baseado em hábitos (meditação, sono)
-6. **Carisma** - Baseado em atividades sociais
-7. **Resistência** - Baseado em TMB, composição corporal
+---
 
-**Critérios de Aceitação:**
-- [ ] Cada status inicia entre 10-50 (baseado em triagem)
-- [ ] Fórmula de cálculo documentada
-- [ ] Status salvos no perfil do usuário
-- [ ] Exibição visual de status (barras, números)
+## Epic 10: Persistência e Sincronização (PENDÊNCIAS)
 
-**Tarefas Técnicas:**
+- US-10.1 / US-10.2  
+	- [ ] Export / Import (backup & restore)
+	- [ ] Versionamento / migrações de dados
+
+---
+
+## Epic 11: Integração com APIs Externas (PENDÊNCIAS)
+
+- US-11.1 / US-11.2  
+	- [ ] Integração com API de calorias (USDA) — fundamental para rastreamento de nutrição
+
+---
+
+## Epic 12: Gamificação Avançada (PENDÊNCIAS)
+
+- US-12.1 / US-12.2  
+	- [ ] Sistema de achievements, badges, títulos e mecânicas de prestige
+
+---
+
+## QA & Testes (prioridade contínua)
+
+- [ ] Expandir cobertura Playwright para jornada completa (onboarding -> triage -> dashboard -> profile -> shop)
+- [ ] Corrigir violações de acessibilidade detectadas pelo linter
+- [ ] Adicionar testes de integração para cálculos críticos (biométricos, XP, decay)
+
+---
+
+> Observação final: vou trabalhar seguindo a ordem das histórias dentro de cada épico. Conforme eu concluir cada história, irei movê-la para `TECHNICAL_STORIES_COMPLETED.md` e commitar mudanças atômicas e PRs por épico.
+
 - Criar funções de cálculo para cada status em `lib/biometric-calculator.ts`
 - Implementar fórmulas baseadas em dados biométricos
 - Armazenar status inicial no perfil
