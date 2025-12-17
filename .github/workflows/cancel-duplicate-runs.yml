@@ -1,0 +1,19 @@
+name: Cancel Duplicate Runs
+
+on:
+  workflow_run:
+    workflows: ["Build and Release APK"]
+    types:
+      - requested
+
+jobs:
+  cancel-duplicate-runs:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Cancel previous runs
+        uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          workflow_id: build-apk.yml
+          access_token: ${{ github.token }}
+          all_but_latest: true
