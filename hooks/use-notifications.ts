@@ -6,6 +6,8 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
   }),
 });
 
@@ -21,7 +23,7 @@ export function useNotifications() {
     requestPermissions();
   }, []);
 
-  const scheduleGigReminder = async (hour: number = 9, minute: number = 0) => {
+  const scheduleGigReminder = async () => {
     try {
       await Notifications.cancelAllScheduledNotificationsAsync();
       await Notifications.scheduleNotificationAsync({
@@ -32,10 +34,9 @@ export function useNotifications() {
           badge: 1,
         },
         trigger: {
-          hour,
-          minute,
+          seconds: 3600,
           repeats: true,
-        },
+        } as any,
       });
       console.log("[Notifications] Gig reminder scheduled");
     } catch (error) {
@@ -45,12 +46,13 @@ export function useNotifications() {
 
   const scheduleStreakNotification = (streakDays: number) => {
     try {
-      Notifications.presentNotificationAsync({
+      Notifications.scheduleNotificationAsync({
         content: {
           title: `Streak de ${streakDays} dias!`,
           body: "Voce esta em uma sequencia incrivel! Continue assim!",
           sound: "default",
         },
+        trigger: null,
       });
     } catch (error) {
       console.error("[Notifications] Error showing notification:", error);
@@ -59,12 +61,13 @@ export function useNotifications() {
 
   const scheduleSuccessNotification = (gigName: string) => {
     try {
-      Notifications.presentNotificationAsync({
+      Notifications.scheduleNotificationAsync({
         content: {
           title: "Gig Completada!",
           body: `Voce completou: ${gigName}`,
           sound: "default",
         },
+        trigger: null,
       });
     } catch (error) {
       console.error("[Notifications] Error showing notification:", error);
@@ -73,12 +76,13 @@ export function useNotifications() {
 
   const scheduleBountyDefeatedNotification = (bountyName: string) => {
     try {
-      Notifications.presentNotificationAsync({
+      Notifications.scheduleNotificationAsync({
         content: {
           title: "Bounty Derrotada!",
           body: `Voce eliminou: ${bountyName}`,
           sound: "default",
         },
+        trigger: null,
       });
     } catch (error) {
       console.error("[Notifications] Error showing notification:", error);
