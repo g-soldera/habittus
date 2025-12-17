@@ -16,6 +16,7 @@ import { CyberpunkColors } from '@/constants/theme';
 import { useGameState } from '@/hooks/use-game-state';
 import { classifyUser, calculateTMB, calculateTDEE } from '@/lib/biometric-calculator';
 import { TriageResponse, Gender, Pillar, BiometricData } from '@/types/biometric';
+import { validateBasicInfo, validateBiometrics } from '@/lib/triage-utils';
 
 export default function TriageScreen() {
   const insets = useSafeAreaInsets();
@@ -40,6 +41,33 @@ export default function TriageScreen() {
   const [heightCm, setHeightCm] = useState('');
   const [weightKg, setWeightKg] = useState('');
   const [bodyFatPercent, setBodyFatPercent] = useState('');
+
+  // Live calculations for feedback
+  const [calculatedTMB, setCalculatedTMB] = useState<number | null>(null);
+  const [calculatedTDEE, setCalculatedTDEE] = useState<number | null>(null);
+
+  // Recalculate TMB/TDEE when biometric inputs change
+  useEffect(() => {
+    const h = parseInt(heightCm || '0', 10);
+    const w = parseInt(weightKg || '0', 10);
+    const a = parseInt(age || '0', 10);
+    if (!h || !w || !a) {
+      setCalculatedTMB(null);
+      setCalculatedTDEE(null);
+      return;
+    }
+
+    try {
+      const tmb = calculateTMB(w, h, a, gender);
+      const activityLevel = parseInt(trainingFrequency) > 3 ? 'active' : parseInt(trainingFrequency) > 0 ? 'moderate' : 'sedentary';
+      const tdee = calculateTDEE(tmb, activityLevel as any);
+      setCalculatedTMB(Math.round(tmb));
+      setCalculatedTDEE(Math.round(tdee));
+    } catch (e) {
+      setCalculatedTMB(null);
+      setCalculatedTDEE(null);
+    }
+  }, [heightCm, weightKg, age, gender, trainingFrequency]);
 
   // Step 3: Objectives (7 Pillars)
   const [objectives, setObjectives] = useState<Pillar[]>([]);
@@ -79,25 +107,15 @@ export default function TriageScreen() {
   const handleNext = () => {
     // Validação básica
     if (step === 1) {
-      if (!characterName.trim() || !age || parseInt(age) < 13 || parseInt(age) > 120) {
-        Alert.alert('Erro', 'Por favor, insira um nome válido e uma idade entre 13 e 120 anos');
+      const validation = validateBasicInfo(characterName, age);
+      if (!validation.valid) {
+        Alert.alert('Erro', validation.reason);
         return;
       }
     } else if (step === 2) {
-      if (!heightCm || !weightKg || !bodyFatPercent) {
-        Alert.alert('Erro', 'Por favor, preencha todos os dados biométricos');
-        return;
-      }
-      if (parseInt(heightCm) < 100 || parseInt(heightCm) > 250) {
-        Alert.alert('Erro', 'Altura deve estar entre 100 e 250 cm');
-        return;
-      }
-      if (parseInt(weightKg) < 30 || parseInt(weightKg) > 300) {
-        Alert.alert('Erro', 'Peso deve estar entre 30 e 300 kg');
-        return;
-      }
-      if (parseInt(bodyFatPercent) < 5 || parseInt(bodyFatPercent) > 50) {
-        Alert.alert('Erro', 'Percentual de gordura deve estar entre 5 e 50%');
+      const validation = validateBiometrics(heightCm, weightKg, bodyFatPercent);
+      if (!validation.valid) {
+        Alert.alert('Erro', validation.reason);
         return;
       }
     } else if (step === 3) {
@@ -255,7 +273,7 @@ export default function TriageScreen() {
               Insira suas medidas para calcular seu TMB e TDEE.
             </ThemedText>
 
-            <ThemedText style={styles.label}>Altura (cm)</ThemedText>
+                  <ThemedText style={styles.label}>Altura (cm)</ThemedText>
             <TextInput
               style={styles.input}
               placeholder="Ex: 175"
@@ -287,6 +305,13 @@ export default function TriageScreen() {
               keyboardType="numeric"
               placeholderTextColor={CyberpunkColors.darkGray}
             />
+
+            {/* Dynamic feedback: TMB / TDEE */}
+            {calculatedTMB !== null && (
+              <ThemedText style={{ marginTop: 8 }}>
+                TMB estimada: {calculatedTMB} kcal · TDEE estimado: {calculatedTDEE}
+              </ThemedText>
+            )}
           </ThemedView>
         );
 
