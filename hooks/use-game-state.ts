@@ -18,9 +18,14 @@ export function useGameState() {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Load game state from AsyncStorage
+  // User profile state (persisted separately)
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+
+  // Load game state and user profile from AsyncStorage
   useEffect(() => {
     loadGameState();
+    loadUserProfile();
   }, []);
 
   const loadGameState = async () => {
@@ -36,6 +41,22 @@ export function useGameState() {
       console.error("[GameState] Error loading state:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadUserProfile = async () => {
+    try {
+      const stored = await AsyncStorage.getItem(USER_PROFILE_KEY);
+      if (stored) {
+        const profile = JSON.parse(stored) as UserProfile;
+        setUserProfile(profile);
+      } else {
+        setUserProfile(null);
+      }
+    } catch (error) {
+      console.error("[GameState] Error loading user profile:", error);
+    } finally {
+      setLoadingProfile(false);
     }
   };
 
@@ -255,6 +276,7 @@ export function useGameState() {
       };
 
       await AsyncStorage.setItem(USER_PROFILE_KEY, JSON.stringify(userProfile));
+      setUserProfile(userProfile);
       
       // Also create a new game state for compatibility
       await createNewGame(data.characterName, data.baseClass);
@@ -267,6 +289,8 @@ export function useGameState() {
   return {
     gameState,
     loading,
+    userProfile,
+    loadingProfile,
     createNewGame,
     completeGig,
     payBounty,

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   View,
   ScrollView,
@@ -20,9 +20,16 @@ import { TriageResponse, Gender, Pillar, BiometricData } from '@/types/biometric
 export default function TriageScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { saveUserProfile } = useGameState();
+  const { saveUserProfile, userProfile, loadingProfile } = useGameState();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
+
+  // If a profile already exists, this is not the first run: redirect to dashboard
+  useEffect(() => {
+    if (!loadingProfile && userProfile) {
+      router.replace('/(tabs)');
+    }
+  }, [loadingProfile, userProfile, router]);
 
   // Step 1: Basic Info
   const [characterName, setCharacterName] = useState('');
