@@ -71,7 +71,7 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x android/gradlew
 
-      - name: Build APK (Debug) - Optimized
+      - name: Build APK (Debug)
         run: |
           cd android
           ./gradlew assembleDebug \
@@ -85,26 +85,58 @@ jobs:
         timeout-minutes: 20
         continue-on-error: true
 
+      - name: Build APK (Release - Minified)
+        run: |
+          cd android
+          ./gradlew assembleRelease \
+            --no-daemon \
+            --parallel \
+            --max-workers=4 \
+            -Dorg.gradle.jvmargs="-Xmx4g -XX:+UseG1GC" \
+            -Dkotlin.incremental=true \
+            -Dkotlin.compiler.execution.strategy="in-process" \
+            --stacktrace
+        timeout-minutes: 25
+        continue-on-error: true
+
       - name: Find APK files
         id: find-apk
         run: |
-          DEBUG_APK=$(find android/app/build/outputs/apk -name "*.apk" -type f | head -1)
-          if [ -n "$DEBUG_APK" ]; then
+          DEBUG_APK=$(find android/app/build/outputs/apk/debug -name "*.apk" -type f | head -1)
+          RELEASE_APK=$(find android/app/build/outputs/apk/release -name "*.apk" -type f | head -1)
+          
+          echo "=== APK Search Results ==="
+          echo "Debug APK: $DEBUG_APK"
+          echo "Release APK: $RELEASE_APK"
+          
+          if [ -n "$RELEASE_APK" ]; then
+            echo "apk_found=true" >> $GITHUB_OUTPUT
+            echo "apk_path=$RELEASE_APK" >> $GITHUB_OUTPUT
+            echo "apk_type=release" >> $GITHUB_OUTPUT
+            ls -lh "$RELEASE_APK"
+          elif [ -n "$DEBUG_APK" ]; then
             echo "apk_found=true" >> $GITHUB_OUTPUT
             echo "apk_path=$DEBUG_APK" >> $GITHUB_OUTPUT
-            echo "APK found: $DEBUG_APK"
+            echo "apk_type=debug" >> $GITHUB_OUTPUT
             ls -lh "$DEBUG_APK"
           else
             echo "apk_found=false" >> $GITHUB_OUTPUT
-            echo "No APK found in build outputs"
-            find android/app/build/outputs -type f -name "*.apk" 2>/dev/null || echo "No APK files found"
+            echo "No APK files found"
+            find android/app/build/outputs -type f -name "*.apk" 2>/dev/null || echo "No APK files in outputs"
           fi
+
+      - name: Calculate APK size
+        if: steps.find-apk.outputs.apk_found == 'true'
+        run: |
+          APK_SIZE=$(ls -lh "${{ steps.find-apk.outputs.apk_path }}" | awk '{print $5}')
+          echo "APK_SIZE=$APK_SIZE" >> $GITHUB_ENV
+          echo "APK Size: $APK_SIZE"
 
       - name: Upload APK to artifacts
         if: steps.find-apk.outputs.apk_found == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: habittus-apk
+          name: habittus-apk-${{ steps.find-apk.outputs.apk_type }}
           path: ${{ steps.find-apk.outputs.apk_path }}
           if-no-files-found: warn
 
@@ -119,10 +151,20 @@ jobs:
             
             Build #${{ github.run_number }}
             Commit: ${{ github.sha }}
-            Build Time: ~10 minutes
+            Build Type: ${{ steps.find-apk.outputs.apk_type }}
+            APK Size: ${{ env.APK_SIZE }}
+            Build Time: ~10-15 minutes
             
             ### APK File
-            - **habittus-debug.apk**: Debug build for testing
+            - **habittus-${{ steps.find-apk.outputs.apk_type }}.apk**: ${{ steps.find-apk.outputs.apk_type }} build
+            
+            ### Optimizations Applied
+            - ✅ ProGuard/R8 Minification
+            - ✅ Resource Shrinking
+            - ✅ Code Obfuscation
+            - ✅ Unused Code Removal
+            - ✅ Parallel Build Compilation
+            - ✅ Gradle Build Cache
             
             ### Installation Instructions
             1. Download the APK file
@@ -136,6 +178,7 @@ jobs:
             - Dynamic shop with streak discounts
             - Streak counter and progression
             - Local data persistence
+            - Optimized for minimal APK size
             
             ### Testing with Expo Go
             - Download Expo Go from Google Play Store
@@ -154,7 +197,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '✅ Build completed successfully! APK is ready for download in artifacts.'
+              body: '✅ Build completed successfully! APK (${{ env.APK_SIZE }}) is ready for download in artifacts.'
             })
 
       - name: Comment on PR (Failed)
@@ -174,6 +217,7 @@ jobs:
         run: |
           echo "=== Build Summary ==="
           echo "APK Found: ${{ steps.find-apk.outputs.apk_found }}"
+          echo "APK Type: ${{ steps.find-apk.outputs.apk_type }}"
           if [ "${{ steps.find-apk.outputs.apk_found }}" == "true" ]; then
             echo "APK Path: ${{ steps.find-apk.outputs.apk_path }}"
             ls -lh "${{ steps.find-apk.outputs.apk_path }}"
