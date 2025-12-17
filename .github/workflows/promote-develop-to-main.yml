@@ -1,0 +1,49 @@
+name: Promote develop → main
+
+# Triggered when the CI workflow completes on develop; if successful,
+# create a single pull request from `develop` -> `main` if none exists.
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+jobs:
+  promote:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'develop' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create PR from develop → main if needed
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            // Check for open PRs from develop -> main
+            const { data: prs } = await github.rest.pulls.list({
+              owner,
+              repo,
+              state: 'open',
+              head: `${owner}:develop`,
+              base: 'main',
+            });
+
+            if (prs.length > 0) {
+              console.log('Open PR from develop -> main already exists:', prs[0].html_url);
+              return;
+            }
+
+            // Create a new PR
+            const title = 'chore(ci): promote develop → main (auto)';
+            const body = `Automated PR created because the CI workflow on **develop** passed.\n\nCI Run: ${{ github.event.workflow_run.html_url }}`;
+
+            const { data: newPr } = await github.rest.pulls.create({
+              owner,
+              repo,
+              title,
+              head: 'develop',
+              base: 'main',
+              body,
+            });
+
+            console.log('Created PR:', newPr.html_url);
