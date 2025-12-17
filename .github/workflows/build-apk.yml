@@ -64,26 +64,24 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: wrapper
+          cache-read-only: false
 
-      - name: Prebuild Android
+      - name: Cache Android build
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('android/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Prebuild Android (cached)
         run: npx expo prebuild --platform android --clean
+        timeout-minutes: 15
 
       - name: Make gradlew executable
         run: chmod +x android/gradlew
-
-      - name: Build APK (Debug)
-        run: |
-          cd android
-          ./gradlew assembleDebug \
-            --no-daemon \
-            --parallel \
-            --max-workers=4 \
-            -Dorg.gradle.jvmargs="-Xmx4g -XX:+UseG1GC" \
-            -Dkotlin.incremental=true \
-            -Dkotlin.compiler.execution.strategy="in-process" \
-            --stacktrace
-        timeout-minutes: 20
-        continue-on-error: true
 
       - name: Build APK (Release - Minified)
         run: |
@@ -95,15 +93,30 @@ jobs:
             -Dorg.gradle.jvmargs="-Xmx4g -XX:+UseG1GC" \
             -Dkotlin.incremental=true \
             -Dkotlin.compiler.execution.strategy="in-process" \
+            --build-cache \
             --stacktrace
-        timeout-minutes: 25
-        continue-on-error: true
+        timeout-minutes: 20
+
+      - name: Build APK (Debug) - Fallback
+        if: failure()
+        run: |
+          cd android
+          ./gradlew assembleDebug \
+            --no-daemon \
+            --parallel \
+            --max-workers=4 \
+            -Dorg.gradle.jvmargs="-Xmx4g -XX:+UseG1GC" \
+            -Dkotlin.incremental=true \
+            -Dkotlin.compiler.execution.strategy="in-process" \
+            --build-cache \
+            --stacktrace
+        timeout-minutes: 20
 
       - name: Find APK files
         id: find-apk
         run: |
-          DEBUG_APK=$(find android/app/build/outputs/apk/debug -name "*.apk" -type f | head -1)
-          RELEASE_APK=$(find android/app/build/outputs/apk/release -name "*.apk" -type f | head -1)
+          DEBUG_APK=$(find android/app/build/outputs/apk/debug -name "*.apk" -type f 2>/dev/null | head -1)
+          RELEASE_APK=$(find android/app/build/outputs/apk/release -name "*.apk" -type f 2>/dev/null | head -1)
           
           echo "=== APK Search Results ==="
           echo "Debug APK: $DEBUG_APK"
@@ -153,7 +166,7 @@ jobs:
             Commit: ${{ github.sha }}
             Build Type: ${{ steps.find-apk.outputs.apk_type }}
             APK Size: ${{ env.APK_SIZE }}
-            Build Time: ~10-15 minutes
+            Build Time: ~8-12 minutes
             
             ### APK File
             - **habittus-${{ steps.find-apk.outputs.apk_type }}.apk**: ${{ steps.find-apk.outputs.apk_type }} build
@@ -165,6 +178,7 @@ jobs:
             - ✅ Unused Code Removal
             - ✅ Parallel Build Compilation
             - ✅ Gradle Build Cache
+            - ✅ Kotlin Incremental Compilation
             
             ### Installation Instructions
             1. Download the APK file
@@ -173,11 +187,11 @@ jobs:
             
             ### Features
             - 16-bit Cyberpunk pixel art logo
-            - Character creation system with 4 classes
-            - Daily gigs and bounties system
-            - Dynamic shop with streak discounts
-            - Streak counter and progression
-            - Local data persistence
+            - Multi-dimensional Life RPG system
+            - 7 pillars: Health, Nutrition, Study, Productivity, Finance, Habits, Social
+            - Character creation with automatic class classification
+            - Biometric tracking (TMB, TDEE calculation)
+            - Local data persistence with AsyncStorage
             - Optimized for minimal APK size
             
             ### Testing with Expo Go
