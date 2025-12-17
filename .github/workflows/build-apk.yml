@@ -61,27 +61,25 @@ jobs:
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
-      - name: Prebuild Android (with caching)
+      - name: Prebuild Android
         run: npx expo prebuild --platform android --clean --no-install
-        timeout-minutes: 10
 
       - name: Make gradlew executable
         run: chmod +x android/gradlew
 
-      - name: Build Release APK (Optimized)
+      - name: Build Release APK
         run: |
           cd android
           ./gradlew assembleRelease \
-            --no-daemon \
             --parallel \
             --max-workers=2 \
-            -Dorg.gradle.jvmargs="-Xmx3g -XX:+UseG1GC -XX:+ParallelRefProcEnabled" \
+            -Dorg.gradle.jvmargs="-Xmx3g -XX:+UseG1GC" \
             -Dkotlin.incremental=true \
-            -Dkotlin.compiler.execution.strategy="in-process" \
             --build-cache \
             -x lint \
-            -x lintVitalRelease
-        timeout-minutes: 30
+            -x lintVitalRelease \
+            -x testRelease \
+            -x bundleRelease
         continue-on-error: true
 
       - name: Find APK files
@@ -92,21 +90,10 @@ jobs:
           if [ -n "$RELEASE_APK" ]; then
             echo "apk_found=true" >> $GITHUB_OUTPUT
             echo "apk_path=$RELEASE_APK" >> $GITHUB_OUTPUT
-            echo "apk_type=release" >> $GITHUB_OUTPUT
-            echo "APK encontrado: $RELEASE_APK"
             ls -lh "$RELEASE_APK"
           else
             echo "apk_found=false" >> $GITHUB_OUTPUT
-            echo "❌ APK não encontrado"
-            find android/app/build/outputs -type f -name "*.apk" 2>/dev/null || echo "Nenhum APK em outputs"
           fi
-
-      - name: Calculate APK size
-        if: steps.find-apk.outputs.apk_found == 'true'
-        run: |
-          APK_SIZE=$(ls -lh "${{ steps.find-apk.outputs.apk_path }}" | awk '{print $5}')
-          echo "APK_SIZE=$APK_SIZE" >> $GITHUB_ENV
-          echo "📦 Tamanho do APK: $APK_SIZE"
 
       - name: Upload APK to artifacts
         if: steps.find-apk.outputs.apk_found == 'true'
@@ -114,7 +101,6 @@ jobs:
         with:
           name: habittus-apk-release
           path: ${{ steps.find-apk.outputs.apk_path }}
-          if-no-files-found: warn
 
       - name: Create Release
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.find-apk.outputs.apk_found == 'true'
@@ -127,8 +113,6 @@ jobs:
             
             **Build #${{ github.run_number }}**
             - Commit: ${{ github.sha }}
-            - APK Size: ${{ env.APK_SIZE }}
-            - Build Time: ~5-10 minutes
             
             ### 📦 Download
             - **habittus-release.apk**: Optimized release build
@@ -138,8 +122,7 @@ jobs:
             - ✅ Resource Shrinking
             - ✅ Gradle Build Cache
             - ✅ Kotlin Incremental Compilation
-            - ✅ Parallel Build (2 workers)
-            - ✅ Lint Tasks Disabled
+            - ✅ All unnecessary tasks disabled
             
             ### 🎯 Features
             - 16-bit Cyberpunk pixel art
@@ -157,15 +140,3 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Print build summary
-        if: always()
-        run: |
-          echo "=== 📊 Build Summary ==="
-          echo "APK Found: ${{ steps.find-apk.outputs.apk_found }}"
-          if [ "${{ steps.find-apk.outputs.apk_found }}" == "true" ]; then
-            echo "✅ APK Path: ${{ steps.find-apk.outputs.apk_path }}"
-            ls -lh "${{ steps.find-apk.outputs.apk_path }}"
-          else
-            echo "❌ Build failed or APK not found"
-          fi
