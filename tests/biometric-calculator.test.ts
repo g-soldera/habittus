@@ -20,8 +20,8 @@ describe('biometric-calculator', () => {
 
   it('calculates TMB correctly for female', () => {
     const tmb = calculateTMB(60, 165, 30, 'female');
-    // (10*60) + (6.25*165) - (5*30) - 161 = 1175.25
-    expect(tmb).toBeCloseTo(1175.25, 2);
+    // (10*60) + (6.25*165) - (5*30) - 161 = 1320.25
+    expect(tmb).toBeCloseTo(1320.25, 2);
   });
 
   it('calculates TDEE with multipliers', () => {

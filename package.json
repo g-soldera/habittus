@@ -85,7 +85,7 @@
     "qrcode": "^1.5.4",
     "tsx": "^4.19.1",
     "@testing-library/react-native": "^11.5.0",
-    "react-test-renderer": "18.2.0",
+    "react-test-renderer": "19.1.0",
     "@playwright/test": "^1.44.0",
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "typescript": "~5.9.2",
