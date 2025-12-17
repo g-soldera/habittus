@@ -1,0 +1,151 @@
+import { View, StyleSheet } from "react-native";
+import { ThemedText } from "./themed-text";
+import { CyberpunkColors } from "@/constants/theme";
+import { BioMonitor } from "@/types";
+
+interface BioMonitorProps {
+  stats: BioMonitor;
+}
+
+export function BioMonitorComponent({ stats }: BioMonitorProps) {
+  const StatBar = ({ label, value, color }: { label: string; value: number; color: string }) => (
+    <View style={styles.statContainer}>
+      <View style={styles.statHeader}>
+        <ThemedText style={styles.statLabel}>{label}</ThemedText>
+        <ThemedText style={[styles.statValue, { color }]}>{value}%</ThemedText>
+      </View>
+      <View style={styles.barBackground}>
+        <View
+          style={[
+            styles.barFill,
+            {
+              width: `${Math.min(value, 100)}%`,
+              backgroundColor: color,
+            },
+          ]}
+        />
+      </View>
+    </View>
+  );
+
+  return (
+    <View style={styles.container}>
+      <ThemedText type="subtitle" style={styles.title}>
+        BIO-MONITOR
+      </ThemedText>
+
+      <StatBar label="RAM" value={stats.ram} color={CyberpunkColors.cyan} />
+      <StatBar label="HARDWARE" value={stats.hardware} color={CyberpunkColors.green} />
+      <StatBar label="COOL" value={stats.cool} color={CyberpunkColors.magenta} />
+
+      {/* Credits display */}
+      <View style={styles.creditsContainer}>
+        <ThemedText style={styles.creditsLabel}>CREDITS</ThemedText>
+        <ThemedText style={styles.creditsValue}>{stats.credits}</ThemedText>
+      </View>
+
+      {/* XP and Gold display */}
+      <View style={styles.statsRow}>
+        <View style={styles.statBox}>
+          <ThemedText style={styles.statBoxLabel}>XP</ThemedText>
+          <ThemedText style={styles.statBoxValue}>{stats.totalXp}</ThemedText>
+        </View>
+        <View style={styles.statBox}>
+          <ThemedText style={styles.statBoxLabel}>GOLD</ThemedText>
+          <ThemedText style={styles.statBoxValue}>{stats.totalGold}</ThemedText>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: CyberpunkColors.cardBg,
+    borderWidth: 2,
+    borderColor: CyberpunkColors.cyan,
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+  },
+  title: {
+    fontSize: 16,
+    color: CyberpunkColors.cyan,
+    marginBottom: 16,
+    fontFamily: "Courier New",
+  },
+  statContainer: {
+    marginBottom: 12,
+  },
+  statHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: CyberpunkColors.textSecondary,
+    fontFamily: "Courier New",
+  },
+  statValue: {
+    fontSize: 12,
+    fontWeight: "bold",
+    fontFamily: "Courier New",
+  },
+  barBackground: {
+    height: 8,
+    backgroundColor: CyberpunkColors.inputBg,
+    borderRadius: 4,
+    overflow: "hidden",
+  },
+  barFill: {
+    height: "100%",
+    borderRadius: 4,
+  },
+  creditsContainer: {
+    backgroundColor: CyberpunkColors.inputBg,
+    borderWidth: 1,
+    borderColor: CyberpunkColors.magenta,
+    borderRadius: 4,
+    padding: 12,
+    marginVertical: 12,
+    alignItems: "center",
+  },
+  creditsLabel: {
+    fontSize: 12,
+    color: CyberpunkColors.textSecondary,
+    fontFamily: "Courier New",
+  },
+  creditsValue: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: CyberpunkColors.magenta,
+    fontFamily: "Courier New",
+  },
+  statsRow: {
+    flexDirection: "row",
+    gap: 12,
+    marginTop: 12,
+  },
+  statBox: {
+    flex: 1,
+    backgroundColor: CyberpunkColors.inputBg,
+    borderWidth: 1,
+    borderColor: CyberpunkColors.purple,
+    borderRadius: 4,
+    padding: 12,
+    alignItems: "center",
+  },
+  statBoxLabel: {
+    fontSize: 11,
+    color: CyberpunkColors.textSecondary,
+    marginBottom: 4,
+    fontFamily: "Courier New",
+  },
+  statBoxValue: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: CyberpunkColors.purple,
+    fontFamily: "Courier New",
+  },
+});

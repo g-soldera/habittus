@@ -1,12 +1,38 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * Habittus Cyberpunk Theme
+ * Dark neon aesthetic with vibrant accent colors
  */
 
 import { Platform } from "react-native";
 
+// Cyberpunk Color Palette
+export const CyberpunkColors = {
+  // Primary Neons
+  cyan: "#00d9ff",
+  magenta: "#ff006e",
+  green: "#39ff14",
+  purple: "#b537f2",
+  yellow: "#ffff00",
+
+  // Backgrounds
+  darkBg: "#0a0e27",
+  cardBg: "#1a1f3a",
+  inputBg: "#0f1419",
+
+  // Text
+  textPrimary: "#ffffff",
+  textSecondary: "#a0aec0",
+  textDisabled: "#4a5568",
+
+  // Status
+  success: "#39ff14",
+  warning: "#ffff00",
+  error: "#ff0055",
+  info: "#00d9ff",
+};
+
 const tintColorLight = "#0a7ea4";
-const tintColorDark = "#fff";
+const tintColorDark = "#00d9ff"; // Neon Cyan
 
 export const Colors = {
   light: {
@@ -18,36 +44,41 @@ export const Colors = {
     tabIconSelected: tintColorLight,
   },
   dark: {
-    text: "#ECEDEE",
-    background: "#151718",
-    tint: tintColorDark,
-    icon: "#9BA1A6",
-    tabIconDefault: "#9BA1A6",
-    tabIconSelected: tintColorDark,
+    text: CyberpunkColors.textPrimary,
+    background: CyberpunkColors.darkBg,
+    tint: CyberpunkColors.cyan,
+    icon: CyberpunkColors.textSecondary,
+    tabIconDefault: CyberpunkColors.textSecondary,
+    tabIconSelected: CyberpunkColors.cyan,
+    // Additional cyberpunk colors
+    cardBackground: CyberpunkColors.cardBg,
+    inputBackground: CyberpunkColors.inputBg,
+    success: CyberpunkColors.success,
+    warning: CyberpunkColors.warning,
+    error: CyberpunkColors.error,
+    magenta: CyberpunkColors.magenta,
+    purple: CyberpunkColors.purple,
   },
 };
 
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: "system-ui",
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
+    /** Monospaced for cyberpunk aesthetic */
+    sans: "Courier New",
     serif: "ui-serif",
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
     rounded: "ui-rounded",
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: "ui-monospace",
+    mono: "Menlo",
   },
   default: {
-    sans: "normal",
+    sans: "monospace",
     serif: "serif",
     rounded: "normal",
     mono: "monospace",
   },
   web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+    sans: "'Courier New', Courier, monospace",
     serif: "Georgia, 'Times New Roman', serif",
     rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
+    mono: "'Courier New', Courier, monospace",
   },
 });

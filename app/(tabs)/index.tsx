@@ -1,278 +1,221 @@
-import { Image } from "expo-image";
-import { useRouter, Link } from "expo-router";
-import * as WebBrowser from "expo-web-browser";
-import { useEffect, useState } from "react";
-import { ActivityIndicator, Platform, Pressable, StyleSheet } from "react-native";
+import { useRouter, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { HelloWave } from "@/components/hello-wave";
-import ParallaxScrollView from "@/components/parallax-scroll-view";
+import { BioMonitorComponent } from "@/components/bio-monitor";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { getLoginUrl } from "@/constants/oauth";
-import { useAuth } from "@/hooks/use-auth";
+import { CyberpunkColors } from "@/constants/theme";
+import { useGameState } from "@/hooks/use-game-state";
 
-export default function HomeScreen() {
-  const { user, loading, isAuthenticated, logout } = useAuth();
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
+export default function DashboardScreen() {
   const router = useRouter();
-
-  useEffect(() => {
-    console.log("[HomeScreen] Auth state:", {
-      hasUser: !!user,
-      loading,
-      isAuthenticated,
-      user: user ? { id: user.id, openId: user.openId, name: user.name, email: user.email } : null,
-    });
-  }, [user, loading, isAuthenticated]);
-
-  const handleLogin = async () => {
-    try {
-      console.log("[Auth] Login button clicked");
-      setIsLoggingIn(true);
-      const loginUrl = getLoginUrl();
-      console.log("[Auth] Generated login URL:", loginUrl);
-
-      // On web, use direct redirect in same tab
-      // On mobile, use WebBrowser to open OAuth in a separate context
-      if (Platform.OS === "web") {
-        console.log("[Auth] Web platform: redirecting to OAuth in same tab...");
-        window.location.href = loginUrl;
-        return;
+  const insets = useSafeAreaInsets();
+  const { gameState, loading } = useGameState();
+  // Check if game state exists, if not go to character creation
+  useFocusEffect(
+    useCallback(() => {
+      if (!loading && !gameState) {
+        router.replace("/(tabs)/character-creation");
       }
+    }, [gameState, loading, router])
+  );
 
-      // Mobile: Open OAuth URL in browser
-      // The OAuth server will redirect to our deep link (manusapp://oauth/callback?code=...&state=...)
-      console.log("[Auth] Opening OAuth URL in browser...");
-      const result = await WebBrowser.openAuthSessionAsync(
-        loginUrl,
-        undefined, // Deep link is already configured in getLoginUrl, so no need to specify here
-        {
-          preferEphemeralSession: false,
-          showInRecents: true,
-        },
-      );
+  if (loading) {
+    return (
+      <ThemedView style={styles.container}>
+        <ActivityIndicator size="large" color={CyberpunkColors.cyan} />
+      </ThemedView>
+    );
+  }
 
-      console.log("[Auth] WebBrowser result:", result);
-      if (result.type === "cancel") {
-        console.log("[Auth] OAuth cancelled by user");
-      } else if (result.type === "dismiss") {
-        console.log("[Auth] OAuth dismissed");
-      } else if (result.type === "success" && result.url) {
-        console.log("[Auth] OAuth session successful, navigating to callback:", result.url);
-        // Extract code and state from the URL
-        try {
-          // Parse the URL - it might be exp:// or a regular URL
-          let url: URL;
-          if (result.url.startsWith("exp://") || result.url.startsWith("exps://")) {
-            // For exp:// URLs, we need to parse them differently
-            // Format: exp://192.168.31.156:8081/--/oauth/callback?code=...&state=...
-            const urlStr = result.url.replace(/^exp(s)?:\/\//, "http://");
-            url = new URL(urlStr);
-          } else {
-            url = new URL(result.url);
-          }
+  if (!gameState) {
+    return null;
+  }
 
-          const code = url.searchParams.get("code");
-          const state = url.searchParams.get("state");
-          const error = url.searchParams.get("error");
-
-          console.log("[Auth] Extracted params from callback URL:", {
-            code: code?.substring(0, 20) + "...",
-            state: state?.substring(0, 20) + "...",
-            error,
-          });
-
-          if (error) {
-            console.error("[Auth] OAuth error in callback:", error);
-            return;
-          }
-
-          if (code && state) {
-            // Navigate to callback route with params
-            console.log("[Auth] Navigating to callback route with params...");
-            router.push({
-              pathname: "/oauth/callback" as any,
-              params: { code, state },
-            });
-          } else {
-            console.error("[Auth] Missing code or state in callback URL");
-          }
-        } catch (err) {
-          console.error("[Auth] Failed to parse callback URL:", err, result.url);
-          // Fallback: try parsing with regex
-          const codeMatch = result.url.match(/[?&]code=([^&]+)/);
-          const stateMatch = result.url.match(/[?&]state=([^&]+)/);
-
-          if (codeMatch && stateMatch) {
-            const code = decodeURIComponent(codeMatch[1]);
-            const state = decodeURIComponent(stateMatch[1]);
-            console.log("[Auth] Fallback: extracted params via regex, navigating...");
-            router.push({
-              pathname: "/oauth/callback" as any,
-              params: { code, state },
-            });
-          } else {
-            console.error("[Auth] Could not extract code/state from URL");
-          }
-        }
-      }
-    } catch (error) {
-      console.error("[Auth] Login error:", error);
-    } finally {
-      setIsLoggingIn(false);
-    }
-  };
+  const nextGig = gameState.gigs[0]; // Simple: show first gig
+  const streakBonus = Math.min(0.5, gameState.character.loginStreak * 0.02);
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-      headerImage={
-        <Image
-          source={require("@/assets/images/partial-react-logo.png")}
-          style={styles.reactLogo}
-        />
-      }
+    <ThemedView
+      style={[
+        styles.container,
+        {
+          paddingTop: Math.max(insets.top, 20),
+          paddingBottom: Math.max(insets.bottom, 20),
+        },
+      ]}
     >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.authContainer}>
-        {loading ? (
-          <ActivityIndicator />
-        ) : isAuthenticated && user ? (
-          <ThemedView style={styles.userInfo}>
-            <ThemedText type="subtitle">Logged in as</ThemedText>
-            <ThemedText type="defaultSemiBold">{user.name || user.email || user.openId}</ThemedText>
-            <Pressable onPress={logout} style={styles.logoutButton}>
-              <ThemedText style={styles.logoutText}>Logout</ThemedText>
-            </Pressable>
-          </ThemedView>
-        ) : (
-          <Pressable
-            onPress={handleLogin}
-            disabled={isLoggingIn}
-            style={[styles.loginButton, isLoggingIn && styles.loginButtonDisabled]}
-          >
-            {isLoggingIn ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <ThemedText style={styles.loginText}>Login</ThemedText>
-            )}
-          </Pressable>
-        )}
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{" "}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: "cmd + d",
-              android: "cmd + m",
-              web: "F12",
-            })}
-          </ThemedText>{" "}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert("Action pressed")} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert("Share pressed")}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert("Delete pressed")}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <View>
+            <ThemedText type="title" style={styles.greeting}>
+              {gameState.character.name}
+            </ThemedText>
+            <ThemedText style={styles.class}>
+              {gameState.character.class.toUpperCase()}
+            </ThemedText>
+          </View>
+        </View>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{" "}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{" "}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{" "}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        {/* Streak Counter */}
+        <View style={styles.streakContainer}>
+          <ThemedText style={styles.streakLabel}>LOGIN STREAK</ThemedText>
+          <ThemedText style={styles.streakValue}>{gameState.character.loginStreak}</ThemedText>
+          <ThemedText style={styles.streakBonus}>
+            {Math.round(streakBonus * 100)}% desconto na loja
+          </ThemedText>
+        </View>
+
+        {/* Bio-Monitor */}
+        <BioMonitorComponent stats={gameState.bioMonitor} />
+
+        {/* Next Gig */}
+        {nextGig && (
+          <View style={styles.nextGigContainer}>
+            <ThemedText style={styles.nextGigLabel}>PRÓXIMA GIG</ThemedText>
+            <View style={styles.nextGigCard}>
+              <ThemedText type="defaultSemiBold" style={styles.nextGigName}>
+                {nextGig.name}
+              </ThemedText>
+              <ThemedText style={styles.nextGigReward}>
+                +{nextGig.xpReward} XP / +{nextGig.goldReward} GOLD
+              </ThemedText>
+            </View>
+          </View>
+        )}
+
+        {/* Quick Actions */}
+        <View style={styles.actionsContainer}>
+          <Pressable
+            style={styles.actionButton}
+            onPress={() => router.navigate({pathname: "/(tabs)/gigs"} as any)}
+          >
+            <ThemedText style={styles.actionButtonText}>GIGS</ThemedText>
+          </Pressable>
+
+          <Pressable
+            style={styles.actionButton}
+            onPress={() => router.navigate({pathname: "/(tabs)/shop"} as any)}
+          >
+            <ThemedText style={styles.actionButtonText}>LOJA</ThemedText>
+          </Pressable>
+
+          <Pressable
+            style={styles.actionButton}
+            onPress={() => router.navigate({pathname: "/(tabs)/profile"} as any)}
+          >
+            <ThemedText style={styles.actionButtonText}>PERFIL</ThemedText>
+          </Pressable>
+        </View>
+      </ScrollView>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+    backgroundColor: CyberpunkColors.darkBg,
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+  },
+  header: {
+    marginBottom: 24,
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    gap: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  greeting: {
+    fontSize: 32,
+    color: CyberpunkColors.cyan,
+    fontFamily: "Courier New",
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: "absolute",
+  class: {
+    fontSize: 12,
+    color: CyberpunkColors.textSecondary,
+    marginTop: 4,
+    fontFamily: "Courier New",
   },
-  authContainer: {
-    marginBottom: 16,
+  streakContainer: {
+    backgroundColor: CyberpunkColors.cardBg,
+    borderWidth: 2,
+    borderColor: CyberpunkColors.green,
+    borderRadius: 8,
     padding: 16,
-    borderRadius: 8,
-    backgroundColor: "rgba(0, 0, 0, 0.05)",
-  },
-  userInfo: {
-    gap: 8,
     alignItems: "center",
+    marginBottom: 16,
   },
-  loginButton: {
-    backgroundColor: "#007AFF",
-    paddingVertical: 12,
-    paddingHorizontal: 24,
+  streakLabel: {
+    fontSize: 12,
+    color: CyberpunkColors.textSecondary,
+    marginBottom: 4,
+    fontFamily: "Courier New",
+  },
+  streakValue: {
+    fontSize: 48,
+    fontWeight: "bold",
+    color: CyberpunkColors.green,
+    fontFamily: "Courier New",
+  },
+  streakBonus: {
+    fontSize: 12,
+    color: CyberpunkColors.cyan,
+    marginTop: 8,
+    fontFamily: "Courier New",
+  },
+  nextGigContainer: {
+    marginBottom: 16,
+  },
+  nextGigLabel: {
+    fontSize: 12,
+    color: CyberpunkColors.textSecondary,
+    marginBottom: 8,
+    fontFamily: "Courier New",
+  },
+  nextGigCard: {
+    backgroundColor: CyberpunkColors.cardBg,
+    borderWidth: 2,
+    borderColor: CyberpunkColors.magenta,
     borderRadius: 8,
+    padding: 12,
+  },
+  nextGigName: {
+    fontSize: 16,
+    color: CyberpunkColors.magenta,
+    marginBottom: 4,
+  },
+  nextGigReward: {
+    fontSize: 12,
+    color: CyberpunkColors.cyan,
+    fontFamily: "Courier New",
+  },
+  actionsContainer: {
+    flexDirection: "row",
+    gap: 12,
+    marginTop: 24,
+  },
+  actionButton: {
+    flex: 1,
+    backgroundColor: CyberpunkColors.cyan,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 4,
     alignItems: "center",
     justifyContent: "center",
-    minHeight: 44,
+    minHeight: 48,
   },
-  loginButtonDisabled: {
-    opacity: 0.6,
-  },
-  loginText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  logoutButton: {
-    marginTop: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 6,
-    backgroundColor: "rgba(255, 59, 48, 0.1)",
-  },
-  logoutText: {
-    color: "#FF3B30",
+  actionButtonText: {
+    color: CyberpunkColors.darkBg,
     fontSize: 14,
-    fontWeight: "500",
+    fontWeight: "bold",
+    fontFamily: "Courier New",
   },
 });
