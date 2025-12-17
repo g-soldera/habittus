@@ -77,6 +77,8 @@ export default function GigsScreen() {
           <Pressable
             style={styles.completeButton}
             onPress={() => handleCompleteGig(item.id)}
+            accessibilityRole="button"
+            accessibilityLabel={`Completar ${item.name}`}
           >
             <ThemedText style={styles.completeButtonText}>COMPLETAR</ThemedText>
           </Pressable>
@@ -132,6 +134,8 @@ export default function GigsScreen() {
             <Pressable
               style={styles.payButton}
               onPress={() => handlePayBounty(item.id)}
+              accessibilityRole="button"
+              accessibilityLabel={`Pagar ${item.name}`}
             >
               <ThemedText style={styles.payButtonText}>PAGAR</ThemedText>
             </Pressable>
@@ -156,6 +160,8 @@ export default function GigsScreen() {
         <Pressable
           style={[styles.tab, activeTab === "gigs" && styles.tabActive]}
           onPress={() => setActiveTab("gigs")}
+          accessibilityRole="button"
+          accessibilityLabel="Abrir aba Gigs"
         >
           <ThemedText
             style={[
@@ -169,6 +175,8 @@ export default function GigsScreen() {
         <Pressable
           style={[styles.tab, activeTab === "bounties" && styles.tabActive]}
           onPress={() => setActiveTab("bounties")}
+          accessibilityRole="button"
+          accessibilityLabel="Abrir aba Bounties"
         >
           <ThemedText
             style={[
