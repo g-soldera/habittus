@@ -21,80 +21,117 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'pnpm'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 9
 
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: 'gradle'
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install dependencies
-        run: pnpm install
+      - name: Accept Android licenses
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
       - name: Prebuild Android
         run: npx expo prebuild --platform android --clean
 
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
+
       - name: Build APK (Debug)
         run: |
           cd android
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --no-daemon --stacktrace
+        continue-on-error: true
 
       - name: Build APK (Release)
         run: |
           cd android
-          ./gradlew assembleRelease
+          ./gradlew assembleRelease --no-daemon --stacktrace
         continue-on-error: true
 
+      - name: Find APK files
+        id: find-apk
+        run: |
+          DEBUG_APK=$(find android/app/build/outputs/apk -name "*.apk" -type f | head -1)
+          if [ -n "$DEBUG_APK" ]; then
+            echo "apk_found=true" >> $GITHUB_OUTPUT
+            echo "apk_path=$DEBUG_APK" >> $GITHUB_OUTPUT
+          else
+            echo "apk_found=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Upload APK to artifacts
+        if: steps.find-apk.outputs.apk_found == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: habittus-apk
-          path: |
-            android/app/build/outputs/apk/debug/app-debug.apk
-            android/app/build/outputs/apk/release/app-release.apk
+          path: ${{ steps.find-apk.outputs.apk_path }}
           if-no-files-found: warn
 
       - name: Create Release
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.find-apk.outputs.apk_found == 'true'
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            android/app/build/outputs/apk/debug/app-debug.apk
-            android/app/build/outputs/apk/release/app-release.apk
+          files: ${{ steps.find-apk.outputs.apk_path }}
           tag_name: v${{ github.run_number }}
           body: |
             ## Habittus - Cyberpunk Life RPG
             
             Build #${{ github.run_number }}
+            Commit: ${{ github.sha }}
             
-            ### APK Files
-            - **app-debug.apk**: Debug build for testing
-            - **app-release.apk**: Release build (if available)
+            ### APK File
+            - **habittus.apk**: Debug build for testing
             
-            ### Installation
+            ### Installation Instructions
             1. Download the APK file
             2. Enable "Unknown Sources" in Android settings
             3. Install the APK on your device
             
             ### Testing with Expo Go
+            - Download Expo Go from Google Play Store
             - Scan the QR code in the dev server
-            - Or visit: https://8081-i3vp33jxxjzcawv5sit9s-cc999cb5.manusvm.computer
+            
+            ### Release Notes
+            - Cyberpunk 16-bit pixel art logo
+            - Character creation system
+            - Daily gigs and bounties
+            - Shop with dynamic discounts
+            - Streak counter system
           draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Comment on PR
-        if: github.event_name == 'pull_request'
+      - name: Comment on PR (Success)
+        if: github.event_name == 'pull_request' && steps.find-apk.outputs.apk_found == 'true'
         uses: actions/github-script@v7
         with:
           script: |
@@ -102,5 +139,17 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '✅ Build completed! Check the artifacts for APK files.'
+              body: '✅ Build completed successfully! APK is ready for download in artifacts.'
+            })
+
+      - name: Comment on PR (Failed)
+        if: github.event_name == 'pull_request' && steps.find-apk.outputs.apk_found == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '❌ Build failed. Check the workflow logs for details.'
             })
