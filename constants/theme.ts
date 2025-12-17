@@ -29,6 +29,10 @@ export const CyberpunkColors = {
   warning: "#ffff00",
   error: "#ff0055",
   info: "#00d9ff",
+
+  // Additional
+  darkGray: "#4a5568",
+  black: "#000000",
 };
 
 const tintColorLight = "#0a7ea4";

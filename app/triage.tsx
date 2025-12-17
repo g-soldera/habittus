@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   View,
   ScrollView,
@@ -12,10 +12,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Colors } from '@/constants/theme';
+import { CyberpunkColors } from '@/constants/theme';
 import { useGameState } from '@/hooks/use-game-state';
 import { classifyUser, calculateTMB, calculateTDEE } from '@/lib/biometric-calculator';
-import { TriageResponse, Gender } from '@/types/biometric';
+import { TriageResponse, Gender, Pillar, BiometricData } from '@/types/biometric';
 
 export default function TriageScreen() {
   const insets = useSafeAreaInsets();
@@ -34,28 +34,36 @@ export default function TriageScreen() {
   const [weightKg, setWeightKg] = useState('');
   const [bodyFatPercent, setBodyFatPercent] = useState('');
 
-  // Step 3: Objectives
-  const [objectives, setObjectives] = useState<string[]>([]);
-  const objectiveOptions = [
-    'Perder peso',
-    'Ganhar massa muscular',
-    'Melhorar resistência cardiovascular',
-    'Aumentar flexibilidade',
-    'Melhorar produtividade',
-    'Reduzir estresse',
-    'Dormir melhor',
-    'Aumentar energia',
+  // Step 3: Objectives (7 Pillars)
+  const [objectives, setObjectives] = useState<Pillar[]>([]);
+  const pillarOptions: { label: string; value: Pillar }[] = [
+    { label: '💪 Saúde Física', value: 'health' },
+    { label: '🍎 Nutrição', value: 'nutrition' },
+    { label: '📚 Estudo', value: 'study' },
+    { label: '✅ Produtividade', value: 'productivity' },
+    { label: '💰 Finanças', value: 'finance' },
+    { label: '🎯 Hábitos', value: 'habits' },
+    { label: '👥 Social', value: 'social' },
   ];
 
-  // Step 4: Routine
+  // Step 4: Health Details
   const [trainingFrequency, setTrainingFrequency] = useState('0');
   const [trainingType, setTrainingType] = useState<'strength' | 'cardio' | 'functional' | 'yoga' | null>(null);
-  const [sleepHours, setSleepHours] = useState('7');
-  const [waterIntake, setWaterIntake] = useState('8');
-  const [mealsPerDay, setMealsPerDay] = useState('3');
-  const [activityLevel, setActivityLevel] = useState<'sedentary' | 'moderate' | 'active'>('moderate');
 
-  const toggleObjective = (obj: string) => {
+  // Step 5: Nutrition Details
+  const [dietType, setDietType] = useState('balanced');
+  const [mealsPerDay, setMealsPerDay] = useState('3');
+
+  // Step 6: Study & Productivity
+  const [hoursStudyPerWeek, setHoursStudyPerWeek] = useState('0');
+  const [hoursOfFocusPerDay, setHoursOfFocusPerDay] = useState('0');
+
+  // Step 7: Finance & Habits
+  const [monthlyIncome, setMonthlyIncome] = useState('0');
+  const [totalDebt, setTotalDebt] = useState('0');
+  const [averageSleepHours, setAverageSleepHours] = useState('7');
+
+  const toggleObjective = (obj: Pillar) => {
     setObjectives(prev =>
       prev.includes(obj) ? prev.filter(o => o !== obj) : [...prev, obj]
     );
@@ -92,7 +100,7 @@ export default function TriageScreen() {
       }
     }
 
-    if (step < 4) {
+    if (step < 7) {
       setStep(step + 1);
     } else {
       handleSubmit();
@@ -111,21 +119,40 @@ export default function TriageScreen() {
         gender
       );
 
+      const activityLevel = parseInt(trainingFrequency) > 3 ? 'active' : parseInt(trainingFrequency) > 0 ? 'moderate' : 'sedentary';
       const tdee = calculateTDEE(tmb, activityLevel);
 
       // Cria resposta de triagem
       const triageResponse: TriageResponse = {
-        objectives: objectives as any,
+        objectives,
         currentTrainingFrequency: parseInt(trainingFrequency),
         primaryTrainingType: trainingType,
-        averageSleepHours: parseInt(sleepHours),
-        dailyWaterIntake: parseInt(waterIntake),
+        healthObjectives: [],
+        nutritionObjectives: [],
+        studyObjectives: [],
+        productivityObjectives: [],
+        financialObjectives: [],
+        socialObjectives: [],
+        averageSleepHours: parseInt(averageSleepHours),
         mealsPerDay: parseInt(mealsPerDay),
-        activityLevel,
+        educationLevel: 'superior',
+        hoursStudyPerWeek: parseInt(hoursStudyPerWeek),
+        areasOfInterest: [],
+        hoursOfFocusPerDay: parseInt(hoursOfFocusPerDay),
+        monthlyIncome: parseInt(monthlyIncome),
+        totalDebt: parseInt(totalDebt),
+        monthlySavings: 0,
+        meditationFrequency: 'never',
+        journalingFrequency: 'never',
+        stressLevel: 5,
+        socialActivitiesPerWeek: 0,
+        networkingInterest: false,
+        mentoringInterest: false,
+        dietType,
       };
 
       // Classifica usuário
-      const biometrics = {
+      const biometrics: BiometricData = {
         age: parseInt(age),
         gender,
         heightCm: parseInt(heightCm),
@@ -143,15 +170,274 @@ export default function TriageScreen() {
         biometrics,
         baseClass: classification.baseClass,
         initialStats: classification.statBoosts,
+        pillarStats: classification.pillarBoosts,
       });
 
       // Navega para dashboard
       router.replace('/(tabs)');
     } catch (error) {
       console.error('[Triage] Error:', error);
-      Alert.alert('Erro', 'Ocorreu um erro ao processar sua triagem. Tente novamente.');
+      Alert.alert('Erro', 'Falha ao salvar perfil. Tente novamente.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const renderStep = () => {
+    switch (step) {
+      case 1:
+        return (
+          <ThemedView style={styles.stepContainer}>
+            <ThemedText type="title" style={styles.stepTitle}>
+              Bem-vindo ao Habittus! 🎮
+            </ThemedText>
+            <ThemedText style={styles.stepDescription}>
+              Vamos criar seu personagem. Comece com seus dados básicos.
+            </ThemedText>
+
+            <ThemedText style={styles.label}>Nome do Personagem</ThemedText>
+            <TextInput
+              style={styles.input}
+              placeholder="Digite seu nome..."
+              value={characterName}
+              onChangeText={setCharacterName}
+              placeholderTextColor={CyberpunkColors.darkGray}
+            />
+
+            <ThemedText style={styles.label}>Idade</ThemedText>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex: 25"
+              value={age}
+              onChangeText={setAge}
+              keyboardType="numeric"
+              placeholderTextColor={CyberpunkColors.darkGray}
+            />
+
+            <ThemedText style={styles.label}>Sexo</ThemedText>
+            <View style={styles.genderContainer}>
+              <Pressable
+                style={[styles.genderButton, gender === 'male' && styles.genderButtonActive]}
+                onPress={() => setGender('male')}
+              >
+                <ThemedText style={styles.genderButtonText}>Masculino</ThemedText>
+              </Pressable>
+              <Pressable
+                style={[styles.genderButton, gender === 'female' && styles.genderButtonActive]}
+                onPress={() => setGender('female')}
+              >
+                <ThemedText style={styles.genderButtonText}>Feminino</ThemedText>
+              </Pressable>
+            </View>
+          </ThemedView>
+        );
+
+      case 2:
+        return (
+          <ThemedView style={styles.stepContainer}>
+            <ThemedText type="title" style={styles.stepTitle}>
+              Dados Biométricos 📏
+            </ThemedText>
+            <ThemedText style={styles.stepDescription}>
+              Insira suas medidas para calcular seu TMB e TDEE.
+            </ThemedText>
+
+            <ThemedText style={styles.label}>Altura (cm)</ThemedText>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex: 175"
+              value={heightCm}
+              onChangeText={setHeightCm}
+              keyboardType="numeric"
+              placeholderTextColor={CyberpunkColors.darkGray}
+            />
+
+            <ThemedText style={styles.label}>Peso (kg)</ThemedText>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex: 75"
+              value={weightKg}
+              onChangeText={setWeightKg}
+              keyboardType="numeric"
+              placeholderTextColor={CyberpunkColors.darkGray}
+            />
+
+            <ThemedText style={styles.label}>% Gordura Corporal</ThemedText>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex: 15"
+              value={bodyFatPercent}
+              onChangeText={setBodyFatPercent}
+              keyboardType="numeric"
+              placeholderTextColor={CyberpunkColors.darkGray}
+            />
+          </ThemedView>
+        );
+
+      case 3:
+        return (
+          <ThemedView style={styles.stepContainer}>
+            <ThemedText type="title" style={styles.stepTitle}>
+              Seus Objetivos 🎯
+            </ThemedText>
+            <ThemedText style={styles.stepDescription}>
+              Selecione os pilares da vida que deseja melhorar.
+            </ThemedText>
+
+            <View style={styles.objectivesGrid}>
+              {pillarOptions.map(option => (
+                <Pressable
+                  key={option.value}
+                  style={[
+                    styles.objectiveButton,
+                    objectives.includes(option.value) && styles.objectiveButtonActive,
+                  ]}
+                  onPress={() => toggleObjective(option.value)}
+                >
+                  <ThemedText style={styles.objectiveButtonText}>
+                    {option.label}
+                  </ThemedText>
+                </Pressable>
+              ))}
+            </View>
+          </ThemedView>
+        );
+
+      case 4:
+        return (
+          <ThemedView style={styles.stepContainer}>
+            <ThemedText type="title" style={styles.stepTitle}>
+              Saúde Física 💪
+            </ThemedText>
+
+            <ThemedText style={styles.label}>Frequência de Treino (dias/semana)</ThemedText>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex: 3"
+              value={trainingFrequency}
+              onChangeText={setTrainingFrequency}
+              keyboardType="numeric"
+              placeholderTextColor={CyberpunkColors.darkGray}
+            />
+
+            <ThemedText style={styles.label}>Tipo de Treino</ThemedText>
+            <View style={styles.trainingTypeContainer}>
+              {['strength', 'cardio', 'functional', 'yoga'].map(type => (
+                <Pressable
+                  key={type}
+                  style={[
+                    styles.trainingTypeButton,
+                    trainingType === type && styles.trainingTypeButtonActive,
+                  ]}
+                  onPress={() => setTrainingType(type as any)}
+                >
+                  <ThemedText style={styles.trainingTypeButtonText}>
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                  </ThemedText>
+                </Pressable>
+              ))}
+            </View>
+          </ThemedView>
+        );
+
+      case 5:
+        return (
+          <ThemedView style={styles.stepContainer}>
+            <ThemedText type="title" style={styles.stepTitle}>
+              Nutrição 🍎
+            </ThemedText>
+
+            <ThemedText style={styles.label}>Tipo de Dieta</ThemedText>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex: Balanceada"
+              value={dietType}
+              onChangeText={setDietType}
+              placeholderTextColor={CyberpunkColors.darkGray}
+            />
+
+            <ThemedText style={styles.label}>Refeições por Dia</ThemedText>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex: 3"
+              value={mealsPerDay}
+              onChangeText={setMealsPerDay}
+              keyboardType="numeric"
+              placeholderTextColor={CyberpunkColors.darkGray}
+            />
+          </ThemedView>
+        );
+
+      case 6:
+        return (
+          <ThemedView style={styles.stepContainer}>
+            <ThemedText type="title" style={styles.stepTitle}>
+              Estudo & Produtividade 📚
+            </ThemedText>
+
+            <ThemedText style={styles.label}>Horas de Estudo por Semana</ThemedText>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex: 10"
+              value={hoursStudyPerWeek}
+              onChangeText={setHoursStudyPerWeek}
+              keyboardType="numeric"
+              placeholderTextColor={CyberpunkColors.darkGray}
+            />
+
+            <ThemedText style={styles.label}>Horas de Foco por Dia</ThemedText>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex: 6"
+              value={hoursOfFocusPerDay}
+              onChangeText={setHoursOfFocusPerDay}
+              keyboardType="numeric"
+              placeholderTextColor={CyberpunkColors.darkGray}
+            />
+          </ThemedView>
+        );
+
+      case 7:
+        return (
+          <ThemedView style={styles.stepContainer}>
+            <ThemedText type="title" style={styles.stepTitle}>
+              Finanças & Hábitos 💰
+            </ThemedText>
+
+            <ThemedText style={styles.label}>Renda Mensal (R$)</ThemedText>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex: 3000"
+              value={monthlyIncome}
+              onChangeText={setMonthlyIncome}
+              keyboardType="numeric"
+              placeholderTextColor={CyberpunkColors.darkGray}
+            />
+
+            <ThemedText style={styles.label}>Dívida Total (R$)</ThemedText>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex: 5000"
+              value={totalDebt}
+              onChangeText={setTotalDebt}
+              keyboardType="numeric"
+              placeholderTextColor={CyberpunkColors.darkGray}
+            />
+
+            <ThemedText style={styles.label}>Horas de Sono por Noite</ThemedText>
+            <TextInput
+              style={styles.input}
+              placeholder="Ex: 7"
+              value={averageSleepHours}
+              onChangeText={setAverageSleepHours}
+              keyboardType="numeric"
+              placeholderTextColor={CyberpunkColors.darkGray}
+            />
+          </ThemedView>
+        );
+
+      default:
+        return null;
     }
   };
 
@@ -162,257 +448,49 @@ export default function TriageScreen() {
         {
           paddingTop: Math.max(insets.top, 20),
           paddingBottom: Math.max(insets.bottom, 20),
-          paddingLeft: Math.max(insets.left, 20),
-          paddingRight: Math.max(insets.right, 20),
         },
       ]}
     >
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        <ThemedText type="title" style={styles.title}>
-          TRIAGEM INICIAL
-        </ThemedText>
-        <ThemedText style={styles.subtitle}>
-          Etapa {step} de 4
-        </ThemedText>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {renderStep()}
 
-        {step === 1 && (
-          <View style={styles.stepContainer}>
-            <ThemedText type="subtitle" style={styles.stepTitle}>
-              Dados Básicos
-            </ThemedText>
-
-            <View style={styles.inputGroup}>
-              <ThemedText style={styles.label}>Nome do Personagem</ThemedText>
-              <TextInput
-                style={styles.input}
-                placeholder="Digite seu nome..."
-                placeholderTextColor="#666"
-                value={characterName}
-                onChangeText={setCharacterName}
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <ThemedText style={styles.label}>Idade</ThemedText>
-              <TextInput
-                style={styles.input}
-                placeholder="Ex: 25"
-                placeholderTextColor="#666"
-                value={age}
-                onChangeText={setAge}
-                keyboardType="number-pad"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <ThemedText style={styles.label}>Sexo</ThemedText>
-              <View style={styles.buttonGroup}>
-                <Pressable
-                  style={[
-                    styles.optionButton,
-                    gender === 'male' && styles.optionButtonActive,
-                  ]}
-                  onPress={() => setGender('male')}
-                >
-                  <ThemedText style={styles.optionButtonText}>Masculino</ThemedText>
-                </Pressable>
-                <Pressable
-                  style={[
-                    styles.optionButton,
-                    gender === 'female' && styles.optionButtonActive,
-                  ]}
-                  onPress={() => setGender('female')}
-                >
-                  <ThemedText style={styles.optionButtonText}>Feminino</ThemedText>
-                </Pressable>
-              </View>
-            </View>
+        <View style={styles.progressContainer}>
+          <ThemedText style={styles.progressText}>
+            Etapa {step} de 7
+          </ThemedText>
+          <View style={styles.progressBar}>
+            <View
+              style={[
+                styles.progressFill,
+                { width: `${(step / 7) * 100}%` },
+              ]}
+            />
           </View>
-        )}
-
-        {step === 2 && (
-          <View style={styles.stepContainer}>
-            <ThemedText type="subtitle" style={styles.stepTitle}>
-              Dados Biométricos
-            </ThemedText>
-
-            <View style={styles.inputGroup}>
-              <ThemedText style={styles.label}>Altura (cm)</ThemedText>
-              <TextInput
-                style={styles.input}
-                placeholder="Ex: 180"
-                placeholderTextColor="#666"
-                value={heightCm}
-                onChangeText={setHeightCm}
-                keyboardType="number-pad"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <ThemedText style={styles.label}>Peso (kg)</ThemedText>
-              <TextInput
-                style={styles.input}
-                placeholder="Ex: 75"
-                placeholderTextColor="#666"
-                value={weightKg}
-                onChangeText={setWeightKg}
-                keyboardType="decimal-pad"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <ThemedText style={styles.label}>Percentual de Gordura (%)</ThemedText>
-              <TextInput
-                style={styles.input}
-                placeholder="Ex: 20"
-                placeholderTextColor="#666"
-                value={bodyFatPercent}
-                onChangeText={setBodyFatPercent}
-                keyboardType="decimal-pad"
-              />
-            </View>
-          </View>
-        )}
-
-        {step === 3 && (
-          <View style={styles.stepContainer}>
-            <ThemedText type="subtitle" style={styles.stepTitle}>
-              Seus Objetivos
-            </ThemedText>
-            <ThemedText style={styles.stepDescription}>
-              Selecione todos que se aplicam:
-            </ThemedText>
-
-            <View style={styles.objectivesGrid}>
-              {objectiveOptions.map(obj => (
-                <Pressable
-                  key={obj}
-                  style={[
-                    styles.objectiveButton,
-                    objectives.includes(obj) && styles.objectiveButtonActive,
-                  ]}
-                  onPress={() => toggleObjective(obj)}
-                >
-                  <ThemedText
-                    style={[
-                      styles.objectiveButtonText,
-                      objectives.includes(obj) && styles.objectiveButtonTextActive,
-                    ]}
-                  >
-                    {obj}
-                  </ThemedText>
-                </Pressable>
-              ))}
-            </View>
-          </View>
-        )}
-
-        {step === 4 && (
-          <View style={styles.stepContainer}>
-            <ThemedText type="subtitle" style={styles.stepTitle}>
-              Sua Rotina Atual
-            </ThemedText>
-
-            <View style={styles.inputGroup}>
-              <ThemedText style={styles.label}>Treinos por Semana</ThemedText>
-              <TextInput
-                style={styles.input}
-                placeholder="Ex: 3"
-                placeholderTextColor="#666"
-                value={trainingFrequency}
-                onChangeText={setTrainingFrequency}
-                keyboardType="number-pad"
-              />
-            </View>
-
-            {parseInt(trainingFrequency) > 0 && (
-              <View style={styles.inputGroup}>
-                <ThemedText style={styles.label}>Tipo de Treino Principal</ThemedText>
-                <View style={styles.buttonGroup}>
-                  {(['strength', 'cardio', 'functional', 'yoga'] as const).map(type => (
-                    <Pressable
-                      key={type}
-                      style={[
-                        styles.optionButton,
-                        trainingType === type && styles.optionButtonActive,
-                      ]}
-                      onPress={() => setTrainingType(type)}
-                    >
-                      <ThemedText style={styles.optionButtonText}>
-                        {type.charAt(0).toUpperCase() + type.slice(1)}
-                      </ThemedText>
-                    </Pressable>
-                  ))}
-                </View>
-              </View>
-            )}
-
-            <View style={styles.inputGroup}>
-              <ThemedText style={styles.label}>Horas de Sono por Noite</ThemedText>
-              <TextInput
-                style={styles.input}
-                placeholder="Ex: 7"
-                placeholderTextColor="#666"
-                value={sleepHours}
-                onChangeText={setSleepHours}
-                keyboardType="number-pad"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <ThemedText style={styles.label}>Copos de Água por Dia</ThemedText>
-              <TextInput
-                style={styles.input}
-                placeholder="Ex: 8"
-                placeholderTextColor="#666"
-                value={waterIntake}
-                onChangeText={setWaterIntake}
-                keyboardType="number-pad"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <ThemedText style={styles.label}>Nível de Atividade</ThemedText>
-              <View style={styles.buttonGroup}>
-                {(['sedentary', 'moderate', 'active'] as const).map(level => (
-                  <Pressable
-                    key={level}
-                    style={[
-                      styles.optionButton,
-                      activityLevel === level && styles.optionButtonActive,
-                    ]}
-                    onPress={() => setActivityLevel(level)}
-                  >
-                    <ThemedText style={styles.optionButtonText}>
-                      {level === 'sedentary' ? 'Sedentário' : level === 'moderate' ? 'Moderado' : 'Ativo'}
-                    </ThemedText>
-                  </Pressable>
-                ))}
-              </View>
-            </View>
-          </View>
-        )}
+        </View>
 
         <View style={styles.buttonContainer}>
           {step > 1 && (
             <Pressable
-              style={[styles.button, styles.buttonSecondary]}
+              style={styles.backButton}
               onPress={() => setStep(step - 1)}
-              disabled={loading}
             >
-              <ThemedText style={styles.buttonText}>Voltar</ThemedText>
+              <ThemedText style={styles.backButtonText}>← Voltar</ThemedText>
             </Pressable>
           )}
+
           <Pressable
-            style={[styles.button, styles.buttonPrimary]}
+            style={[styles.nextButton, loading && styles.nextButtonDisabled]}
             onPress={handleNext}
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="#000" />
+              <ActivityIndicator color="#fff" />
             ) : (
-              <ThemedText style={styles.buttonText}>
-                {step === 4 ? 'Começar Jornada' : 'Próximo'}
+              <ThemedText style={styles.nextButtonText}>
+                {step === 7 ? 'Criar Personagem' : 'Próximo →'}
               </ThemedText>
             )}
           </Pressable>
@@ -425,133 +503,148 @@ export default function TriageScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0e27',
+    paddingHorizontal: 20,
   },
   scrollContent: {
-    flexGrow: 1,
     paddingVertical: 20,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#00FFFF',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#a0aec0',
-    textAlign: 'center',
-    marginBottom: 24,
-  },
   stepContainer: {
-    marginBottom: 32,
+    marginBottom: 30,
   },
   stepTitle: {
-    fontSize: 20,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#00FFFF',
-    marginBottom: 16,
+    marginBottom: 10,
+    color: CyberpunkColors.cyan,
   },
   stepDescription: {
     fontSize: 14,
-    color: '#a0aec0',
-    marginBottom: 16,
-  },
-  inputGroup: {
     marginBottom: 20,
+    opacity: 0.7,
   },
   label: {
     fontSize: 14,
-    color: '#00FFFF',
-    marginBottom: 8,
     fontWeight: '600',
+    marginBottom: 8,
+    color: CyberpunkColors.cyan,
   },
   input: {
-    borderWidth: 2,
-    borderColor: '#00FFFF',
+    borderWidth: 1,
+    borderColor: CyberpunkColors.cyan,
     borderRadius: 8,
     paddingHorizontal: 12,
-    paddingVertical: 12,
-    color: '#ffffff',
-    fontSize: 16,
-    backgroundColor: '#0f1419',
+    paddingVertical: 10,
+    marginBottom: 16,
+    color: CyberpunkColors.cyan,
+    fontFamily: 'monospace',
   },
-  buttonGroup: {
+  genderContainer: {
     flexDirection: 'row',
-    gap: 8,
-    flexWrap: 'wrap',
+    gap: 12,
+    marginBottom: 16,
   },
-  optionButton: {
+  genderButton: {
     flex: 1,
-    minWidth: '45%',
     paddingVertical: 12,
-    paddingHorizontal: 12,
-    borderWidth: 2,
-    borderColor: '#4a5568',
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: CyberpunkColors.cyan,
     borderRadius: 8,
-    backgroundColor: '#1a1f3a',
     alignItems: 'center',
   },
-  optionButtonActive: {
-    borderColor: '#00FFFF',
-    backgroundColor: '#00FFFF',
+  genderButtonActive: {
+    backgroundColor: CyberpunkColors.cyan,
   },
-  optionButtonText: {
-    fontSize: 14,
-    color: '#ffffff',
+  genderButtonText: {
     fontWeight: '600',
   },
   objectivesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: 12,
   },
   objectiveButton: {
-    width: '48%',
     paddingVertical: 12,
-    paddingHorizontal: 12,
-    borderWidth: 2,
-    borderColor: '#4a5568',
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: CyberpunkColors.cyan,
     borderRadius: 8,
-    backgroundColor: '#1a1f3a',
-    alignItems: 'center',
+    marginBottom: 8,
   },
   objectiveButtonActive: {
-    borderColor: '#FF006E',
-    backgroundColor: '#FF006E',
+    backgroundColor: CyberpunkColors.cyan,
   },
   objectiveButtonText: {
-    fontSize: 12,
-    color: '#ffffff',
     fontWeight: '600',
-    textAlign: 'center',
   },
-  objectiveButtonTextActive: {
-    color: '#000000',
+  trainingTypeContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 16,
+  },
+  trainingTypeButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: CyberpunkColors.cyan,
+    borderRadius: 6,
+  },
+  trainingTypeButtonActive: {
+    backgroundColor: CyberpunkColors.cyan,
+  },
+  trainingTypeButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  progressContainer: {
+    marginBottom: 20,
+  },
+  progressText: {
+    fontSize: 12,
+    marginBottom: 8,
+    opacity: 0.7,
+  },
+  progressBar: {
+    height: 4,
+    backgroundColor: CyberpunkColors.darkGray,
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: CyberpunkColors.cyan,
   },
   buttonContainer: {
     flexDirection: 'row',
     gap: 12,
-    marginTop: 32,
+    marginTop: 20,
   },
-  button: {
+  backButton: {
     flex: 1,
-    paddingVertical: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: CyberpunkColors.cyan,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  backButtonText: {
+    fontWeight: '600',
+    color: CyberpunkColors.cyan,
+  },
+  nextButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: CyberpunkColors.cyan,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 48,
   },
-  buttonPrimary: {
-    backgroundColor: '#00FFFF',
+  nextButtonDisabled: {
+    opacity: 0.6,
   },
-  buttonSecondary: {
-    backgroundColor: '#4a5568',
-  },
-  buttonText: {
-    fontSize: 16,
+  nextButtonText: {
     fontWeight: '600',
-    color: '#000000',
+    color: CyberpunkColors.black,
   },
 });
