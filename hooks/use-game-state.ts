@@ -9,8 +9,10 @@ import {
   DEFAULT_REWARDS,
 } from "@/lib/mock-data";
 import { GameState, Gig, Bounty, Reward, InventoryItem, BioMonitor } from "@/types";
+import { UserProfile, BiometricData, ClassType } from "@/types/biometric";
 
 const GAME_STATE_KEY = "habittus_game_state";
+const USER_PROFILE_KEY = "habittus_user_profile";
 
 export function useGameState() {
   const [gameState, setGameState] = useState<GameState | null>(null);
@@ -194,6 +196,48 @@ export function useGameState() {
     }
   };
 
+  const saveUserProfile = async (data: {
+    characterName: string;
+    biometrics: BiometricData;
+    baseClass: ClassType;
+    initialStats: any;
+  }) => {
+    try {
+      const userProfile: UserProfile = {
+        id: `user-${Date.now()}`,
+        name: data.characterName,
+        characterName: data.characterName,
+        biometrics: data.biometrics,
+        stats: {
+          strength: data.initialStats.strength || 50,
+          agility: data.initialStats.agility || 50,
+          constitution: data.initialStats.constitution || 50,
+          intelligence: data.initialStats.intelligence || 50,
+          wisdom: data.initialStats.wisdom || 50,
+          charisma: data.initialStats.charisma || 50,
+        },
+        currentClass: data.baseClass,
+        unlockedClasses: [data.baseClass],
+        streak: 0,
+        totalXP: 0,
+        gold: 100,
+        weight: data.biometrics.weightKg,
+        bodyFatPercent: data.biometrics.bodyFatPercent,
+        createdAt: Date.now(),
+        lastActivityDate: new Date().toISOString().split('T')[0],
+        dailyTrackingHistory: [],
+      };
+
+      await AsyncStorage.setItem(USER_PROFILE_KEY, JSON.stringify(userProfile));
+      
+      // Also create a new game state for compatibility
+      await createNewGame(data.characterName, data.baseClass);
+    } catch (error) {
+      console.error("[GameState] Error saving user profile:", error);
+      throw error;
+    }
+  };
+
   return {
     gameState,
     loading,
@@ -204,5 +248,6 @@ export function useGameState() {
     addCustomReward,
     resetGame,
     saveGameState,
+    saveUserProfile,
   };
 }
