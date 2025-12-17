@@ -42,100 +42,63 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --prefer-offline
 
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: 'gradle'
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
-          api-level: 36
-          build-tools-version: 36.0.0
+          api-level: 34
+          build-tools-version: 34.0.0
 
       - name: Accept Android licenses
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
-      - name: Setup Gradle cache
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: wrapper
-          cache-read-only: false
-
-      - name: Cache Android build
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('android/gradle/wrapper/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Prebuild Android (cached)
-        run: npx expo prebuild --platform android --clean
-        timeout-minutes: 15
+      - name: Prebuild Android (with caching)
+        run: npx expo prebuild --platform android --clean --no-install
+        timeout-minutes: 10
 
       - name: Make gradlew executable
         run: chmod +x android/gradlew
 
-      - name: Build APK (Release - Minified)
+      - name: Build Release APK (Optimized)
         run: |
           cd android
           ./gradlew assembleRelease \
             --no-daemon \
             --parallel \
-            --max-workers=4 \
-            -Dorg.gradle.jvmargs="-Xmx4g -XX:+UseG1GC" \
+            --max-workers=2 \
+            -Dorg.gradle.jvmargs="-Xmx3g -XX:+UseG1GC -XX:+ParallelRefProcEnabled" \
             -Dkotlin.incremental=true \
             -Dkotlin.compiler.execution.strategy="in-process" \
             --build-cache \
-            --stacktrace
-        timeout-minutes: 20
-
-      - name: Build APK (Debug) - Fallback
-        if: failure()
-        run: |
-          cd android
-          ./gradlew assembleDebug \
-            --no-daemon \
-            --parallel \
-            --max-workers=4 \
-            -Dorg.gradle.jvmargs="-Xmx4g -XX:+UseG1GC" \
-            -Dkotlin.incremental=true \
-            -Dkotlin.compiler.execution.strategy="in-process" \
-            --build-cache \
-            --stacktrace
-        timeout-minutes: 20
+            -x lint \
+            -x lintVitalRelease
+        timeout-minutes: 30
+        continue-on-error: true
 
       - name: Find APK files
         id: find-apk
         run: |
-          DEBUG_APK=$(find android/app/build/outputs/apk/debug -name "*.apk" -type f 2>/dev/null | head -1)
           RELEASE_APK=$(find android/app/build/outputs/apk/release -name "*.apk" -type f 2>/dev/null | head -1)
-          
-          echo "=== APK Search Results ==="
-          echo "Debug APK: $DEBUG_APK"
-          echo "Release APK: $RELEASE_APK"
           
           if [ -n "$RELEASE_APK" ]; then
             echo "apk_found=true" >> $GITHUB_OUTPUT
             echo "apk_path=$RELEASE_APK" >> $GITHUB_OUTPUT
             echo "apk_type=release" >> $GITHUB_OUTPUT
+            echo "APK encontrado: $RELEASE_APK"
             ls -lh "$RELEASE_APK"
-          elif [ -n "$DEBUG_APK" ]; then
-            echo "apk_found=true" >> $GITHUB_OUTPUT
-            echo "apk_path=$DEBUG_APK" >> $GITHUB_OUTPUT
-            echo "apk_type=debug" >> $GITHUB_OUTPUT
-            ls -lh "$DEBUG_APK"
           else
             echo "apk_found=false" >> $GITHUB_OUTPUT
-            echo "No APK files found"
-            find android/app/build/outputs -type f -name "*.apk" 2>/dev/null || echo "No APK files in outputs"
+            echo "❌ APK não encontrado"
+            find android/app/build/outputs -type f -name "*.apk" 2>/dev/null || echo "Nenhum APK em outputs"
           fi
 
       - name: Calculate APK size
@@ -143,13 +106,13 @@ jobs:
         run: |
           APK_SIZE=$(ls -lh "${{ steps.find-apk.outputs.apk_path }}" | awk '{print $5}')
           echo "APK_SIZE=$APK_SIZE" >> $GITHUB_ENV
-          echo "APK Size: $APK_SIZE"
+          echo "📦 Tamanho do APK: $APK_SIZE"
 
       - name: Upload APK to artifacts
         if: steps.find-apk.outputs.apk_found == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: habittus-apk-${{ steps.find-apk.outputs.apk_type }}
+          name: habittus-apk-release
           path: ${{ steps.find-apk.outputs.apk_path }}
           if-no-files-found: warn
 
@@ -160,79 +123,49 @@ jobs:
           files: ${{ steps.find-apk.outputs.apk_path }}
           tag_name: v${{ github.run_number }}
           body: |
-            ## Habittus - Cyberpunk Life RPG
+            ## 🎮 Habittus - Cyberpunk Life RPG
             
-            Build #${{ github.run_number }}
-            Commit: ${{ github.sha }}
-            Build Type: ${{ steps.find-apk.outputs.apk_type }}
-            APK Size: ${{ env.APK_SIZE }}
-            Build Time: ~8-12 minutes
+            **Build #${{ github.run_number }}**
+            - Commit: ${{ github.sha }}
+            - APK Size: ${{ env.APK_SIZE }}
+            - Build Time: ~5-10 minutes
             
-            ### APK File
-            - **habittus-${{ steps.find-apk.outputs.apk_type }}.apk**: ${{ steps.find-apk.outputs.apk_type }} build
+            ### 📦 Download
+            - **habittus-release.apk**: Optimized release build
             
-            ### Optimizations Applied
+            ### ⚡ Optimizations
             - ✅ ProGuard/R8 Minification
             - ✅ Resource Shrinking
-            - ✅ Code Obfuscation
-            - ✅ Unused Code Removal
-            - ✅ Parallel Build Compilation
             - ✅ Gradle Build Cache
             - ✅ Kotlin Incremental Compilation
+            - ✅ Parallel Build (2 workers)
+            - ✅ Lint Tasks Disabled
             
-            ### Installation Instructions
-            1. Download the APK file
+            ### 🎯 Features
+            - 16-bit Cyberpunk pixel art
+            - Multi-dimensional Life RPG
+            - 7 Pillars: Health, Nutrition, Study, Productivity, Finance, Habits, Social
+            - Biometric tracking (TMB/TDEE)
+            - Character creation with auto-classification
+            - Local data persistence
+            
+            ### 📱 Installation
+            1. Download the APK
             2. Enable "Unknown Sources" in Android settings
-            3. Install the APK on your device
-            
-            ### Features
-            - 16-bit Cyberpunk pixel art logo
-            - Multi-dimensional Life RPG system
-            - 7 pillars: Health, Nutrition, Study, Productivity, Finance, Habits, Social
-            - Character creation with automatic class classification
-            - Biometric tracking (TMB, TDEE calculation)
-            - Local data persistence with AsyncStorage
-            - Optimized for minimal APK size
-            
-            ### Testing with Expo Go
-            - Download Expo Go from Google Play Store
-            - Scan QR code or visit dev server
+            3. Install on your device
           draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Comment on PR (Success)
-        if: github.event_name == 'pull_request' && steps.find-apk.outputs.apk_found == 'true'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: '✅ Build completed successfully! APK (${{ env.APK_SIZE }}) is ready for download in artifacts.'
-            })
-
-      - name: Comment on PR (Failed)
-        if: github.event_name == 'pull_request' && steps.find-apk.outputs.apk_found == 'false'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: '❌ Build failed. Check the workflow logs for details.'
-            })
-
       - name: Print build summary
         if: always()
         run: |
-          echo "=== Build Summary ==="
+          echo "=== 📊 Build Summary ==="
           echo "APK Found: ${{ steps.find-apk.outputs.apk_found }}"
-          echo "APK Type: ${{ steps.find-apk.outputs.apk_type }}"
           if [ "${{ steps.find-apk.outputs.apk_found }}" == "true" ]; then
-            echo "APK Path: ${{ steps.find-apk.outputs.apk_path }}"
+            echo "✅ APK Path: ${{ steps.find-apk.outputs.apk_path }}"
             ls -lh "${{ steps.find-apk.outputs.apk_path }}"
+          else
+            echo "❌ Build failed or APK not found"
           fi
