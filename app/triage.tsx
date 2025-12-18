@@ -17,6 +17,15 @@ import { useGameState } from '@/hooks/use-game-state';
 import { classifyUser, calculateTMB, calculateTDEE } from '@/lib/biometric-calculator';
 import { TriageResponse, Gender, Pillar, BiometricData } from '@/types/biometric';
 
+// Step components
+import TriageStepBasic from '@/components/triage/step-basic';
+import TriageStepBiometrics from '@/components/triage/step-biometrics';
+import TriageStepObjectives from '@/components/triage/step-objectives';
+import TriageStepHealth from '@/components/triage/step-health';
+import TriageStepNutrition from '@/components/triage/step-nutrition';
+import TriageStepStudy from '@/components/triage/step-study';
+import TriageStepFinance from '@/components/triage/step-finance';
+
 export default function TriageScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -198,94 +207,28 @@ export default function TriageScreen() {
             <ThemedText type="title" style={styles.stepTitle}>
               Bem-vindo ao Habittus! 🎮
             </ThemedText>
-            <ThemedText style={styles.stepDescription}>
-              Vamos criar seu personagem. Comece com seus dados básicos.
-            </ThemedText>
 
-            <ThemedText style={styles.label}>Nome do Personagem</ThemedText>
-            <TextInput
-              style={styles.input}
-              placeholder="Digite seu nome..."
-              value={characterName}
-              onChangeText={setCharacterName}
-              accessibilityLabel="Nome do Personagem"
-              placeholderTextColor={CyberpunkColors.darkGray}
+            <TriageStepBasic
+              characterName={characterName}
+              setCharacterName={setCharacterName}
+              age={age}
+              setAge={setAge}
+              gender={gender}
+              setGender={setGender}
             />
-
-            <ThemedText style={styles.label}>Idade</ThemedText>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: 25"
-              value={age}
-              onChangeText={setAge}
-              accessibilityLabel="Idade"
-              keyboardType="numeric"
-              placeholderTextColor={CyberpunkColors.darkGray}
-            />
-
-            <ThemedText style={styles.label}>Sexo</ThemedText>
-            <View style={styles.genderContainer}>
-              <Pressable
-                style={[styles.genderButton, gender === 'male' && styles.genderButtonActive]}
-                onPress={() => setGender('male')}
-                accessibilityRole="button"
-                accessibilityLabel="Sexo Masculino"
-              >
-                <ThemedText style={styles.genderButtonText}>Masculino</ThemedText>
-              </Pressable>
-              <Pressable
-                style={[styles.genderButton, gender === 'female' && styles.genderButtonActive]}
-                onPress={() => setGender('female')}
-                accessibilityRole="button"
-                accessibilityLabel="Sexo Feminino"
-              >
-                <ThemedText style={styles.genderButtonText}>Feminino</ThemedText>
-              </Pressable>
-            </View>
           </ThemedView>
         );
 
       case 2:
         return (
           <ThemedView style={styles.stepContainer}>
-            <ThemedText type="title" style={styles.stepTitle}>
-              Dados Biométricos 📏
-            </ThemedText>
-            <ThemedText style={styles.stepDescription}>
-              Insira suas medidas para calcular seu TMB e TDEE.
-            </ThemedText>
-
-            <ThemedText style={styles.label}>Altura (cm)</ThemedText>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: 175"
-              value={heightCm}
-              onChangeText={setHeightCm}
-              accessibilityLabel="Altura em cm"
-              keyboardType="numeric"
-              placeholderTextColor={CyberpunkColors.darkGray}
-            />
-
-            <ThemedText style={styles.label}>Peso (kg)</ThemedText>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: 75"
-              value={weightKg}
-              onChangeText={setWeightKg}
-              accessibilityLabel="Peso em kg"
-              keyboardType="numeric"
-              placeholderTextColor={CyberpunkColors.darkGray}
-            />
-
-            <ThemedText style={styles.label}>% Gordura Corporal</ThemedText>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: 15"
-              value={bodyFatPercent}
-              onChangeText={setBodyFatPercent}
-              accessibilityLabel="Percentual de gordura"
-              keyboardType="numeric"
-              placeholderTextColor={CyberpunkColors.darkGray}
+            <TriageStepBiometrics
+              heightCm={heightCm}
+              setHeightCm={setHeightCm}
+              weightKg={weightKg}
+              setWeightKg={setWeightKg}
+              bodyFatPercent={bodyFatPercent}
+              setBodyFatPercent={setBodyFatPercent}
             />
           </ThemedView>
         );
@@ -293,97 +236,34 @@ export default function TriageScreen() {
       case 3:
         return (
           <ThemedView style={styles.stepContainer}>
-            <ThemedText type="title" style={styles.stepTitle}>
-              Seus Objetivos 🎯
-            </ThemedText>
-            <ThemedText style={styles.stepDescription}>
-              Selecione os pilares da vida que deseja melhorar.
-            </ThemedText>
-
-            <View style={styles.objectivesGrid}>
-              {pillarOptions.map(option => (
-                <Pressable
-                  key={option.value}
-                  style={[
-                    styles.objectiveButton,
-                    objectives.includes(option.value) && styles.objectiveButtonActive,
-                  ]}
-                  onPress={() => toggleObjective(option.value)}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Selecionar objetivo ${option.label}`}
-                >
-                  <ThemedText style={styles.objectiveButtonText}>
-                    {option.label}
-                  </ThemedText>
-                </Pressable>
-              ))}
-            </View>
+            <TriageStepObjectives
+              objectives={objectives}
+              toggleObjective={toggleObjective}
+              pillarOptions={pillarOptions}
+            />
           </ThemedView>
         );
 
       case 4:
         return (
           <ThemedView style={styles.stepContainer}>
-            <ThemedText type="title" style={styles.stepTitle}>
-              Saúde Física 💪
-            </ThemedText>
-
-            <ThemedText style={styles.label}>Frequência de Treino (dias/semana)</ThemedText>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: 3"
-              value={trainingFrequency}
-              onChangeText={setTrainingFrequency}
-              keyboardType="numeric"
-              placeholderTextColor={CyberpunkColors.darkGray}
+            <TriageStepHealth
+              trainingFrequency={trainingFrequency}
+              setTrainingFrequency={setTrainingFrequency}
+              trainingType={trainingType}
+              setTrainingType={setTrainingType}
             />
-
-            <ThemedText style={styles.label}>Tipo de Treino</ThemedText>
-            <View style={styles.trainingTypeContainer}>
-              {['strength', 'cardio', 'functional', 'yoga'].map(type => (
-                <Pressable
-                  key={type}
-                  style={[
-                    styles.trainingTypeButton,
-                    trainingType === type && styles.trainingTypeButtonActive,
-                  ]}
-                  onPress={() => setTrainingType(type as any)}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Selecionar tipo de treino ${type}`}
-                >
-                  <ThemedText style={styles.trainingTypeButtonText}>
-                    {type.charAt(0).toUpperCase() + type.slice(1)}
-                  </ThemedText>
-                </Pressable>
-              ))}
-            </View>
           </ThemedView>
         );
 
       case 5:
         return (
           <ThemedView style={styles.stepContainer}>
-            <ThemedText type="title" style={styles.stepTitle}>
-              Nutrição 🍎
-            </ThemedText>
-
-            <ThemedText style={styles.label}>Tipo de Dieta</ThemedText>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: Balanceada"
-              value={dietType}
-              onChangeText={setDietType}
-              placeholderTextColor={CyberpunkColors.darkGray}
-            />
-
-            <ThemedText style={styles.label}>Refeições por Dia</ThemedText>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: 3"
-              value={mealsPerDay}
-              onChangeText={setMealsPerDay}
-              keyboardType="numeric"
-              placeholderTextColor={CyberpunkColors.darkGray}
+            <TriageStepNutrition
+              dietType={dietType}
+              setDietType={setDietType}
+              mealsPerDay={mealsPerDay}
+              setMealsPerDay={setMealsPerDay}
             />
           </ThemedView>
         );
@@ -391,28 +271,11 @@ export default function TriageScreen() {
       case 6:
         return (
           <ThemedView style={styles.stepContainer}>
-            <ThemedText type="title" style={styles.stepTitle}>
-              Estudo & Produtividade 📚
-            </ThemedText>
-
-            <ThemedText style={styles.label}>Horas de Estudo por Semana</ThemedText>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: 10"
-              value={hoursStudyPerWeek}
-              onChangeText={setHoursStudyPerWeek}
-              keyboardType="numeric"
-              placeholderTextColor={CyberpunkColors.darkGray}
-            />
-
-            <ThemedText style={styles.label}>Horas de Foco por Dia</ThemedText>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: 6"
-              value={hoursOfFocusPerDay}
-              onChangeText={setHoursOfFocusPerDay}
-              keyboardType="numeric"
-              placeholderTextColor={CyberpunkColors.darkGray}
+            <TriageStepStudy
+              hoursStudyPerWeek={hoursStudyPerWeek}
+              setHoursStudyPerWeek={setHoursStudyPerWeek}
+              hoursOfFocusPerDay={hoursOfFocusPerDay}
+              setHoursOfFocusPerDay={setHoursOfFocusPerDay}
             />
           </ThemedView>
         );
@@ -420,38 +283,13 @@ export default function TriageScreen() {
       case 7:
         return (
           <ThemedView style={styles.stepContainer}>
-            <ThemedText type="title" style={styles.stepTitle}>
-              Finanças & Hábitos 💰
-            </ThemedText>
-
-            <ThemedText style={styles.label}>Renda Mensal (R$)</ThemedText>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: 3000"
-              value={monthlyIncome}
-              onChangeText={setMonthlyIncome}
-              keyboardType="numeric"
-              placeholderTextColor={CyberpunkColors.darkGray}
-            />
-
-            <ThemedText style={styles.label}>Dívida Total (R$)</ThemedText>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: 5000"
-              value={totalDebt}
-              onChangeText={setTotalDebt}
-              keyboardType="numeric"
-              placeholderTextColor={CyberpunkColors.darkGray}
-            />
-
-            <ThemedText style={styles.label}>Horas de Sono por Noite</ThemedText>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: 7"
-              value={averageSleepHours}
-              onChangeText={setAverageSleepHours}
-              keyboardType="numeric"
-              placeholderTextColor={CyberpunkColors.darkGray}
+            <TriageStepFinance
+              monthlyIncome={monthlyIncome}
+              setMonthlyIncome={setMonthlyIncome}
+              totalDebt={totalDebt}
+              setTotalDebt={setTotalDebt}
+              averageSleepHours={averageSleepHours}
+              setAverageSleepHours={setAverageSleepHours}
             />
           </ThemedView>
         );
@@ -498,6 +336,7 @@ export default function TriageScreen() {
               onPress={() => setStep(step - 1)}
               accessibilityRole="button"
               accessibilityLabel="Voltar"
+              testID="triage-back-button"
             >
               <ThemedText style={styles.backButtonText}>← Voltar</ThemedText>
             </Pressable>
@@ -508,6 +347,7 @@ export default function TriageScreen() {
             onPress={handleNext}
             accessibilityRole="button"
             accessibilityLabel={step === 7 ? 'Criar Personagem' : 'Próximo'}
+            testID="triage-next-button"
             disabled={loading}
           >
             {loading ? (
