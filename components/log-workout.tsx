@@ -3,11 +3,14 @@ import { View, StyleSheet, TextInput, Pressable, Alert } from 'react-native';
 import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
 import { CyberpunkColors } from '@/constants/theme';
+import { useGameState } from '@/hooks/use-game-state';
 
 export function LogWorkout({ onSave }: { onSave: (payload: any) => void }) {
   const [type, setType] = useState<'strength' | 'cardio' | 'functional' | 'yoga'>('strength');
   const [duration, setDuration] = useState('30');
   const [intensity, setIntensity] = useState<'low' | 'medium' | 'high'>('medium');
+
+  const { logWorkout } = useGameState();
 
   const handleSave = () => {
     const minutes = parseInt(duration);
@@ -16,7 +19,16 @@ export function LogWorkout({ onSave }: { onSave: (payload: any) => void }) {
       return;
     }
 
-    onSave({ type, duration: minutes, intensity });
+    const mappedIntensity = intensity === 'medium' ? 'moderate' : (intensity as any);
+
+    if (onSave) {
+      onSave({ type, duration: minutes, intensity: mappedIntensity });
+      return;
+    }
+
+    // default: persist to game state
+    logWorkout(minutes, mappedIntensity as any);
+    Alert.alert('Salvo', 'Treino salvo e XP aplicado');
   };
 
   return (

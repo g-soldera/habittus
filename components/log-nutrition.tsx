@@ -3,10 +3,12 @@ import { View, StyleSheet, TextInput, Pressable, Alert } from 'react-native';
 import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
 import { CyberpunkColors } from '@/constants/theme';
+import { useGameState } from '@/hooks/use-game-state';
 
 export function LogNutrition({ onSave }: { onSave: (payload: any) => void }) {
   const [name, setName] = useState('');
   const [calories, setCalories] = useState('250');
+  const { logMeal } = useGameState();
 
   const handleSave = () => {
     const c = parseInt(calories);
@@ -15,7 +17,13 @@ export function LogNutrition({ onSave }: { onSave: (payload: any) => void }) {
       return;
     }
 
-    onSave({ name, calories: c });
+    if (onSave) {
+      onSave({ name, calories: c });
+      return;
+    }
+
+    logMeal(c, name);
+    Alert.alert('Salvo', 'Refeição registrada e XP aplicado');
   };
 
   return (

@@ -3,15 +3,24 @@ import { View, StyleSheet, TextInput, Pressable } from 'react-native';
 import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
 import { CyberpunkColors } from '@/constants/theme';
+import { useGameState } from '@/hooks/use-game-state';
+import { Alert } from 'react-native';
 
 export function LogStudy({ onSave }: { onSave: (payload: any) => void }) {
   const [hours, setHours] = useState('1');
   const [topic, setTopic] = useState('');
   const [type, setType] = useState<'reading' | 'course' | 'practice' | 'project'>('reading');
+  const { logStudy } = useGameState();
 
   const handleSave = () => {
     const h = parseFloat(hours);
-    onSave({ hours: h, topic, type });
+    if (onSave) {
+      onSave({ hours: h, topic, type });
+      return;
+    }
+
+    logStudy(h, topic);
+    Alert.alert('Salvo', 'Sessão de estudo salva e XP aplicado');
   };
 
   return (

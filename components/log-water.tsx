@@ -3,16 +3,19 @@ import { View, StyleSheet, Pressable } from 'react-native';
 import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
 import { CyberpunkColors } from '@/constants/theme';
+import { useGameState } from '@/hooks/use-game-state';
+import { Alert } from 'react-native';
 
 export function LogWater({ onAdd }: { onAdd: (amountMl: number) => void }) {
+  const { logWater } = useGameState();
   return (
     <ThemedView style={styles.container}>
       <ThemedText type="title">Hidratação</ThemedText>
       <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-        <Pressable style={styles.quickButton} onPress={() => onAdd(200)}>
+        <Pressable style={styles.quickButton} onPress={() => { if (onAdd) { onAdd(200); } else { logWater(200); Alert.alert('Salvo', '200ml registrados'); } }}>
           <ThemedText>+1 Copo (200ml)</ThemedText>
         </Pressable>
-        <Pressable style={styles.quickButton} onPress={() => onAdd(500)}>
+        <Pressable style={styles.quickButton} onPress={() => { if (onAdd) { onAdd(500); } else { logWater(500); Alert.alert('Salvo', '500ml registrados'); } }}>
           <ThemedText>+500ml</ThemedText>
         </Pressable>
       </View>

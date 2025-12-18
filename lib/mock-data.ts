@@ -175,5 +175,9 @@ export const createDefaultGameState = (
   bounties: DEFAULT_BOUNTIES,
   rewards: DEFAULT_REWARDS,
   inventory: [],
+  trainings: [],
+  meals: [],
+  studies: [],
+  waterLogs: [],
   lastUpdatedAt: Date.now(),
 });
