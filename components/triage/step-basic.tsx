@@ -21,7 +21,7 @@ export function TriageStepBasic({
   setGender: (g: Gender) => void;
 }) {
   return (
-    <ThemedView>
+    <ThemedView accessible={true} accessibilityRole="form">
       <ThemedText type="title">Bem-vindo ao Habittus! 🎮</ThemedText>
       <ThemedText style={{ marginTop: 8 }}>Vamos criar seu personagem. Comece com seus dados básicos.</ThemedText>
 
@@ -50,8 +50,8 @@ export function TriageStepBasic({
 
       <ThemedText style={{ marginTop: 12 }}>Sexo</ThemedText>
       <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-        <ThemedView testID="triage-gender-male" accessibilityRole="button" onTouchStart={() => setGender('male')}>Masculino</ThemedView>
-        <ThemedView testID="triage-gender-female" accessibilityRole="button" onTouchStart={() => setGender('female')}>Feminino</ThemedView>
+        <ThemedView testID="triage-gender-male" accessibilityRole="button" onTouchStart={() => setGender('male')} accessible={true}>Masculino</ThemedView>
+        <ThemedView testID="triage-gender-female" accessibilityRole="button" onTouchStart={() => setGender('female')} accessible={true}>Feminino</ThemedView>
       </View>
     </ThemedView>
   );

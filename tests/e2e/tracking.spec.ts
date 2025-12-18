@@ -11,16 +11,28 @@ test.describe('Tracking - onboarding -> logging -> dashboard', () => {
 
     // 2) Simulate onboarding: navigate to triage, fill minimal required fields
     // Use data-testid attributes where possible. Here we use placeholder selectors.
-    await page.click('text=Começar');
+    // Start triage flow
+    await page.click('[data-testid="triage-next-button"]');
 
-    // Example: fill name and basic biometrics
-    await page.fill('input[name="characterName"]', 'E2E Test');
-    await page.fill('input[name="age"]', '30');
-    await page.fill('input[name="heightCm"]', '175');
-    await page.fill('input[name="weightKg"]', '70');
+    // Fill basic step
+    await page.fill('[data-testid="triage-character-name"]', 'E2E Test');
+    await page.fill('[data-testid="triage-age"]', '30');
+    await page.click('[data-testid="triage-next-button"]');
 
-    // Submit triage
-    await page.click('text=Finalizar Triagem');
+    // Fill biometrics
+    await page.fill('[data-testid="triage-height"]', '175');
+    await page.fill('[data-testid="triage-weight"]', '70');
+    await page.fill('[data-testid="triage-bodyfat"]', '15');
+    await page.click('[data-testid="triage-next-button"]');
+
+    // Complete remaining steps quickly
+    await page.click('[data-testid="triage-next-button"]');
+    await page.click('[data-testid="triage-next-button"]');
+    await page.click('[data-testid="triage-next-button"]');
+    await page.click('[data-testid="triage-next-button"]');
+
+    // Submit triage at final step
+    await page.click('[data-testid="triage-next-button"]');
 
     // 3) On dashboard, assert bioMonitor exists and note XP
     const xpBefore = await page.textContent('[data-testid="bio-total-xp"]');

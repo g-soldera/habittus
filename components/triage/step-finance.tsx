@@ -20,17 +20,17 @@ export function TriageStepFinance({
   setAverageSleepHours: (v: string) => void;
 }) {
   return (
-    <ThemedView>
+    <ThemedView accessible={true} accessibilityRole="form">
       <ThemedText type="title">Finanças & Hábitos 💰</ThemedText>
 
       <ThemedText style={{ marginTop: 12 }}>Renda Mensal (R$)</ThemedText>
-      <TextInput testID="triage-monthly-income" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={monthlyIncome} onChangeText={setMonthlyIncome} keyboardType="numeric" />
+      <TextInput testID="triage-monthly-income" accessibilityLabel="Renda mensal" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={monthlyIncome} onChangeText={setMonthlyIncome} keyboardType="numeric" />
 
       <ThemedText style={{ marginTop: 12 }}>Dívida Total (R$)</ThemedText>
-      <TextInput testID="triage-total-debt" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={totalDebt} onChangeText={setTotalDebt} keyboardType="numeric" />
+      <TextInput testID="triage-total-debt" accessibilityLabel="Dívida total" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={totalDebt} onChangeText={setTotalDebt} keyboardType="numeric" />
 
       <ThemedText style={{ marginTop: 12 }}>Horas de Sono por Noite</ThemedText>
-      <TextInput testID="triage-sleep-hours" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={averageSleepHours} onChangeText={setAverageSleepHours} keyboardType="numeric" />
+      <TextInput testID="triage-sleep-hours" accessibilityLabel="Horas de sono por noite" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={averageSleepHours} onChangeText={setAverageSleepHours} keyboardType="numeric" />
     </ThemedView>
   );
 }

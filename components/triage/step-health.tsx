@@ -16,7 +16,7 @@ export function TriageStepHealth({
   setTrainingType: (v: any) => void;
 }) {
   return (
-    <ThemedView>
+    <ThemedView accessible={true} accessibilityRole="form">
       <ThemedText type="title">Saúde Física 💪</ThemedText>
 
       <ThemedText style={{ marginTop: 12 }}>Frequência de Treino (dias/semana)</ThemedText>
@@ -25,7 +25,7 @@ export function TriageStepHealth({
       <ThemedText style={{ marginTop: 12 }}>Tipo de Treino</ThemedText>
       <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
         {['strength', 'cardio', 'functional', 'yoga'].map(type => (
-          <Pressable key={type} testID={`triage-training-${type}`} onPress={() => setTrainingType(type as any)} style={{ padding: 8, borderWidth: 1, borderColor: CyberpunkColors.cyan, marginRight: 8 }} accessibilityRole="button">
+          <Pressable key={type} testID={`triage-training-${type}`} onPress={() => setTrainingType(type as any)} style={{ padding: 8, borderWidth: 1, borderColor: CyberpunkColors.cyan, marginRight: 8 }} accessibilityRole="button" accessible={true}>
             <ThemedText>{type}</ThemedText>
           </Pressable>
         ))}

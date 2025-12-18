@@ -40,6 +40,22 @@ export function useGameState() {
       if (stored) {
         const state = JSON.parse(stored) as GameState;
         setGameState(state);
+
+        // If saved state is stale, apply daily decay automatically
+        try {
+          const MS_PER_DAY = 1000 * 60 * 60 * 24;
+          const days = Math.floor((Date.now() - (state.lastUpdatedAt || 0)) / MS_PER_DAY);
+          if (days > 0) {
+            const { applyDailyDecay: applyDecay } = await import('@/lib/status');
+            const newBio = applyDecay(state.bioMonitor, days);
+            state.bioMonitor = newBio;
+            state.lastUpdatedAt = Date.now();
+            await AsyncStorage.setItem(GAME_STATE_KEY, JSON.stringify(state));
+            setGameState(state);
+          }
+        } catch (err) {
+          console.error('[GameState] Error applying startup decay:', err);
+        }
       } else {
         setGameState(null);
       }

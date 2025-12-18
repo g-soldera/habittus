@@ -20,18 +20,18 @@ export function TriageStepBiometrics({
   setBodyFatPercent: (v: string) => void;
 }) {
   return (
-    <ThemedView>
+    <ThemedView accessible={true} accessibilityRole="form">
       <ThemedText type="title">Dados Biométricos 📏</ThemedText>
       <ThemedText>Insira suas medidas para calcular seu TMB e TDEE.</ThemedText>
 
       <ThemedText style={{ marginTop: 12 }}>Altura (cm)</ThemedText>
-      <TextInput testID="triage-height" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={heightCm} onChangeText={setHeightCm} keyboardType="numeric" />
+      <TextInput testID="triage-height" accessibilityLabel="Altura em cm" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={heightCm} onChangeText={setHeightCm} keyboardType="numeric" />
 
       <ThemedText style={{ marginTop: 12 }}>Peso (kg)</ThemedText>
-      <TextInput testID="triage-weight" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={weightKg} onChangeText={setWeightKg} keyboardType="numeric" />
+      <TextInput testID="triage-weight" accessibilityLabel="Peso em kg" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={weightKg} onChangeText={setWeightKg} keyboardType="numeric" />
 
       <ThemedText style={{ marginTop: 12 }}>% Gordura Corporal</ThemedText>
-      <TextInput testID="triage-bodyfat" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={bodyFatPercent} onChangeText={setBodyFatPercent} keyboardType="numeric" />
+      <TextInput testID="triage-bodyfat" accessibilityLabel="Percentual de gordura" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={bodyFatPercent} onChangeText={setBodyFatPercent} keyboardType="numeric" />
     </ThemedView>
   );
 }
