@@ -209,6 +209,17 @@ export function useGameState() {
     await saveGameState(updatedState);
   };
 
+  // Apply daily decay to bioMonitor (can be called by scheduler or UI)
+  const applyDailyDecay = async (days = 1) => {
+    if (!gameState) return;
+    const updatedState = { ...gameState } as GameState;
+    const newBio = (await import('@/lib/status')).applyDailyDecay(updatedState.bioMonitor, days);
+    updatedState.bioMonitor = newBio;
+    updatedState.lastUpdatedAt = Date.now();
+    await saveGameState(updatedState);
+    return updatedState;
+  };
+
   const purchaseReward = async (rewardId: string) => {
     if (!gameState) return;
 
