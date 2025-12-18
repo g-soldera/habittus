@@ -1,0 +1,1 @@
+// Component integration tests pending - skip for now due to test env configuration

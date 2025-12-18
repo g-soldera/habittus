@@ -917,6 +917,7 @@ Obs: triagem básica já implementada; as tarefas abaixo são refinamentos e mel
 - [x] Dashboard simples
 - [x] Rastreamento de treinos
 - [x] Rastreamento de água
+- [x] Integração dos componentes de tracking com `use-game-state` e cálculos de XP (`lib/tracking.ts`)
 - [x] Shop simples
 - [x] Recompensas customizadas
 - [x] Streak counter

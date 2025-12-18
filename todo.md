@@ -5,73 +5,83 @@
 ---
 
 ## Epic: Triagem e Onboarding (Prioridade: Alta) ✅
-- [x] Tela `triage.tsx` com 7 etapas implementada (validações básicas)  
-- [x] Cálculo de TMB/TDEE (em `lib/biometric-calculator.ts`)  
-- [x] Classificação automática de classe (função `classifyUser`)  
-- [x] Persistência de perfil (salvar perfil e criar GameState)
-- [x] Redirecionamento para Dashboard ao finalizar triagem
-- [x] Redirecionamento automático para Dashboard para usuários existentes (implementado)
+
+- [X] Tela `triage.tsx` com 7 etapas implementada (validações básicas)
+- [X] Cálculo de TMB/TDEE (em `lib/biometric-calculator.ts`)
+- [X] Classificação automática de classe (função `classifyUser`)
+- [X] Persistência de perfil (salvar perfil e criar GameState)
+- [X] Redirecionamento para Dashboard ao finalizar triagem
+- [X] Redirecionamento automático para Dashboard para usuários existentes (implementado)
 - [ ] Testes E2E cobrindo fluxo de onboarding (Criar teste Playwright: onboarding -> triage -> dashboard)
 - [ ] Acessibilidade: revisar labels, roles e foco (priorizar triage)
 
 ---
 
 ## Epic: Status RPG & Cálculos (Prioridade: Alta) ✅
-- [x] Funções TMB/TDEE, BMI, peso e bodyfat (implementadas)
-- [x] Cálculo de XP e decay básico (implementado)
-- [x] Função `checkClassUnlock` (implementada)
+
+- [X] Funções TMB/TDEE, BMI, peso e bodyfat (implementadas)
+- [X] Cálculo de XP e decay básico (implementado)
+- [X] Função `checkClassUnlock` (implementada)
 - [ ] Documentar fórmulas e expectativas numéricas (README / comentários)
 - [ ] Testes unitários adicionais para fórmulas críticas (adicionar cobertura)
 
 ---
 
 ## Epic: Rastreamento (Prioridade: Alta → Média)
-- [x] Rastreamento de treinos (gigs / logs básicos)  
-- [x] Rastreamento de água (implementado)
-- [ ] Rastreamento de nutrição (LogNutrition.tsx) — **faltando** (MVP v2)
-- [ ] Rastreamento de estudo (LogStudy.tsx) — **faltando** (MVP v2)
-- [ ] Task manager (TaskManager.tsx) — **faltando** (MVP v2)
+
+- [X] Rastreamento de treinos (gigs / logs básicos)
+- [X] Rastreamento de água (implementado)
+- [X] Integração dos componentes de tracking com `use-game-state` (persistência e aplicação de XP) — **feito**
+- [X] Funções de cálculo de XP/efeitos (`lib/tracking.ts`) e testes unitários (adicionados)
+- [ ] Rastreamento de nutrição (LogNutrition.tsx) — **usar integração já pronta**
+- [ ] Rastreamento de estudo (LogStudy.tsx) — **usar integração já pronta**
+- [ ] Task manager (TaskManager.tsx) — **faltando**
 - [ ] FinanceTracker (Dashboard financeiro) — **faltando**
 
-Próximo passo: criar issues/PRs separados por componente (LogNutrition, LogStudy, TaskManager).
+Próximo passo: adicionar testes E2E para garantir que logging → dashboard/status funcione como esperado e adicionar unit tests para `use-game-state` logging methods.
 
 ---
 
 ## Epic: Personagem e Visual (Prioridade: Média)
-- [ ] `CharacterDisplay.tsx` e sprites 16-bit (MVP v2)
-- [ ] Mudança de silhueta por peso (MVP v2)
-- [ ] Aura / brilho por status (MVP v3)
-- [ ] Equipamentos e inventário visual (MVP v3)
+
+- [ ] `CharacterDisplay.tsx` e sprites 16-bit
+- [ ] Mudança de silhueta por peso
+- [ ] Aura / brilho por status
+- [ ] Equipamentos e inventário visual
 
 Próximo passo: design assets & implementar placeholder visual responsivo.
 
 ---
 
 ## Epic: Shop & Recompensas (Prioridade: Alta)
-- [x] Tela `shop` e compra básica (deduz Gold, adiciona inventário)
-- [x] Criação de recompensas customizadas (`Add Custom Reward`)
+
+- [X] Tela `shop` e compra básica (deduz Gold, adiciona inventário)
+- [X] Criação de recompensas customizadas (`Add Custom Reward`)
 - [ ] Exibir desconto dinâmico no UI (melhorar visual atual)
 - [ ] Melhorar inventário (consumíveis, expiração)
 
 ---
 
 ## Epic: Streak & Progressão (Prioridade: Alta)
-- [x] Streak counter e increment (básico)
-- [x] Milestones básicos (definidos no documento)
+
+- [X] Streak counter e increment (básico)
+- [X] Milestones básicos (definidos no documento)
 - [ ] Penalidade de streak quebrada (applyStreakPenalty)
 - [ ] Milestones automáticos e notificações (integração com notifications)
 
 ---
 
 ## Epic: Dashboard, Perfil e Estatísticas (Prioridade: Média)
-- [x] Dashboard básico (Bio-Monitor, Streak, Quick Actions)
-- [x] Profile (dados gerais)
-- [ ] Tela de `Statistics.tsx` com gráficos (MVP v2)
+
+- [X] Dashboard básico (Bio-Monitor, Streak, Quick Actions)
+- [X] Profile (dados gerais)
+- [ ] Tela de `Statistics.tsx` com gráficos
 - [ ] Exportar CSV e filtros (7/30/90/1y)
 
 ---
 
 ## Epic: Notificações & In-App (Prioridade: Média)
+
 - [ ] Local notifications agendadas (expo-notifications)
 - [ ] In-app toasts/notifications (NotificationToast.tsx)
 - [ ] Customização de horários de lembrete
@@ -79,24 +89,27 @@ Próximo passo: design assets & implementar placeholder visual responsivo.
 ---
 
 ## Epic: Persistência & Sync (Prioridade: Alta)
-- [x] AsyncStorage para GameState (implementado)
-- [x] AsyncStorage para user profile (implementado)
+
+- [X] AsyncStorage para GameState (implementado)
+- [X] AsyncStorage para user profile (implementado)
 - [ ] Export / Import (backup & restore)
 - [ ] Versionamento e migrações de dados
 
 ---
 
 ## Infra & Qualidade
-- [x] ESLint a11y configurado
-- [x] Playwright scaffold (até o momento vazio)  
-- [x] Vitest configurado (unit tests)
-- [ ] Expansão da suíte E2E (priorizar onboarding + navegação)  
+
+- [X] ESLint a11y configurado
+- [X] Playwright scaffold (até o momento vazio)
+- [X] Vitest configurado (unit tests)
+- [ ] Expansão da suíte E2E (priorizar onboarding + navegação)
 - [ ] Corrigir violações de acessibilidade encontradas pelo linter
 - [ ] Checklists de PR por épico (commits atômicos, descrição, testes)
 
 ---
 
 ## Notas de Processo e Próximos Passos Imediatos (minhas ações propostas)
+
 1. Corrigir fluxo de first-run/returning user (feito) — abrir PR: `epic/onboarding-redirect` ✅
 2. Adicionar testes unitários para funções biométricas (feito) — abrir PR: `test/biometric` ✅
 3. Criar checklist E2E para onboarding e implementar teste Playwright (próximo)
