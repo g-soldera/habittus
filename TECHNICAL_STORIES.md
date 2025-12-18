@@ -10,16 +10,14 @@ Movido para a seção **COMPLETED EPICS** ao final do documento (implementaçõe
 
 ---
 
-## Epic 2: Sistema de Status RPG (PENDÊNCIAS)
+## Epic 2: Sistema de Status RPG (IN-PROGRESS)
 
-- US-2.1: Cálculo de Status Iniciais  
-	- [ ] Documentar fórmulas e ajustar valores iniciais para 10-50 conforme critério do produto
-	- [ ] Implementar exibição visual de status na Dashboard (barras numeradas)
-	- [ ] Adicionar testes para fórmulas críticas
+Fundação implementada: cálculos de stats iniciais, testes, documentação, componente de exibição.
 
-- US-2.2 / US-2.3: Decay e Ganho de Status  
-	- [ ] Ajustar decay (revisar percentuais e aplicações por tipo)
-	- [ ] Implementar ganhos por atividades detalhadas e limites diários (cap system)
+Pendências:
+- Integrar `StatusDisplay` no Dashboard
+- Implementar decay automático no app open
+- Teste E2E para progresso de stats
 
 ---
 
