@@ -220,6 +220,42 @@ export function useGameState() {
     return updatedState;
   };
 
+  /**
+   * Check for class unlocks based on userProfile stats and training history.
+   * If a new class is unlocked, add to userProfile.unlockedClasses and optionally set currentClass.
+   */
+  const evaluateClassUnlocks = async () => {
+    try {
+      if (!userProfile || !gameState) return null;
+
+      // derive trainings counts from gameState.trainings
+      const trainingsCount: Record<string, number> = {};
+      (gameState.trainings || []).forEach(t => {
+        const key = (t as any).intensity ? (t as any).intensity : (t as any).type || 'unknown';
+        // prefer using type if available
+        const type = (t as any).type || key;
+        trainingsCount[type] = (trainingsCount[type] || 0) + 1;
+      });
+
+      const { checkClassUnlock } = await import('@/lib/biometric-calculator');
+      const newClass = checkClassUnlock(userProfile.stats as any, userProfile.streak || 0, trainingsCount);
+
+      if (newClass && !userProfile.unlockedClasses.includes(newClass)) {
+        const updatedProfile = { ...userProfile };
+        updatedProfile.unlockedClasses = [...updatedProfile.unlockedClasses, newClass];
+        updatedProfile.currentClass = newClass;
+        await AsyncStorage.setItem(USER_PROFILE_KEY, JSON.stringify(updatedProfile));
+        setUserProfile(updatedProfile);
+        return newClass;
+      }
+
+      return null;
+    } catch (error) {
+      console.error('[GameState] Error evaluating class unlocks', error);
+      return null;
+    }
+  };
+
   const purchaseReward = async (rewardId: string) => {
     if (!gameState) return;
 
