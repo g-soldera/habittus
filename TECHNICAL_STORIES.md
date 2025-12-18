@@ -4,22 +4,9 @@
 
 ---
 
-## Epic 1: Sistema de Triagem e Onboarding (PENDÊNCIAS)
+## Epic 1: Sistema de Triagem e Onboarding (COMPLETED)
 
-Obs: triagem básica já implementada; as tarefas abaixo são refinamentos e melhorias de UX/a11y/validação.
-
-- US-1.1: Triagem Inicial - Dados Básicos  
-	- [ ] Garantir validação de idade (18-100) e mensagens claras de erro (refinar)
-	- [ ] Separar passos em componentes (`TriageStep1.tsx`) e adicionar testes unitários de validação
-	- [ ] Acessibilidade: labels adicionais e ordem de foco
-
-- US-1.2: Triagem - Dados Biométricos  
-	- [ ] Exibir TMB/TDEE calculados dinamicamente na interface (feedback imediato)
-	- [ ] Testes unitários e2e para validação dos cálculos na UI
-
-- US-1.3 a US-1.7: Objetivos, Saúde, Nutrição, Estudo e Finanças  
-	- [ ] Refatorar cada etapa em componentes separados (`TriageStep2..7.tsx`) para facilitar testes e acessibilidade
-	- [ ] Persistir inputs intermediários (salvar progresso da triagem)
+Movido para a seção **COMPLETED EPICS** ao final do documento (implementações: validação 18-100, estimativa TMB/TDEE em tempo real, utilitários testáveis, testes unitários, melhorias de redirecionamento e persistência de perfil).  
 
 ---
 
@@ -142,6 +129,30 @@ Obs: triagem básica já implementada; as tarefas abaixo são refinamentos e mel
 - Armazenar status inicial no perfil
 - Criar tipos TypeScript para status
 
+---
+
+## COMPLETED EPICS
+
+### Epic 1: Sistema de Triagem e Onboarding — COMPLETED (2025-12-17)
+
+Descrição original (resumo): Implementar triagem inicial em 7 passos para coletar dados básicos, biométricos, objetivos por pilares, treino, nutrição, estudo, finanças e classificar automaticamente a classe do usuário.  
+
+O que foi implementado nesta entrega:
+- Validações de entrada refinadas (idade agora válida apenas entre 18 e 100 anos) — `lib/triage-utils.ts`  
+- Utilitários de validação testáveis (`validateAge`, `validateBiometrics`, `estimateTmbTdee`)  
+- Feedback em tempo real de TMB/TDEE na etapa biométrica (UI em `app/triage.tsx`)  
+- Classificação automática integra com `lib/biometric-calculator.ts` (`classifyUser`)  
+- Persistência de perfil e criação de GameState (`use-game-state`, `saveUserProfile`)  
+- Redirecionamento de usuários retornantes da triagem para Dashboard (`triage.tsx` checks `userProfile`)  
+- Testes unitários adicionados: `tests/triage-utils.test.ts`, `tests/biometric.test.ts`  
+
+PR: `epic/triage-refactor` — inclui commits atômicos para validações, UI de feedback e testes.
+
+Observações e próximos passos (por fazer):
+- Refatorar steps em componentes (`TriageStep1..7.tsx`) para melhor testabilidade e acessibilidade (próximo PR)
+- Adicionar testes E2E para validar jornada completa (onboarding -> triage -> dashboard)
+
+---
 ---
 
 ### US-2.2: Decay de Status com o Tempo

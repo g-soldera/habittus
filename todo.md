@@ -97,10 +97,11 @@ Próximo passo: design assets & implementar placeholder visual responsivo.
 ---
 
 ## Notas de Processo e Próximos Passos Imediatos (minhas ações propostas)
-1. Corrigir fluxo de first-run/returning user (feito) — abrir PR: `epic/onboarding-redirect` ✅
-2. Adicionar testes unitários para funções biométricas (feito) — abrir PR: `test/biometric` ✅
-3. Criar checklist E2E para onboarding e implementar teste Playwright (próximo)
-4. Planejar EPICS e abrir PRs por épico com commits atômicos (priorizar Triagem, Rastreamento Nutrição e Personagem)
+1. Corrigir fluxo de first-run/returning user (feito) — PR: `sprint1/accessibility-e2e-setup` ✅
+2. Adicionar testes unitários para funções biométricas (feito) — PR: `sprint1/accessibility-e2e-setup` ✅
+3. Implementar validações testáveis e feedback TMB/TDEE ao vivo — PR: `epic/triage-refactor` (aberto) ✅
+4. Criar checklist E2E para onboarding e implementar teste Playwright (próximo)
+5. Planejar EPICS e abrir PRs por épico com commits atômicos (priorizar Rastreamento Nutrição e Personagem).
 
 ---
 

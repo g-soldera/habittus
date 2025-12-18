@@ -14,7 +14,8 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { CyberpunkColors } from '@/constants/theme';
 import { useGameState } from '@/hooks/use-game-state';
-import { classifyUser, calculateTMB, calculateTDEE } from '@/lib/biometric-calculator';
+import { classifyUser } from '@/lib/biometric-calculator';
+import { validateAge, validateBiometrics, estimateTmbTdee } from '@/lib/triage-utils';
 import { TriageResponse, Gender, Pillar, BiometricData } from '@/types/biometric';
 
 export default function TriageScreen() {
@@ -36,10 +37,32 @@ export default function TriageScreen() {
   const [age, setAge] = useState('');
   const [gender, setGender] = useState<Gender>('male');
 
+  // Live estimate for TMB/TDEE
+  const [liveEstimate, setLiveEstimate] = useState<{ tmb: number; tdee: number; activityLevel: string } | null>(null);
+
   // Step 2: Body Metrics
   const [heightCm, setHeightCm] = useState('');
   const [weightKg, setWeightKg] = useState('');
   const [bodyFatPercent, setBodyFatPercent] = useState('');
+
+  // Update live estimates when biometrics or training frequency change
+  useEffect(() => {
+    const h = parseInt(heightCm);
+    const w = parseInt(weightKg);
+    const a = parseInt(age);
+    const tf = parseInt(trainingFrequency);
+
+    if (!Number.isNaN(h) && !Number.isNaN(w) && !Number.isNaN(a)) {
+      try {
+        const est = estimateTmbTdee(w, h, a, gender, Number.isNaN(tf) ? 0 : tf);
+        setLiveEstimate(est as any);
+      } catch {
+        setLiveEstimate(null);
+      }
+    } else {
+      setLiveEstimate(null);
+    }
+  }, [heightCm, weightKg, age, gender, trainingFrequency]);
 
   // Step 3: Objectives (7 Pillars)
   const [objectives, setObjectives] = useState<Pillar[]>([]);
@@ -79,25 +102,19 @@ export default function TriageScreen() {
   const handleNext = () => {
     // Validação básica
     if (step === 1) {
-      if (!characterName.trim() || !age || parseInt(age) < 13 || parseInt(age) > 120) {
-        Alert.alert('Erro', 'Por favor, insira um nome válido e uma idade entre 13 e 120 anos');
+      const ageNumber = parseInt(age);
+      const ageValidation = validateAge(ageNumber);
+      if (!characterName.trim() || !age || !ageValidation.valid) {
+        Alert.alert('Erro', ageValidation.message || 'Por favor, insira um nome válido e uma idade válida (18-100 anos)');
         return;
       }
     } else if (step === 2) {
-      if (!heightCm || !weightKg || !bodyFatPercent) {
-        Alert.alert('Erro', 'Por favor, preencha todos os dados biométricos');
-        return;
-      }
-      if (parseInt(heightCm) < 100 || parseInt(heightCm) > 250) {
-        Alert.alert('Erro', 'Altura deve estar entre 100 e 250 cm');
-        return;
-      }
-      if (parseInt(weightKg) < 30 || parseInt(weightKg) > 300) {
-        Alert.alert('Erro', 'Peso deve estar entre 30 e 300 kg');
-        return;
-      }
-      if (parseInt(bodyFatPercent) < 5 || parseInt(bodyFatPercent) > 50) {
-        Alert.alert('Erro', 'Percentual de gordura deve estar entre 5 e 50%');
+      const h = parseInt(heightCm);
+      const w = parseInt(weightKg);
+      const bf = parseInt(bodyFatPercent);
+      const biomValidation = validateBiometrics(h, w, bf);
+      if (!heightCm || !weightKg || !bodyFatPercent || !biomValidation.valid) {
+        Alert.alert('Erro', biomValidation.message || 'Por favor, preencha todos os dados biométricos corretamente');
         return;
       }
     } else if (step === 3) {
@@ -119,15 +136,13 @@ export default function TriageScreen() {
       setLoading(true);
 
       // Calcula TMB e TDEE
-      const tmb = calculateTMB(
+      const { tmb, tdee } = estimateTmbTdee(
         parseInt(weightKg),
         parseInt(heightCm),
         parseInt(age),
-        gender
+        gender,
+        parseInt(trainingFrequency) || 0
       );
-
-      const activityLevel = parseInt(trainingFrequency) > 3 ? 'active' : parseInt(trainingFrequency) > 0 ? 'moderate' : 'sedentary';
-      const tdee = calculateTDEE(tmb, activityLevel);
 
       // Cria resposta de triagem
       const triageResponse: TriageResponse = {
@@ -287,6 +302,19 @@ export default function TriageScreen() {
               keyboardType="numeric"
               placeholderTextColor={CyberpunkColors.darkGray}
             />
+
+            {/* Live TMB/TDEE feedback */}
+            {liveEstimate && (
+              <ThemedView style={{ marginTop: 12 }}>
+                <ThemedText style={{ fontSize: 12, color: CyberpunkColors.textSecondary }}>Estimativa</ThemedText>
+                <ThemedText accessibilityLabel={`TMB estimado ${Math.round(liveEstimate.tmb)} calorias`} style={{ color: CyberpunkColors.cyan }}>
+                  TMB: {Math.round(liveEstimate.tmb)} kcal
+                </ThemedText>
+                <ThemedText accessibilityLabel={`TDEE estimado ${Math.round(liveEstimate.tdee)} calorias`} style={{ color: CyberpunkColors.cyan }}>
+                  TDEE: {Math.round(liveEstimate.tdee)} kcal ({liveEstimate.activityLevel})
+                </ThemedText>
+              </ThemedView>
+            )}
           </ThemedView>
         );
 
