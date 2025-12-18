@@ -8,6 +8,12 @@ import {
   DEFAULT_GIGS,
   DEFAULT_REWARDS,
 } from "@/lib/mock-data";
+import {
+  createTrainingLog,
+  createMealLog,
+  createStudyLog,
+  createWaterLog,
+} from '@/lib/tracking';
 import { GameState, Gig, Bounty, Reward, InventoryItem, BioMonitor } from "@/types";
 import { UserProfile, BiometricData, ClassType } from "@/types/biometric";
 
@@ -150,6 +156,68 @@ export function useGameState() {
         await saveGameState(updatedState);
       }
     }
+  };
+
+  const logWorkout = async (durationMinutes: number, intensity: 'low' | 'moderate' | 'high' = 'moderate', caloriesBurned?: number) => {
+    if (!gameState) return;
+    const updatedState = { ...gameState } as GameState;
+    const entry = createTrainingLog(durationMinutes, intensity, caloriesBurned);
+    updatedState.trainings = updatedState.trainings || [];
+    updatedState.trainings.push(entry);
+    // Apply XP and small hardware boost
+    updatedState.bioMonitor.totalXp += entry.xpGained;
+    updatedState.bioMonitor.hardware = Math.min(100, updatedState.bioMonitor.hardware + Math.round(entry.xpGained / 10));
+
+    updatedState.lastUpdatedAt = Date.now();
+    await saveGameState(updatedState);
+  };
+
+  const logStudy = async (hours: number, subject?: string) => {
+    if (!gameState) return;
+    const updatedState = { ...gameState } as GameState;
+    const entry = createStudyLog(hours, subject);
+    updatedState.studies = updatedState.studies || [];
+    updatedState.studies.push(entry);
+    updatedState.bioMonitor.totalXp += entry.xpGained;
+    updatedState.bioMonitor.ram = Math.min(100, updatedState.bioMonitor.ram + Math.round(entry.xpGained / 25));
+    updatedState.lastUpdatedAt = Date.now();
+    await saveGameState(updatedState);
+  };
+
+  const logMeal = async (calories: number, name?: string) => {
+    if (!gameState) return;
+    const updatedState = { ...gameState } as GameState;
+    const entry = createMealLog(calories, name);
+    updatedState.meals = updatedState.meals || [];
+    updatedState.meals.push(entry);
+    updatedState.bioMonitor.totalXp += entry.xpGained;
+    // Small credits reward for logging nutrition
+    updatedState.bioMonitor.credits += Math.round(calories / 200);
+    updatedState.lastUpdatedAt = Date.now();
+    await saveGameState(updatedState);
+  };
+
+  const logWater = async (ml: number) => {
+    if (!gameState) return;
+    const updatedState = { ...gameState } as GameState;
+    const entry = createWaterLog(ml);
+    updatedState.waterLogs = updatedState.waterLogs || [];
+    updatedState.waterLogs.push(entry);
+    // Apply RAM boost immediately
+    updatedState.bioMonitor.ram = Math.min(100, updatedState.bioMonitor.ram + (entry.ramBoost || 0));
+    updatedState.lastUpdatedAt = Date.now();
+    await saveGameState(updatedState);
+  };
+
+  // Apply daily decay to bioMonitor (can be called by scheduler or UI)
+  const applyDailyDecay = async (days = 1) => {
+    if (!gameState) return;
+    const updatedState = { ...gameState } as GameState;
+    const newBio = (await import('@/lib/status')).applyDailyDecay(updatedState.bioMonitor, days);
+    updatedState.bioMonitor = newBio;
+    updatedState.lastUpdatedAt = Date.now();
+    await saveGameState(updatedState);
+    return updatedState;
   };
 
   const purchaseReward = async (rewardId: string) => {
@@ -299,5 +367,10 @@ export function useGameState() {
     resetGame,
     saveGameState,
     saveUserProfile,
+    logWorkout,
+    logStudy,
+    logMeal,
+    logWater,
   };
 }
+

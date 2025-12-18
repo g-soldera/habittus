@@ -64,6 +64,38 @@ export interface InventoryItem {
   quantity: number;
 }
 
+// Activity / Tracking Logs
+export interface TrainingLog {
+  id: string;
+  durationMinutes: number;
+  caloriesBurned?: number;
+  intensity?: 'low' | 'moderate' | 'high';
+  xpGained: number;
+  createdAt: number;
+}
+
+export interface MealLog {
+  id: string;
+  name?: string;
+  calories: number;
+  xpGained: number;
+  createdAt: number;
+}
+
+export interface StudyLog {
+  id: string;
+  hours: number;
+  subject?: string;
+  xpGained: number;
+  createdAt: number;
+}
+
+export interface WaterLog {
+  id: string;
+  ml: number;
+  ramBoost?: number; // temporary RAM boost
+  createdAt: number;
+}
 // Game State
 export interface GameState {
   character: Character;
@@ -72,6 +104,10 @@ export interface GameState {
   bounties: Bounty[];
   rewards: Reward[];
   inventory: InventoryItem[];
+  trainings?: TrainingLog[];
+  meals?: MealLog[];
+  studies?: StudyLog[];
+  waterLogs?: WaterLog[];
   lastUpdatedAt: number;
 }
 
