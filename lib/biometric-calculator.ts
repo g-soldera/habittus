@@ -103,15 +103,137 @@ export function classifyUser(triage: TriageResponse, biometrics: BiometricData):
     selectedClass = 'fixer';
   }
 
-  // Gera estatísticas iniciais baseado na classe
+  // Gera estatísticas iniciais baseado na classe E nos dados da triagem
   const statBoosts = getInitialStatBoosts(selectedClass);
+  const realisticStats = calculateRealisticInitialStats(triage, biometrics, statBoosts);
   const pillarBoosts = getInitialPillarBoosts(selectedClass);
 
   return {
     baseClass: selectedClass,
     reasoning: `Classificado como ${selectedClass.toUpperCase()} baseado em: objetivos (${objectives.join(', ')}), atividade (${activityLevel}), treino (${primaryTrainingType || 'nenhum'})`,
-    statBoosts,
+    statBoosts: realisticStats,
     pillarBoosts,
+  };
+}
+
+/**
+ * Calcula stats iniciais realísticos baseado nas respostas da triagem
+ * Em vez de todos começarem em 50, ajustamos baseado no estilo de vida atual
+ */
+function calculateRealisticInitialStats(
+  triage: TriageResponse,
+  biometrics: BiometricData,
+  classBoosts: Partial<UserStats>
+): Partial<UserStats> {
+  const stats: UserStats = {
+    strength: 30, // Baseline baixo
+    agility: 30,
+    constitution: 30,
+    intelligence: 30,
+    wisdom: 30,
+    charisma: 30,
+    willpower: 30,
+  };
+
+  // Ajustes baseados em frequência de treino
+  if (triage.currentTrainingFrequency >= 5) {
+    stats.strength += 25;
+    stats.constitution += 20;
+    stats.agility += 20;
+  } else if (triage.currentTrainingFrequency >= 3) {
+    stats.strength += 15;
+    stats.constitution += 15;
+    stats.agility += 10;
+  } else if (triage.currentTrainingFrequency >= 1) {
+    stats.strength += 5;
+    stats.constitution += 5;
+  }
+
+  // Ajustes por tipo de treino
+  if (triage.primaryTrainingType === 'strength') {
+    stats.strength += 15;
+    stats.constitution += 10;
+  } else if (triage.primaryTrainingType === 'cardio') {
+    stats.constitution += 15;
+    stats.agility += 10;
+  } else if (triage.primaryTrainingType === 'functional') {
+    stats.agility += 15;
+    stats.strength += 5;
+  } else if (triage.primaryTrainingType === 'yoga') {
+    stats.agility += 10;
+    stats.wisdom += 10;
+  }
+
+  // Ajustes baseados em horas de estudo
+  if (triage.hoursStudyPerWeek >= 20) {
+    stats.intelligence += 25;
+    stats.wisdom += 15;
+  } else if (triage.hoursStudyPerWeek >= 10) {
+    stats.intelligence += 15;
+    stats.wisdom += 10;
+  } else if (triage.hoursStudyPerWeek >= 5) {
+    stats.intelligence += 10;
+    stats.wisdom += 5;
+  }
+
+  // Ajustes baseados em horas de foco
+  if (triage.hoursOfFocusPerDay >= 6) {
+    stats.willpower += 20;
+    stats.intelligence += 10;
+  } else if (triage.hoursOfFocusPerDay >= 4) {
+    stats.willpower += 15;
+    stats.intelligence += 5;
+  } else if (triage.hoursOfFocusPerDay >= 2) {
+    stats.willpower += 10;
+  }
+
+  // Ajustes baseados em situação financeira
+  if (triage.monthlyIncome > 5000 && triage.totalDebt === 0) {
+    stats.charisma += 15;
+    stats.wisdom += 10;
+  } else if (triage.monthlyIncome > 3000) {
+    stats.charisma += 10;
+    stats.wisdom += 5;
+  } else if (triage.totalDebt > triage.monthlyIncome * 2) {
+    // Endividado = stress = -wisdom
+    stats.wisdom = Math.max(20, stats.wisdom - 5);
+  }
+
+  // Ajustes baseados em sono
+  if (triage.averageSleepHours >= 7 && triage.averageSleepHours <= 9) {
+    stats.constitution += 10;
+    stats.willpower += 5;
+  } else if (triage.averageSleepHours < 6) {
+    // Sono ruim = penalidade
+    stats.constitution = Math.max(20, stats.constitution - 10);
+    stats.willpower = Math.max(20, stats.willpower - 5);
+  }
+
+  // Ajustes baseados em IMC (biometria)
+  const bmi = calculateBMI(biometrics.weightKg, biometrics.heightCm);
+  if (bmi >= 18.5 && bmi <= 24.9) {
+    // IMC saudável
+    stats.constitution += 10;
+    stats.agility += 5;
+  } else if (bmi >= 30) {
+    // Obesidade = penalidade em agilidade
+    stats.agility = Math.max(20, stats.agility - 10);
+    stats.constitution = Math.max(20, stats.constitution - 5);
+  } else if (bmi < 18.5) {
+    // Abaixo do peso = penalidade em força
+    stats.strength = Math.max(20, stats.strength - 10);
+    stats.constitution = Math.max(20, stats.constitution - 5);
+  }
+
+  // Aplica boosts de classe por cima dos stats realísticos
+  return {
+    strength: Math.min(100, stats.strength + (classBoosts.strength || 0)),
+    agility: Math.min(100, stats.agility + (classBoosts.agility || 0)),
+    constitution: Math.min(100, stats.constitution + (classBoosts.constitution || 0)),
+    intelligence: Math.min(100, stats.intelligence + (classBoosts.intelligence || 0)),
+    wisdom: Math.min(100, stats.wisdom + (classBoosts.wisdom || 0)),
+    charisma: Math.min(100, stats.charisma + (classBoosts.charisma || 0)),
+    willpower: Math.min(100, stats.willpower + (classBoosts.willpower || 0)),
   };
 }
 
@@ -119,76 +241,70 @@ export function classifyUser(triage: TriageResponse, biometrics: BiometricData):
  * Retorna os boosts de status iniciais para cada classe
  */
 export function getInitialStatBoosts(classType: ClassType): Partial<UserStats> {
-  const baseStats: UserStats = {
-    strength: 50,
-    agility: 50,
-    constitution: 50,
-    intelligence: 50,
-    wisdom: 50,
-    charisma: 50,
-    willpower: 50,
-  };
-
+  // Boosts ADICIONAIS da classe (não começa em 50, começa em 0)
+  // Os stats base já vêm de calculateRealisticInitialStats
   const classBoosts: Record<ClassType, Partial<UserStats>> = {
     netrunner: {
-      intelligence: baseStats.intelligence + 20,
-      wisdom: baseStats.wisdom + 15,
-      strength: baseStats.strength - 10,
-      agility: baseStats.agility - 5,
+      intelligence: 20,
+      wisdom: 15,
+      strength: -10,
+      agility: -5,
     },
     solo: {
-      strength: baseStats.strength + 25,
-      constitution: baseStats.constitution + 20,
-      agility: baseStats.agility - 10,
+      strength: 25,
+      constitution: 20,
+      agility: -10,
     },
     fixer: {
-      charisma: baseStats.charisma + 15,
-      wisdom: baseStats.wisdom + 15,
-      constitution: baseStats.constitution + 15,
+      charisma: 15,
+      wisdom: 15,
+      constitution: 15,
     },
     techie: {
-      agility: baseStats.agility + 25,
-      intelligence: baseStats.intelligence + 10, // Destreza não existe, usa INT como proxy
-      strength: baseStats.strength - 10,
+      agility: 25,
+      intelligence: 10,
+      strength: -10,
     },
     cyborg: {
-      strength: baseStats.strength + 30,
-      agility: baseStats.agility + 30,
-      constitution: baseStats.constitution + 10,
+      strength: 30,
+      agility: 30,
+      constitution: 10,
     },
     hacker: {
-      intelligence: baseStats.intelligence + 30,
-      wisdom: baseStats.wisdom + 25,
-      charisma: baseStats.charisma + 20,
+      intelligence: 30,
+      wisdom: 25,
+      charisma: 20,
     },
     gladiador: {
-      strength: baseStats.strength + 28,
-      constitution: baseStats.constitution + 28,
-      charisma: baseStats.charisma + 20,
+      strength: 28,
+      constitution: 28,
+      charisma: 20,
     },
     ninja: {
-      agility: baseStats.agility + 30,
-      intelligence: baseStats.intelligence + 28,
-      wisdom: baseStats.wisdom + 10,
+      agility: 30,
+      intelligence: 28,
+      wisdom: 10,
     },
     tita: {
-      strength: baseStats.strength + 35,
-      agility: baseStats.agility + 30,
-      constitution: baseStats.constitution + 35,
-      charisma: baseStats.charisma + 15,
+      strength: 35,
+      agility: 30,
+      constitution: 35,
+      charisma: 15,
     },
     mestre: {
-      intelligence: baseStats.intelligence + 35,
-      wisdom: baseStats.wisdom + 35,
-      charisma: baseStats.charisma + 25,
+      intelligence: 35,
+      wisdom: 35,
+      charisma: 25,
     },
     'ser-supremo': {
-      strength: 100,
-      agility: 100,
-      constitution: 100,
-      intelligence: 100,
-      wisdom: 100,
-      charisma: 100,
+      // Ser supremo já tem stats máximos
+      strength: 70,
+      agility: 70,
+      constitution: 70,
+      intelligence: 70,
+      wisdom: 70,
+      charisma: 70,
+      willpower: 70,
     },
   };
 
