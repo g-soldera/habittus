@@ -3,57 +3,80 @@
 > **Data:** 22 de dezembro de 2025  
 > **Objetivo:** Transformar o app em um verdadeiro RPG Cyberpunk com melhorias visuais, áudio, configurações e gameplay aprimorado.
 
-## 🎯 Prioridade MÁXIMA - Sprint Atual
+## ✅ Implementado Nesta Sessão
 
-### 1. Sistema de Configurações & Áudio ⚙️🎵
-- [ ] Criar tela de configurações (`app/(tabs)/settings.tsx`)
-- [ ] Menu de configurações com música on/off
-- [ ] Integrar música de fundo (rock cyberpunk via API pública - ex: SoundCloud, Freesound)
-- [ ] Sons de clique nos botões (volume configurável)
-- [ ] Slider de volume para música e SFX
-- [ ] Mover botão "RESETAR JOGO" para configurações
-- [ ] Persistir preferências de áudio no AsyncStorage
+### 1. Sistema de Configurações & Áudio ⚙️🎵 [COMPLETO]
+- ✅ Tela de configurações (`app/(tabs)/settings.tsx`)
+- ✅ Hook `useAudio` para gerenciar música de fundo e SFX
+- ✅ Integração com expo-av para áudio
+- ✅ Sliders de volume para música e efeitos sonoros
+- ✅ Toggle on/off para música e SFX
+- ✅ Seletor de idioma (PT-BR/EN-US) preparado
+- ✅ Botão "RESETAR JOGO" movido para configurações
+- ✅ Persistência de preferências com AsyncStorage
 
-### 2. Melhorias Visuais Cyberpunk 🎨✨
-- [ ] Adicionar SVGs cyberpunk (circuitos, glitch effects, neon borders)
+### 2. Melhorias Visuais Cyberpunk 🎨✨ [FASE 1 COMPLETA]
+- ✅ Glow effects no streak counter (shadow + text shadow)
+- ✅ Contraste melhorado em todos os inputs (border 2px, bg escuro)
+- ✅ Botões de gênero com seleção visual clara (border color, glow, bg)
+- ✅ Campo "Tipo de Dieta" transformado em grid de botões com emojis
+- ✅ Botões redundantes da home removidos (já existem no menu)
+- ✅ Ícone Settings adicionado ao menu do rodapé
+
+### 3. Stats Iniciais Realísticos 📊 [COMPLETO]
+- ✅ Função `calculateRealisticInitialStats()` implementada
+- ✅ Stats base começam em 30 (não 50)
+- ✅ Ajustes por frequência/tipo de treino (+25 força se treina muito)
+- ✅ Ajustes por horas de estudo (+25 intelligence se > 20h/semana)
+- ✅ Ajustes por sono (+10 constitution se 7-9h)
+- ✅ Penalidades por IMC inadequado (-10 agility se obeso)
+- ✅ Penalidades por dívidas (-5 wisdom se endividado)
+- ✅ Boosts de classe aplicados sobre stats realísticos
+
+## 🎯 Próximos Passos
+
+### Fase 2: Visuais Avançados & Animações 🚀
+- [ ] Instalar react-native-reanimated para animações
+- [ ] Adicionar SVGs cyberpunk (circuitos, glitch, neon borders)
 - [ ] Animações de transição entre telas
-- [ ] Efeitos de brilho/glow em elementos importantes (XP bar, gold, buttons)
-- [ ] Texturas cyberpunk nos cards (scanlines, noise, grid)
-- [ ] Melhorar contraste de inputs (border glow, background diferenciado)
-- [ ] Botões de seleção (gênero, dieta) com estado visual ativo/inativo claro
-- [ ] Menu do rodapé com cores neon e ícones com glow
-- [ ] Animações de partículas ao completar gigs
-- [ ] Background animado no dashboard (grid cyberpunk, movimento parallax)
+- [ ] Texturas nos cards (scanlines, noise pattern, grid)
+- [ ] Background animado no dashboard (parallax grid)
+- [ ] Partículas ao completar gigs
+- [ ] Efeitos de scan ao abrir telas
 
-### 3. Fixes de UX Críticos 🐛
-- [ ] Campo "Tipo de Dieta" como Select/Picker
-- [ ] Corrigir contraste de inputs (todos os campos de texto)
-- [ ] Botões de gênero com estilo ativo/inativo visível
-- [ ] Remover botões redundantes da home (GIGS, LOJA, PERFIL - já há menu no rodapé)
-- [ ] Bio-monitor: adicionar tooltips explicativos
-- [ ] Alertas da home: melhorar clareza e posicionamento
-- [ ] Stats iniciais baseados nas respostas da triagem (não todos em 50)
-
-### 4. Sistema de i18n (PT-BR e EN-US) 🌍
-- [ ] Instalar react-i18next ou expo-localization
-- [ ] Criar arquivos de tradução (locales/pt-br.json, locales/en-us.json)
+### Fase 3: i18n Completo 🌍
+- [ ] Instalar react-i18next
+- [ ] Criar arquivos locales/pt-br.json e locales/en-us.json
 - [ ] Traduzir todas as strings da UI
-- [ ] Selector de idioma nas configurações
-- [ ] Persistir idioma escolhido
+- [ ] Hook useTranslation em todos os componentes
+- [ ] Persistir idioma selecionado
 
-### 5. Gigs & Bounties Personalizáveis 🎯💰
-- [ ] Tela "Adicionar Gig Personalizada" com campos: nome, descrição, complexidade (1-10)
-- [ ] Algoritmo de cálculo de recompensa baseado em complexidade
-- [ ] Tela "Adicionar Bounty Personalizada" (dívida real)
-- [ ] CRUD completo para gigs e bounties customizadas
-- [ ] Integração com AsyncStorage
+### Fase 4: Gigs & Bounties Personalizáveis 🎯
+- [ ] Tela "Add Custom Gig" com campos (nome, descrição, complexidade 1-10)
+- [ ] Algoritmo: recompensa = complexidade * 10 XP + complexidade * 5 Gold
+- [ ] Tela "Add Custom Bounty" (dívida real do usuário)
+- [ ] CRUD completo (editar, deletar gigs/bounties)
+- [ ] Persistir no AsyncStorage junto com gameState
 
-### 6. Sistema de Avatar/Personagem 🎭
-- [ ] Pesquisar API de avatares compatível com React Native (ex: DiceBear, Avataaars, RoboHash)
+### Fase 5: Avatar/Personagem Customizável 🎭
+- [ ] Pesquisar APIs: DiceBear, Avataaars, RoboHash
 - [ ] Integrar API escolhida
-- [ ] Customização de avatar na criação de personagem
-- [ ] Exibir avatar no Dashboard e Profile
-- [ ] Avatar muda conforme progresso (peso, stats, classe)
+- [ ] Tela de customização de avatar na criação
+- [ ] Avatar no Dashboard e Profile
+- [ ] Avatar muda baseado em peso/stats/classe
+
+### Fase 6: Melhorias do Bio-Monitor & Alertas 💡
+- [ ] Adicionar tooltips explicativos (RAM = Foco/Energia)
+- [ ] Melhorar clareza dos alertas (ícones, cores, texto)
+- [ ] Posicionar alertas de forma menos intrusiva
+- [ ] Animação ao mostrar alertas críticos
+
+### Fase 7: Áudio Real 🎵
+- [ ] Encontrar música cyberpunk/synthwave livre (Pixabay, Freesound)
+- [ ] Adicionar sons de clique (cyber beep)
+- [ ] Sons ao completar gig (success fanfare)
+- [ ] Sons ao comprar item (cash register)
+- [ ] Música de fundo dinâmica (muda por tela)
 
 ## 📋 Backlog Organizado (Épicos)
 

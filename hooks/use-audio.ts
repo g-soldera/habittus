@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
-import { Audio } from 'expo-audio';
+import { createAudioPlayer, setAudioModeAsync } from 'expo-audio';
+import type { AudioPlayer } from 'expo-audio';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AUDIO_SETTINGS_KEY = 'habittus_audio_settings';
@@ -23,7 +24,7 @@ export function useAudio() {
   const [settings, setSettings] = useState<AudioSettings>(DEFAULT_SETTINGS);
   const [isLoading, setIsLoading] = useState(true);
   const [appState, setAppState] = useState<AppStateStatus>('active');
-  const musicSound = useRef<Audio.Sound | null>(null);
+  const musicPlayer = useRef<AudioPlayer | null>(null);
   const appStateSubscription = useRef<any>(null);
 
   // Load settings from storage
@@ -33,11 +34,10 @@ export function useAudio() {
 
   // Setup audio mode
   useEffect(() => {
-    Audio.setAudioModeAsync({
-      allowsRecordingIOS: false,
-      playsInSilentModeIOS: true,
-      staysActiveInBackground: true,
-      shouldDuckAndroid: true,
+    setAudioModeAsync({
+      allowsRecording: false,
+      playsInSilentMode: true,
+      shouldPlayInBackground: true,
     });
   }, []);
 
@@ -54,18 +54,18 @@ export function useAudio() {
     
     if (state === 'inactive' || state === 'background') {
       // Pause music when app goes to background
-      if (musicSound.current) {
+      if (musicPlayer.current) {
         try {
-          await musicSound.current.pauseAsync();
+          musicPlayer.current.pause();
         } catch (error) {
           console.error('[Audio] Error pausing music:', error);
         }
       }
     } else if (state === 'active') {
       // Resume music when app comes to foreground
-      if (musicSound.current && settings.musicEnabled) {
+      if (musicPlayer.current && settings.musicEnabled) {
         try {
-          await musicSound.current.playAsync();
+          musicPlayer.current.play();
         } catch (error) {
           console.error('[Audio] Error resuming music:', error);
         }
@@ -75,17 +75,17 @@ export function useAudio() {
 
   // Load background music
   useEffect(() => {
-    if (settings.musicEnabled && !musicSound.current && appState === 'active') {
+    if (settings.musicEnabled && !musicPlayer.current && appState === 'active') {
       loadBackgroundMusic();
-    } else if (!settings.musicEnabled && musicSound.current) {
+    } else if (!settings.musicEnabled && musicPlayer.current) {
       stopMusic();
     }
   }, [settings.musicEnabled, appState]);
 
   // Update music volume
   useEffect(() => {
-    if (musicSound.current) {
-      musicSound.current.setVolumeAsync(settings.musicVolume);
+    if (musicPlayer.current) {
+      musicPlayer.current.volume = settings.musicVolume;
     }
   }, [settings.musicVolume]);
 
@@ -114,17 +114,14 @@ export function useAudio() {
   const loadBackgroundMusic = async () => {
     try {
       // Using a free royalty-free track from Pixabay
-      const audioSource = {
-        uri: 'https://cdn.pixabay.com/download/audio/2022/09/01/audio_1d14fdf92b.mp3',
-      };
+      const audioSource = 'https://cdn.pixabay.com/download/audio/2022/09/01/audio_1d14fdf92b.mp3';
 
-      const sound = new Audio.Sound();
-      await sound.loadAsync(audioSource);
-      await sound.setIsLoopingAsync(true);
-      await sound.setVolumeAsync(settings.musicVolume);
-      await sound.playAsync();
+      const player = createAudioPlayer(audioSource);
+      player.loop = true;
+      player.volume = settings.musicVolume;
+      player.play();
       
-      musicSound.current = sound;
+      musicPlayer.current = player;
     } catch (error) {
       console.error('[Audio] Error loading background music:', error);
       // Fallback: continue without music
@@ -132,11 +129,11 @@ export function useAudio() {
   };
 
   const stopMusic = async () => {
-    if (musicSound.current) {
+    if (musicPlayer.current) {
       try {
-        await musicSound.current.pauseAsync();
-        await musicSound.current.unloadAsync();
-        musicSound.current = null;
+        musicPlayer.current.pause();
+        musicPlayer.current.remove();
+        musicPlayer.current = null;
       } catch (error) {
         console.error('[Audio] Error stopping music:', error);
       }
@@ -149,16 +146,13 @@ export function useAudio() {
     try {
       // Create a simple beep sound using a minimal WAV file in base64
       // This is a short beep tone that works cross-platform
-      const sound = new Audio.Sound();
-      await sound.loadAsync({
-        uri: 'data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA==',
-      });
-      await sound.setVolumeAsync(settings.sfxVolume);
-      await sound.playAsync();
+      const player = createAudioPlayer('data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA==');
+      player.volume = settings.sfxVolume;
+      player.play();
       
       // Cleanup after playing
       setTimeout(() => {
-        sound.unloadAsync();
+        player.remove();
       }, 200);
     } catch (error) {
       console.error('[Audio] Error playing click sound:', error);
@@ -188,8 +182,8 @@ export function useAudio() {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (musicSound.current) {
-        musicSound.current.unloadAsync();
+      if (musicPlayer.current) {
+        musicPlayer.current.remove();
       }
     };
   }, []);

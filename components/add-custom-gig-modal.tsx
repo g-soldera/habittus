@@ -22,7 +22,7 @@ interface AddCustomGigProps {
 
 export function AddCustomGigModal({ onClose }: AddCustomGigProps) {
   const router = useRouter();
-  const { gameState, updateGameState } = useGameState();
+  const { gameState, saveGameState } = useGameState();
   
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -74,7 +74,7 @@ export function AddCustomGigModal({ onClose }: AddCustomGigProps) {
 
     try {
       const updatedGigs = [...gameState.gigs, newGig];
-      await updateGameState({
+      await saveGameState({
         ...gameState,
         gigs: updatedGigs,
       });
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
     borderColor: CyberpunkColors.cyan,
     borderRadius: 4,
     padding: 12,
-    color: CyberpunkColors.text,
+    color: CyberpunkColors.textPrimary,
     fontFamily: "Courier New",
     fontSize: 12,
   },

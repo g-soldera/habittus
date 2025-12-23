@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, TextInput, Pressable, Alert } from 'react-native';
-import { ThemedText } from './themed-text';
-import { ThemedView } from './themed-view';
+import { ThemedText } from '../components/themed-text';
+import { ThemedView } from '../components/themed-view';
 import { CyberpunkColors } from '@/constants/theme';
 import { useGameState } from '@/hooks/use-game-state';
 

@@ -51,6 +51,8 @@ export interface Bounty {
   description: string;
   totalValue: number; // R$ (valor total da dívida)
   remainingValue: number; // R$ (valor restante)
+  totalAmount?: number; // Alias para totalValue (compatibilidade)
+  monthlyPayment?: number; // Meta mensal de pagamento
   createdAt: number;
   paidDates: { date: number; amount: number }[]; // Histórico de pagamentos
 }

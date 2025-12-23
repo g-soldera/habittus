@@ -22,7 +22,7 @@ interface AddCustomBountyProps {
 
 export function AddCustomBountyModal({ onClose }: AddCustomBountyProps) {
   const router = useRouter();
-  const { gameState, updateGameState } = useGameState();
+  const { gameState, saveGameState } = useGameState();
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -46,16 +46,17 @@ export function AddCustomBountyModal({ onClose }: AddCustomBountyProps) {
       id: `bounty-${Date.now()}`,
       name,
       description,
-      totalAmount,
-      paidAmount: 0,
-      monthlyPaymentGoal: monthlyPayment,
-      priority: Math.ceil(totalAmount / 5000), // Higher amount = higher priority
+      totalValue: totalAmount,
+      remainingValue: totalAmount,
+      totalAmount, // Alias para compatibilidade
+      monthlyPayment, // Meta mensal
+      paidDates: [],
       createdAt: Date.now(),
     };
 
     try {
       const updatedBounties = [...gameState.bounties, newBounty];
-      await updateGameState({
+      await saveGameState({
         ...gameState,
         bounties: updatedBounties,
       });
@@ -258,7 +259,7 @@ const styles = StyleSheet.create({
     borderColor: CyberpunkColors.red,
     borderRadius: 4,
     padding: 12,
-    color: CyberpunkColors.text,
+    color: CyberpunkColors.textPrimary,
     fontFamily: "Courier New",
     fontSize: 12,
   },
@@ -276,7 +277,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   currencySymbol: {
-    color: CyberpunkColors.text,
+    color: CyberpunkColors.textPrimary,
     fontSize: 20,
     fontWeight: "bold",
     marginRight: 8,
@@ -340,7 +341,7 @@ const styles = StyleSheet.create({
   },
   warningText: {
     fontSize: 11,
-    color: CyberpunkColors.text,
+    color: CyberpunkColors.textPrimary,
     lineHeight: 16,
   },
   buttonContainer: {
