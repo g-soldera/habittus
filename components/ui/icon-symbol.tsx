@@ -18,7 +18,7 @@ const MAPPING = {
   "paperplane.fill": "send",
   "bag.fill": "shopping-bag",
   "person.fill": "person",
-  "gearshape.fill": "settings",
+  "gear": "settings",
   "chevron.left.forwardslash.chevron.right": "code",
   "chevron.right": "chevron-right",
 } as IconMapping;

@@ -1,6 +1,61 @@
-# Habittus - Backlog Prioritário (Atualizado)
+# Habittus - Sprint Atual (Melhorias Críticas de UX/Visual)
 
-> Esta versão do `todo.md` foi atualizada a partir da auditoria das histórias técnicas (`TECHNICAL_STORIES.md`) e do código atual. As tarefas estão organizadas por épico, com prioridade e próximos passos claros. Marque itens concluídos quando comitar e abra PR por épico.
+> **Data:** 22 de dezembro de 2025  
+> **Objetivo:** Transformar o app em um verdadeiro RPG Cyberpunk com melhorias visuais, áudio, configurações e gameplay aprimorado.
+
+## 🎯 Prioridade MÁXIMA - Sprint Atual
+
+### 1. Sistema de Configurações & Áudio ⚙️🎵
+- [ ] Criar tela de configurações (`app/(tabs)/settings.tsx`)
+- [ ] Menu de configurações com música on/off
+- [ ] Integrar música de fundo (rock cyberpunk via API pública - ex: SoundCloud, Freesound)
+- [ ] Sons de clique nos botões (volume configurável)
+- [ ] Slider de volume para música e SFX
+- [ ] Mover botão "RESETAR JOGO" para configurações
+- [ ] Persistir preferências de áudio no AsyncStorage
+
+### 2. Melhorias Visuais Cyberpunk 🎨✨
+- [ ] Adicionar SVGs cyberpunk (circuitos, glitch effects, neon borders)
+- [ ] Animações de transição entre telas
+- [ ] Efeitos de brilho/glow em elementos importantes (XP bar, gold, buttons)
+- [ ] Texturas cyberpunk nos cards (scanlines, noise, grid)
+- [ ] Melhorar contraste de inputs (border glow, background diferenciado)
+- [ ] Botões de seleção (gênero, dieta) com estado visual ativo/inativo claro
+- [ ] Menu do rodapé com cores neon e ícones com glow
+- [ ] Animações de partículas ao completar gigs
+- [ ] Background animado no dashboard (grid cyberpunk, movimento parallax)
+
+### 3. Fixes de UX Críticos 🐛
+- [ ] Campo "Tipo de Dieta" como Select/Picker
+- [ ] Corrigir contraste de inputs (todos os campos de texto)
+- [ ] Botões de gênero com estilo ativo/inativo visível
+- [ ] Remover botões redundantes da home (GIGS, LOJA, PERFIL - já há menu no rodapé)
+- [ ] Bio-monitor: adicionar tooltips explicativos
+- [ ] Alertas da home: melhorar clareza e posicionamento
+- [ ] Stats iniciais baseados nas respostas da triagem (não todos em 50)
+
+### 4. Sistema de i18n (PT-BR e EN-US) 🌍
+- [ ] Instalar react-i18next ou expo-localization
+- [ ] Criar arquivos de tradução (locales/pt-br.json, locales/en-us.json)
+- [ ] Traduzir todas as strings da UI
+- [ ] Selector de idioma nas configurações
+- [ ] Persistir idioma escolhido
+
+### 5. Gigs & Bounties Personalizáveis 🎯💰
+- [ ] Tela "Adicionar Gig Personalizada" com campos: nome, descrição, complexidade (1-10)
+- [ ] Algoritmo de cálculo de recompensa baseado em complexidade
+- [ ] Tela "Adicionar Bounty Personalizada" (dívida real)
+- [ ] CRUD completo para gigs e bounties customizadas
+- [ ] Integração com AsyncStorage
+
+### 6. Sistema de Avatar/Personagem 🎭
+- [ ] Pesquisar API de avatares compatível com React Native (ex: DiceBear, Avataaars, RoboHash)
+- [ ] Integrar API escolhida
+- [ ] Customização de avatar na criação de personagem
+- [ ] Exibir avatar no Dashboard e Profile
+- [ ] Avatar muda conforme progresso (peso, stats, classe)
+
+## 📋 Backlog Organizado (Épicos)
 
 ---
 

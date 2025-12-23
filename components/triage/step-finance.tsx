@@ -1,7 +1,8 @@
 import React from 'react';
+import { TextInput } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { CyberpunkInput } from '@/components/cyberpunk-input';
+import { CyberpunkColors } from '@/constants/theme';
 
 export function TriageStepFinance({
   monthlyIncome,
@@ -22,14 +23,14 @@ export function TriageStepFinance({
     <ThemedView accessible={true}>
       <ThemedText type="title">Finanças & Hábitos 💰</ThemedText>
 
-      <ThemedText style={{ marginTop: 16, marginBottom: 8 }}>Renda Mensal (R$)</ThemedText>
-      <CyberpunkInput testID="triage-monthly-income" accessibilityLabel="Renda mensal" placeholder="Ex: 5000" value={monthlyIncome} onChangeText={setMonthlyIncome} keyboardType="numeric" />
+      <ThemedText style={{ marginTop: 12 }}>Renda Mensal (R$)</ThemedText>
+      <TextInput testID="triage-monthly-income" accessibilityLabel="Renda mensal" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={monthlyIncome} onChangeText={setMonthlyIncome} keyboardType="numeric" />
 
-      <ThemedText style={{ marginTop: 16, marginBottom: 8 }}>Dívida Total (R$)</ThemedText>
-      <CyberpunkInput testID="triage-total-debt" accessibilityLabel="Dívida total" placeholder="Ex: 10000" value={totalDebt} onChangeText={setTotalDebt} keyboardType="numeric" />
+      <ThemedText style={{ marginTop: 12 }}>Dívida Total (R$)</ThemedText>
+      <TextInput testID="triage-total-debt" accessibilityLabel="Dívida total" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={totalDebt} onChangeText={setTotalDebt} keyboardType="numeric" />
 
-      <ThemedText style={{ marginTop: 16, marginBottom: 8 }}>Horas de Sono por Noite</ThemedText>
-      <CyberpunkInput testID="triage-sleep-hours" accessibilityLabel="Horas de sono por noite" placeholder="Ex: 7" value={averageSleepHours} onChangeText={setAverageSleepHours} keyboardType="numeric" />
+      <ThemedText style={{ marginTop: 12 }}>Horas de Sono por Noite</ThemedText>
+      <TextInput testID="triage-sleep-hours" accessibilityLabel="Horas de sono por noite" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={averageSleepHours} onChangeText={setAverageSleepHours} keyboardType="numeric" />
     </ThemedView>
   );
 }

@@ -1,4 +1,5 @@
-import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
+import { useRouter } from "expo-router";
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ThemedText } from "@/components/themed-text";
@@ -9,8 +10,9 @@ import { useGameState } from "@/hooks/use-game-state";
 import { CLASS_DESCRIPTIONS } from "@/types";
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { gameState, loading } = useGameState();
+  const { gameState, loading, resetGame } = useGameState();
 
   if (loading || !gameState) {
     return (
@@ -25,7 +27,7 @@ export default function ProfileScreen() {
     0
   );
 
-  // Reset moved to settings screen
+
 
   return (
     <ThemedView
@@ -140,6 +142,7 @@ export default function ProfileScreen() {
             })
           )}
         </View>
+
 
       </ScrollView>
     </ThemedView>

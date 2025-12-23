@@ -1,7 +1,8 @@
 import React from 'react';
+import { TextInput } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { CyberpunkInput } from '@/components/cyberpunk-input';
+import { CyberpunkColors } from '@/constants/theme';
 
 export function TriageStepBiometrics({
   heightCm,
@@ -23,14 +24,14 @@ export function TriageStepBiometrics({
       <ThemedText type="title">Dados Biométricos 📏</ThemedText>
       <ThemedText>Insira suas medidas para calcular seu TMB e TDEE.</ThemedText>
 
-      <ThemedText style={{ marginTop: 16, marginBottom: 8 }}>Altura (cm)</ThemedText>
-      <CyberpunkInput testID="triage-height" accessibilityLabel="Altura em centímetros" placeholder="Ex: 175" value={heightCm} onChangeText={setHeightCm} keyboardType="numeric" />
+      <ThemedText style={{ marginTop: 12 }}>Altura (cm)</ThemedText>
+      <TextInput testID="triage-height" accessibilityLabel="Altura em cm" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={heightCm} onChangeText={setHeightCm} keyboardType="numeric" />
 
-      <ThemedText style={{ marginTop: 16, marginBottom: 8 }}>Peso (kg)</ThemedText>
-      <CyberpunkInput testID="triage-weight" accessibilityLabel="Peso em quilogramas" placeholder="Ex: 75" value={weightKg} onChangeText={setWeightKg} keyboardType="numeric" />
+      <ThemedText style={{ marginTop: 12 }}>Peso (kg)</ThemedText>
+      <TextInput testID="triage-weight" accessibilityLabel="Peso em kg" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={weightKg} onChangeText={setWeightKg} keyboardType="numeric" />
 
-      <ThemedText style={{ marginTop: 16, marginBottom: 8 }}>% Gordura Corporal</ThemedText>
-      <CyberpunkInput testID="triage-bodyfat" accessibilityLabel="Percentual de gordura" placeholder="Ex: 20" value={bodyFatPercent} onChangeText={setBodyFatPercent} keyboardType="numeric" />
+      <ThemedText style={{ marginTop: 12 }}>% Gordura Corporal</ThemedText>
+      <TextInput testID="triage-bodyfat" accessibilityLabel="Percentual de gordura" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={bodyFatPercent} onChangeText={setBodyFatPercent} keyboardType="numeric" />
     </ThemedView>
   );
 }

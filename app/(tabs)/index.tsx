@@ -98,11 +98,13 @@ export default function DashboardScreen() {
 
         {/* Streak Counter */}
         <View style={styles.streakContainer}>
-          <ThemedText style={styles.streakLabel}>LOGIN STREAK</ThemedText>
-          <ThemedText style={styles.streakValue}>{gameState.character.loginStreak}</ThemedText>
-          <ThemedText style={styles.streakBonus}>
-            {Math.round(streakBonus * 100)}% desconto na loja
-          </ThemedText>
+          <View style={styles.streakGlow}>
+            <ThemedText style={styles.streakLabel}>🔥 LOGIN STREAK</ThemedText>
+            <ThemedText style={styles.streakValue}>{gameState.character.loginStreak}</ThemedText>
+            <ThemedText style={styles.streakBonus}>
+              {Math.round(streakBonus * 100)}% desconto na loja
+            </ThemedText>
+          </View>
         </View>
 
         {/* Bio-Monitor */}
@@ -111,15 +113,18 @@ export default function DashboardScreen() {
         {/* Next Gig */}
         {nextGig && (
           <View style={styles.nextGigContainer}>
-            <ThemedText style={styles.nextGigLabel}>PRÓXIMA GIG</ThemedText>
-            <View style={styles.nextGigCard}>
+            <ThemedText style={styles.nextGigLabel}>⚡ PRÓXIMA MISSÃO</ThemedText>
+            <Pressable 
+              style={styles.nextGigCard}
+              onPress={() => router.navigate({pathname: "/(tabs)/gigs"} as any)}
+            >
               <ThemedText type="defaultSemiBold" style={styles.nextGigName}>
                 {nextGig.name}
               </ThemedText>
               <ThemedText style={styles.nextGigReward}>
                 +{nextGig.xpReward} XP / +{nextGig.goldReward} GOLD
               </ThemedText>
-            </View>
+            </Pressable>
           </View>
         )}
       </ScrollView>
@@ -208,25 +213,36 @@ const styles = StyleSheet.create({
     backgroundColor: CyberpunkColors.purple,
   },
   streakContainer: {
+    marginBottom: 16,
+  },
+  streakGlow: {
     backgroundColor: CyberpunkColors.cardBg,
     borderWidth: 2,
     borderColor: CyberpunkColors.green,
     borderRadius: 8,
     padding: 16,
     alignItems: "center",
-    marginBottom: 16,
+    shadowColor: CyberpunkColors.green,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 8,
   },
   streakLabel: {
-    fontSize: 12,
-    color: CyberpunkColors.textSecondary,
+    fontSize: 14,
+    color: CyberpunkColors.green,
     marginBottom: 4,
+    fontWeight: "bold",
     fontFamily: "Courier New",
   },
   streakValue: {
-    fontSize: 48,
+    fontSize: 56,
     fontWeight: "bold",
     color: CyberpunkColors.green,
     fontFamily: "Courier New",
+    textShadowColor: CyberpunkColors.green,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 15,
   },
   streakBonus: {
     fontSize: 12,
@@ -238,9 +254,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   nextGigLabel: {
-    fontSize: 12,
-    color: CyberpunkColors.textSecondary,
+    fontSize: 14,
+    color: CyberpunkColors.cyan,
     marginBottom: 8,
+    fontWeight: "bold",
     fontFamily: "Courier New",
   },
   nextGigCard: {

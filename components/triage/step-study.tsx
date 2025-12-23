@@ -1,7 +1,8 @@
 import React from 'react';
+import { TextInput } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { CyberpunkInput } from '@/components/cyberpunk-input';
+import { CyberpunkColors } from '@/constants/theme';
 
 export function TriageStepStudy({
   hoursStudyPerWeek,
@@ -18,11 +19,11 @@ export function TriageStepStudy({
     <ThemedView accessible={true}>
       <ThemedText type="title">Estudo & Produtividade 📚</ThemedText>
 
-      <ThemedText style={{ marginTop: 16, marginBottom: 8 }}>Horas de Estudo por Semana</ThemedText>
-      <CyberpunkInput testID="triage-hours-study" accessibilityLabel="Horas de estudo por semana" placeholder="Ex: 10" value={hoursStudyPerWeek} onChangeText={setHoursStudyPerWeek} keyboardType="numeric" />
+      <ThemedText style={{ marginTop: 12 }}>Horas de Estudo por Semana</ThemedText>
+      <TextInput testID="triage-hours-study" accessibilityLabel="Horas de estudo por semana" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={hoursStudyPerWeek} onChangeText={setHoursStudyPerWeek} keyboardType="numeric" />
 
-      <ThemedText style={{ marginTop: 16, marginBottom: 8 }}>Horas de Foco por Dia</ThemedText>
-      <CyberpunkInput testID="triage-hours-focus" accessibilityLabel="Horas de foco por dia" placeholder="Ex: 4" value={hoursOfFocusPerDay} onChangeText={setHoursOfFocusPerDay} keyboardType="numeric" />
+      <ThemedText style={{ marginTop: 12 }}>Horas de Foco por Dia</ThemedText>
+      <TextInput testID="triage-hours-focus" accessibilityLabel="Horas de foco por dia" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={hoursOfFocusPerDay} onChangeText={setHoursOfFocusPerDay} keyboardType="numeric" />
     </ThemedView>
   );
 }

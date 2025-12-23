@@ -8,34 +8,24 @@ interface BioMonitorProps {
 }
 
 export function BioMonitorComponent({ stats }: BioMonitorProps) {
-  const StatBar = ({ label, value, color, icon, description }: { 
-    label: string; 
-    value: number; 
-    color: string;
-    icon: string;
-    description: string;
-  }) => {
+  const StatBar = ({ label, value, color }: { label: string; value: number; color: string }) => {
     const id = `bio-stat-${label.toLowerCase()}`;
     return (
       <View
         style={styles.statContainer}
         testID={`${id}-container`}
         accessible
-        accessibilityLabel={`${label} ${value}% - ${description}`}
+        accessibilityLabel={`${label} ${value}%`}
         accessibilityValue={{ min: 0, now: value, max: 100 }}
       >
         <View style={styles.statHeader}>
-          <View style={styles.statLabelRow}>
-            <ThemedText style={styles.statIcon}>{icon}</ThemedText>
-            <ThemedText style={styles.statLabel} testID={`${id}-label`}>
-              {label}
-            </ThemedText>
-          </View>
+          <ThemedText style={styles.statLabel} testID={`${id}-label`}>
+            {label}
+          </ThemedText>
           <ThemedText style={[styles.statValue, { color }]} testID={`${id}-value`}>
             {value}%
           </ThemedText>
         </View>
-        <ThemedText style={styles.statDescription}>{description}</ThemedText>
         <View style={styles.barBackground} testID={`${id}-bar-bg`}>
           <View
             style={[
@@ -55,33 +45,12 @@ export function BioMonitorComponent({ stats }: BioMonitorProps) {
   return (
     <View style={styles.container} testID="bio-monitor" accessible accessibilityRole="summary" accessibilityLabel="Bio Monitor">
       <ThemedText type="subtitle" style={styles.title} testID="bio-monitor-title">
-        🖥️ BIO-MONITOR
-      </ThemedText>
-      <ThemedText style={styles.subtitle}>
-        Monitore seus níveis vitais em tempo real
+        BIO-MONITOR
       </ThemedText>
 
-      <StatBar 
-        label="RAM" 
-        value={stats.ram} 
-        color={CyberpunkColors.cyan}
-        icon="🧠"
-        description="Foco e clareza mental"
-      />
-      <StatBar 
-        label="HARDWARE" 
-        value={stats.hardware} 
-        color={CyberpunkColors.green}
-        icon="💪"
-        description="Condição física e energia"
-      />
-      <StatBar 
-        label="COOL" 
-        value={stats.cool} 
-        color={CyberpunkColors.magenta}
-        icon="🧘"
-        description="Controle emocional e bem-estar"
-      />
+      <StatBar label="RAM" value={stats.ram} color={CyberpunkColors.cyan} />
+      <StatBar label="HARDWARE" value={stats.hardware} color={CyberpunkColors.green} />
+      <StatBar label="COOL" value={stats.cool} color={CyberpunkColors.magenta} />
 
       {/* Credits display */}
       <View style={styles.creditsContainer} testID="bio-credits-container" accessible accessibilityLabel={`Credits ${stats.credits}`}>
@@ -128,42 +97,21 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     color: CyberpunkColors.cyan,
-    marginBottom: 4,
-    fontFamily: "Courier New",
-  },
-  subtitle: {
-    fontSize: 10,
-    color: CyberpunkColors.textSecondary,
     marginBottom: 16,
     fontFamily: "Courier New",
   },
   statContainer: {
-    marginBottom: 16,
+    marginBottom: 12,
   },
   statHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 4,
   },
-  statLabelRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  statIcon: {
-    fontSize: 14,
-  },
   statLabel: {
     fontSize: 12,
     color: CyberpunkColors.textSecondary,
     fontFamily: "Courier New",
-  },
-  statDescription: {
-    fontSize: 10,
-    color: CyberpunkColors.textDisabled,
-    marginBottom: 6,
-    fontFamily: "Courier New",
-    fontStyle: "italic",
   },
   statValue: {
     fontSize: 12,

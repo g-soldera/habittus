@@ -1,8 +1,8 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, Pressable } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { CyberpunkButton } from '@/components/cyberpunk-button';
+import { CyberpunkColors } from '@/constants/theme';
 import type { Pillar } from '@/types/biometric';
 
 export function TriageStepObjectives({
@@ -17,19 +17,19 @@ export function TriageStepObjectives({
   return (
     <ThemedView accessible={true}>
       <ThemedText type="title">Seus Objetivos 🎯</ThemedText>
-      <ThemedText style={{ marginTop: 8, marginBottom: 16 }}>
-        Selecione os pilares da vida que deseja melhorar.
-      </ThemedText>
+      <ThemedText>Selecione os pilares da vida que deseja melhorar.</ThemedText>
 
-      <View style={{ gap: 8 }}>
+      <View style={{ marginTop: 12 }}>
         {pillarOptions.map(option => (
-          <CyberpunkButton
+          <Pressable
             key={option.value}
             testID={`triage-objective-${option.value}`}
-            label={option.label}
-            selected={objectives.includes(option.value)}
+            style={{ padding: 12, borderWidth: 1, borderColor: CyberpunkColors.cyan, marginBottom: 8 }}
             onPress={() => toggleObjective(option.value)}
-          />
+            accessibilityRole="button"
+          >
+            <ThemedText>{option.label}</ThemedText>
+          </Pressable>
         ))}
       </View>
     </ThemedView>
