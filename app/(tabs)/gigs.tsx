@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -9,6 +9,7 @@ import { ThemedView } from "@/components/themed-view";
 import { CyberpunkColors } from "@/constants/theme";
 import { useGameState } from "@/hooks/use-game-state";
 import { Gig, Bounty } from "@/types";
+import { SuccessFlash } from "@/components/particle-effects";
 
 type TabType = "gigs" | "bounties";
 
@@ -19,6 +20,7 @@ export default function GigsScreen() {
   const [activeTab, setActiveTab] = useState<TabType>("gigs");
   const [paymentAmount, setPaymentAmount] = useState<Record<string, string>>({});
   const [refreshing, setRefreshing] = useState(false);
+  const [showSuccessFlash, setShowSuccessFlash] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -37,6 +39,7 @@ export default function GigsScreen() {
 
   const handleCompleteGig = async (gigId: string) => {
     await completeGig(gigId);
+    setShowSuccessFlash(true);
     setRefreshing(true);
     setTimeout(() => setRefreshing(false), 300);
   };
@@ -46,6 +49,7 @@ export default function GigsScreen() {
     if (amount > 0) {
       console.log(`[GigsScreen] Pagando bounty ${bountyId} com R$${amount}`);
       await payBounty(bountyId, amount);
+      setShowSuccessFlash(true);
       setPaymentAmount({ ...paymentAmount, [bountyId]: "" });
       setRefreshing(true);
       setTimeout(() => setRefreshing(false), 300);

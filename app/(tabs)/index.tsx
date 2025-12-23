@@ -19,6 +19,7 @@ import { useGameState } from "@/hooks/use-game-state";
 import { useClassWarnings } from "@/hooks/use-class-warnings";
 import { CyberpunkGrid } from "@/components/cyberpunk-grid";
 import { FadeIn, SlideIn, NeonBorder } from "@/components/visual-effects";
+import { Avatar } from "@/components/avatar";
 
 export default function DashboardScreen() {
   const router = useRouter();
@@ -103,6 +104,14 @@ export default function DashboardScreen() {
               LEVEL {gameState.character.level || 1}
             </ThemedText>
           </View>
+          
+          {/* Avatar */}
+          <Avatar 
+            userId={gameState.character.id}
+            size={60}
+            characterClass={gameState.character.class}
+            level={gameState.character.level}
+          />
           
           {/* Class Badge */}
           <View style={styles.classBadge}>
