@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { ClassStatus } from "@/components/class-status";
 import { CyberpunkColors } from "@/constants/theme";
 import { useGameState } from "@/hooks/use-game-state";
 import { CLASS_DESCRIPTIONS } from "@/types";
@@ -56,6 +57,23 @@ export default function ProfileScreen() {
             {CLASS_DESCRIPTIONS[gameState.character.class]}
           </ThemedText>
         </View>
+
+        {/* Class Status Component */}
+        {gameState.character && (
+          <ClassStatus 
+            baseClass={gameState.character.class as any}
+            stats={{
+              strength: gameState.character.stats?.strength || 50,
+              agility: gameState.character.stats?.agility || 50,
+              constitution: gameState.character.stats?.constitution || 50,
+              intelligence: gameState.character.stats?.intelligence || 50,
+              wisdom: gameState.character.stats?.wisdom || 50,
+              charisma: gameState.character.stats?.charisma || 50,
+              willpower: gameState.character.stats?.willpower || 50,
+            }}
+            level={gameState.character.level || 1}
+          />
+        )}
 
         {/* Statistics */}
         <View style={styles.statsContainer}>

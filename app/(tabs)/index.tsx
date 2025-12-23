@@ -4,15 +4,18 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from "reac
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { BioMonitorComponent } from "@/components/bio-monitor";
+import { ClassWarningsPanel } from "@/components/class-warnings";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { CyberpunkColors } from "@/constants/theme";
 import { useGameState } from "@/hooks/use-game-state";
+import { useClassWarnings } from "@/hooks/use-class-warnings";
 
 export default function DashboardScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { gameState, loading } = useGameState();
+  const warnings = useClassWarnings();
   // Check if game state exists, if not go to character creation
   useFocusEffect(
     useCallback(() => {
@@ -52,6 +55,9 @@ export default function DashboardScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {/* Class Warnings */}
+        {warnings.length > 0 && <ClassWarningsPanel warnings={warnings} />}
+
         {/* Header with Class Badge */}
         <View style={styles.header}>
           <View style={{ flex: 1 }}>
