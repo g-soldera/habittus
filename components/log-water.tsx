@@ -9,13 +9,13 @@ import { Alert } from 'react-native';
 export function LogWater({ onAdd }: { onAdd: (amountMl: number) => void }) {
   const { logWater } = useGameState();
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title">Hidratação</ThemedText>
+    <ThemedView style={styles.container} testID="log-water" accessible accessibilityLabel="Hidratação">
+      <ThemedText type="title" testID="log-water-title">Hidratação</ThemedText>
       <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-        <Pressable style={styles.quickButton} onPress={() => { if (onAdd) { onAdd(200); } else { logWater(200); Alert.alert('Salvo', '200ml registrados'); } }}>
+        <Pressable testID="log-water-add-200" style={styles.quickButton} onPress={() => { if (onAdd) { onAdd(200); } else { logWater(200); Alert.alert('Salvo', '200ml registrados'); } }} accessibilityRole="button" accessibilityLabel="Adicionar 200ml">
           <ThemedText>+1 Copo (200ml)</ThemedText>
         </Pressable>
-        <Pressable style={styles.quickButton} onPress={() => { if (onAdd) { onAdd(500); } else { logWater(500); Alert.alert('Salvo', '500ml registrados'); } }}>
+        <Pressable testID="log-water-add-500" style={styles.quickButton} onPress={() => { if (onAdd) { onAdd(500); } else { logWater(500); Alert.alert('Salvo', '500ml registrados'); } }} accessibilityRole="button" accessibilityLabel="Adicionar 500ml">
           <ThemedText>+500ml</ThemedText>
         </Pressable>
       </View>

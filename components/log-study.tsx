@@ -24,25 +24,25 @@ export function LogStudy({ onSave }: { onSave: (payload: any) => void }) {
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title">Log de Estudo</ThemedText>
+    <ThemedView style={styles.container} testID="log-study" accessible accessibilityLabel="Log de Estudo">
+      <ThemedText type="title" testID="log-study-title">Log de Estudo</ThemedText>
 
       <ThemedText style={styles.label}>Horas</ThemedText>
-      <TextInput style={styles.input} keyboardType="numeric" value={hours} onChangeText={setHours} />
+      <TextInput style={styles.input} keyboardType="numeric" value={hours} onChangeText={setHours} testID="log-study-hours" accessibilityLabel="Horas" />
 
       <ThemedText style={styles.label}>Tópico</ThemedText>
-      <TextInput style={styles.input} value={topic} onChangeText={setTopic} />
+      <TextInput style={styles.input} value={topic} onChangeText={setTopic} testID="log-study-topic" accessibilityLabel="Tópico" />
 
       <ThemedText style={styles.label}>Tipo</ThemedText>
       <View style={{ flexDirection: 'row', gap: 8 }}>
         {['reading', 'course', 'practice', 'project'].map(t => (
-          <Pressable key={t} onPress={() => setType(t as any)} style={[styles.typeButton, type === t && styles.typeButtonActive]}>
+          <Pressable key={t} testID={`log-study-type-${t}`} onPress={() => setType(t as any)} style={[styles.typeButton, type === t && styles.typeButtonActive]} accessibilityRole="button" accessibilityLabel={`Tipo ${t}`}>
             <ThemedText>{t}</ThemedText>
           </Pressable>
         ))}
       </View>
 
-      <Pressable style={styles.saveButton} onPress={handleSave}>
+      <Pressable style={styles.saveButton} onPress={handleSave} testID="log-study-save" accessibilityRole="button" accessibilityLabel="Salvar estudo">
         <ThemedText style={{ color: '#000' }}>Salvar</ThemedText>
       </Pressable>
     </ThemedView>

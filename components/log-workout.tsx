@@ -32,31 +32,31 @@ export function LogWorkout({ onSave }: { onSave: (payload: any) => void }) {
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title">Log de Treino</ThemedText>
+    <ThemedView style={styles.container} testID="log-workout" accessible accessibilityLabel="Log de Treino">
+      <ThemedText type="title" testID="log-workout-title">Log de Treino</ThemedText>
 
       <ThemedText style={styles.label}>Tipo</ThemedText>
       <View style={styles.row}>
         {['strength', 'cardio', 'functional', 'yoga'].map(t => (
-          <Pressable key={t} onPress={() => setType(t as any)} style={[styles.typeButton, type === t && styles.typeButtonActive]}>
+          <Pressable key={t} testID={`log-workout-type-${t}`} onPress={() => setType(t as any)} style={[styles.typeButton, type === t && styles.typeButtonActive]} accessibilityRole="button" accessibilityLabel={`Tipo ${t}`}>
             <ThemedText>{t}</ThemedText>
           </Pressable>
         ))}
       </View>
 
       <ThemedText style={styles.label}>Duração (min)</ThemedText>
-      <TextInput style={styles.input} keyboardType="numeric" value={duration} onChangeText={setDuration} />
+      <TextInput style={styles.input} keyboardType="numeric" value={duration} onChangeText={setDuration} testID="log-workout-duration" accessibilityLabel="Duração (min)" />
 
       <ThemedText style={styles.label}>Intensidade</ThemedText>
       <View style={styles.row}>
         {['low', 'medium', 'high'].map(i => (
-          <Pressable key={i} onPress={() => setIntensity(i as any)} style={[styles.typeButton, intensity === i && styles.typeButtonActive]}>
+          <Pressable key={i} testID={`log-workout-intensity-${i}`} onPress={() => setIntensity(i as any)} style={[styles.typeButton, intensity === i && styles.typeButtonActive]} accessibilityRole="button" accessibilityLabel={`Intensidade ${i}`}>
             <ThemedText>{i}</ThemedText>
           </Pressable>
         ))}
       </View>
 
-      <Pressable style={styles.saveButton} onPress={handleSave}>
+      <Pressable style={styles.saveButton} onPress={handleSave} testID="log-workout-save" accessibilityRole="button" accessibilityLabel="Salvar treino">
         <ThemedText style={{ color: '#000' }}>Salvar</ThemedText>
       </Pressable>
     </ThemedView>

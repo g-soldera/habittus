@@ -27,16 +27,16 @@ export function LogNutrition({ onSave }: { onSave: (payload: any) => void }) {
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title">Log de Nutrição</ThemedText>
+    <ThemedView style={styles.container} testID="log-nutrition" accessible accessibilityLabel="Log de Nutrição">
+      <ThemedText type="title" testID="log-nutrition-title">Log de Nutrição</ThemedText>
 
       <ThemedText style={styles.label}>Nome da Refeição</ThemedText>
-      <TextInput style={styles.input} value={name} onChangeText={setName} />
+      <TextInput style={styles.input} value={name} onChangeText={setName} testID="log-nutrition-name" accessibilityLabel="Nome da Refeição" />
 
       <ThemedText style={styles.label}>Calorias</ThemedText>
-      <TextInput style={styles.input} keyboardType="numeric" value={calories} onChangeText={setCalories} />
+      <TextInput style={styles.input} keyboardType="numeric" value={calories} onChangeText={setCalories} testID="log-nutrition-calories" accessibilityLabel="Calorias" />
 
-      <Pressable style={styles.saveButton} onPress={handleSave}>
+      <Pressable style={styles.saveButton} onPress={handleSave} testID="log-nutrition-save" accessibilityRole="button" accessibilityLabel="Salvar refeição">
         <ThemedText style={{ color: '#000' }}>Salvar</ThemedText>
       </Pressable>
     </ThemedView>

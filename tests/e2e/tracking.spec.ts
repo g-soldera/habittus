@@ -35,17 +35,17 @@ test.describe('Tracking - onboarding -> logging -> dashboard', () => {
     await page.click('[data-testid="triage-next-button"]');
 
     // 3) On dashboard, assert bioMonitor exists and note XP
-    const xpBefore = await page.textContent('[data-testid="bio-total-xp"]');
+    const xpBefore = await page.textContent('[data-testid="bio-xp-value"]');
 
     // 4) Open Workout log and submit a quick 30-min moderate workout
     await page.click('text=Log de Treino');
-    await page.fill('input[aria-label="Duração (min)"]', '30');
-    await page.click('text=Salvar');
+    await page.fill('[data-testid="log-workout-duration"]', '30');
+    await page.click('[data-testid="log-workout-save"]');
 
     // Wait for UI to update
     await page.waitForTimeout(500);
 
-    const xpAfter = await page.textContent('[data-testid="bio-total-xp"]');
+    const xpAfter = await page.textContent('[data-testid="bio-xp-value"]');
     expect(parseInt(xpAfter || '0')).toBeGreaterThan(parseInt(xpBefore || '0'));
   });
 });
