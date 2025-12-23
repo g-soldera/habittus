@@ -43,7 +43,13 @@ export default function ProfileScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Character Info */}
         <View style={styles.characterCard}>
-          <Avatar userId={gameState.character.id} size={100} style={{ alignSelf: 'center', marginBottom: 16 }} />
+          <Avatar 
+            userId={gameState.character.id} 
+            size={100} 
+            style={{ alignSelf: 'center', marginBottom: 16 }}
+            characterClass={gameState.character.class}
+            level={gameState.character.level}
+          />
           <ThemedText type="title" style={styles.characterName}>
             {gameState.character.name}
           </ThemedText>
