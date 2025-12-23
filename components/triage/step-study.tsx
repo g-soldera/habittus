@@ -20,10 +20,10 @@ export function TriageStepStudy({
       <ThemedText type="title">Estudo & Produtividade 📚</ThemedText>
 
       <ThemedText style={{ marginTop: 12 }}>Horas de Estudo por Semana</ThemedText>
-      <TextInput testID="triage-hours-study" accessibilityLabel="Horas de estudo por semana" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={hoursStudyPerWeek} onChangeText={setHoursStudyPerWeek} keyboardType="numeric" />
+      <TextInput testID="triage-hours-study" accessibilityLabel="Horas de estudo por semana" style={{ borderWidth: 2, borderColor: CyberpunkColors.cyan, padding: 12, marginTop: 6, backgroundColor: CyberpunkColors.inputBg, color: CyberpunkColors.textPrimary, borderRadius: 6 }} value={hoursStudyPerWeek} onChangeText={setHoursStudyPerWeek} keyboardType="numeric" placeholder="Ex: 10" placeholderTextColor={CyberpunkColors.textDisabled} />
 
       <ThemedText style={{ marginTop: 12 }}>Horas de Foco por Dia</ThemedText>
-      <TextInput testID="triage-hours-focus" accessibilityLabel="Horas de foco por dia" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={hoursOfFocusPerDay} onChangeText={setHoursOfFocusPerDay} keyboardType="numeric" />
+      <TextInput testID="triage-hours-focus" accessibilityLabel="Horas de foco por dia" style={{ borderWidth: 2, borderColor: CyberpunkColors.cyan, padding: 12, marginTop: 6, backgroundColor: CyberpunkColors.inputBg, color: CyberpunkColors.textPrimary, borderRadius: 6 }} value={hoursOfFocusPerDay} onChangeText={setHoursOfFocusPerDay} keyboardType="numeric" placeholder="Ex: 4" placeholderTextColor={CyberpunkColors.textDisabled} />
     </ThemedView>
   );
 }

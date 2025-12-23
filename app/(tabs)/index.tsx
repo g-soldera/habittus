@@ -18,8 +18,10 @@ import { CyberpunkColors } from "@/constants/theme";
 import { useGameState } from "@/hooks/use-game-state";
 import { useClassWarnings } from "@/hooks/use-class-warnings";
 import { CyberpunkGrid } from "@/components/cyberpunk-grid";
+import { CyberpunkOverlay } from "@/components/cyberpunk-overlay";
 import { FadeIn, SlideIn, NeonBorder } from "@/components/visual-effects";
 import { Avatar } from "@/components/avatar";
+import { useAudio } from "@/hooks/use-audio";
 
 export default function DashboardScreen() {
   const router = useRouter();
@@ -27,6 +29,7 @@ export default function DashboardScreen() {
   const { gameState, loading } = useGameState();
   const warnings = useClassWarnings();
   const pulseOpacity = useSharedValue(0.8);
+  const audio = useAudio();
 
   // Pulse animation para o streak
   useEffect(() => {
@@ -79,8 +82,9 @@ export default function DashboardScreen() {
         },
       ]}
     >
-      {/* Background animado */}
+      {/* Background animado e overlay de circuitos */}
       <CyberpunkGrid />
+      <CyberpunkOverlay />
       
       <ScrollView
         contentContainerStyle={styles.scrollContent}

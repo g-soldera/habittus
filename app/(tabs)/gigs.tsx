@@ -10,6 +10,7 @@ import { CyberpunkColors } from "@/constants/theme";
 import { useGameState } from "@/hooks/use-game-state";
 import { Gig, Bounty } from "@/types";
 import { SuccessFlash } from "@/components/particle-effects";
+import { useAudio } from "@/hooks/use-audio";
 
 type TabType = "gigs" | "bounties";
 
@@ -21,6 +22,7 @@ export default function GigsScreen() {
   const [paymentAmount, setPaymentAmount] = useState<Record<string, string>>({});
   const [refreshing, setRefreshing] = useState(false);
   const [showSuccessFlash, setShowSuccessFlash] = useState(false);
+  const audio = useAudio();
 
   useFocusEffect(
     useCallback(() => {
@@ -39,6 +41,7 @@ export default function GigsScreen() {
 
   const handleCompleteGig = async (gigId: string) => {
     await completeGig(gigId);
+    audio.playClickSound();
     setShowSuccessFlash(true);
     setRefreshing(true);
     setTimeout(() => setRefreshing(false), 300);
@@ -49,6 +52,7 @@ export default function GigsScreen() {
     if (amount > 0) {
       console.log(`[GigsScreen] Pagando bounty ${bountyId} com R$${amount}`);
       await payBounty(bountyId, amount);
+      audio.playClickSound();
       setShowSuccessFlash(true);
       setPaymentAmount({ ...paymentAmount, [bountyId]: "" });
       setRefreshing(true);
@@ -141,7 +145,7 @@ export default function GigsScreen() {
         <View style={styles.hpContainer}>
           <View style={styles.hpHeader}>
             <ThemedText style={styles.hpLabel}>HP Restante:</ThemedText>
-            <ThemedText style={[styles.hpValue, { color: progress < 33 ? CyberpunkColors.green : CyberpunkColors.red }]}>
+            <ThemedText style={[styles.hpValue, { color: progress >= 66 ? CyberpunkColors.green : CyberpunkColors.red }]}>
               R$ {item.remainingValue} / {item.totalValue}
             </ThemedText>
           </View>
@@ -245,6 +249,11 @@ export default function GigsScreen() {
         </Pressable>
       </View>
 
+      {/* Success Flash Effect */}
+      {showSuccessFlash && (
+        <SuccessFlash onComplete={() => setShowSuccessFlash(false)} />
+      )}
+
       {/* Content */}
       {activeTab === "gigs" ? (
         <FlatList
@@ -254,6 +263,7 @@ export default function GigsScreen() {
           contentContainerStyle={styles.listContent}
           scrollEnabled={true}
           showsVerticalScrollIndicator={false}
+          extraData={gameState.lastUpdatedAt}
         />
       ) : (
         <FlatList
@@ -263,6 +273,7 @@ export default function GigsScreen() {
           contentContainerStyle={styles.listContent}
           scrollEnabled={true}
           showsVerticalScrollIndicator={false}
+          extraData={gameState.lastUpdatedAt}
         />
       )}
     </ThemedView>

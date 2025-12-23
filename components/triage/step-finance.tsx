@@ -24,13 +24,13 @@ export function TriageStepFinance({
       <ThemedText type="title">Finanças & Hábitos 💰</ThemedText>
 
       <ThemedText style={{ marginTop: 12 }}>Renda Mensal (R$)</ThemedText>
-      <TextInput testID="triage-monthly-income" accessibilityLabel="Renda mensal" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={monthlyIncome} onChangeText={setMonthlyIncome} keyboardType="numeric" />
+      <TextInput testID="triage-monthly-income" accessibilityLabel="Renda mensal" style={{ borderWidth: 2, borderColor: CyberpunkColors.cyan, padding: 12, marginTop: 6, backgroundColor: CyberpunkColors.inputBg, color: CyberpunkColors.textPrimary, borderRadius: 6 }} value={monthlyIncome} onChangeText={setMonthlyIncome} keyboardType="numeric" placeholder="Ex: 4500" placeholderTextColor={CyberpunkColors.textDisabled} />
 
       <ThemedText style={{ marginTop: 12 }}>Dívida Total (R$)</ThemedText>
-      <TextInput testID="triage-total-debt" accessibilityLabel="Dívida total" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={totalDebt} onChangeText={setTotalDebt} keyboardType="numeric" />
+      <TextInput testID="triage-total-debt" accessibilityLabel="Dívida total" style={{ borderWidth: 2, borderColor: CyberpunkColors.cyan, padding: 12, marginTop: 6, backgroundColor: CyberpunkColors.inputBg, color: CyberpunkColors.textPrimary, borderRadius: 6 }} value={totalDebt} onChangeText={setTotalDebt} keyboardType="numeric" placeholder="Ex: 20000" placeholderTextColor={CyberpunkColors.textDisabled} />
 
       <ThemedText style={{ marginTop: 12 }}>Horas de Sono por Noite</ThemedText>
-      <TextInput testID="triage-sleep-hours" accessibilityLabel="Horas de sono por noite" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={averageSleepHours} onChangeText={setAverageSleepHours} keyboardType="numeric" />
+      <TextInput testID="triage-sleep-hours" accessibilityLabel="Horas de sono por noite" style={{ borderWidth: 2, borderColor: CyberpunkColors.cyan, padding: 12, marginTop: 6, backgroundColor: CyberpunkColors.inputBg, color: CyberpunkColors.textPrimary, borderRadius: 6 }} value={averageSleepHours} onChangeText={setAverageSleepHours} keyboardType="numeric" placeholder="Ex: 7" placeholderTextColor={CyberpunkColors.textDisabled} />
     </ThemedView>
   );
 }

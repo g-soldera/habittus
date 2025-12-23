@@ -176,13 +176,14 @@ export default function TriageScreen() {
 
       const classification = classifyUser(triageResponse, biometrics);
 
-      // Salva perfil do usuário
+      // Salva perfil do usuário (inclui triagem para inicializar BioMonitor)
       await saveUserProfile({
         characterName,
         biometrics,
         baseClass: classification.baseClass,
         initialStats: classification.statBoosts,
         pillarStats: classification.pillarBoosts,
+        triage: triageResponse,
       });
 
       // Navega para dashboard

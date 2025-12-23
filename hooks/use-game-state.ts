@@ -15,7 +15,7 @@ import {
   createWaterLog,
 } from '@/lib/tracking';
 import { GameState, Gig, Bounty, Reward, InventoryItem, BioMonitor } from "@/types";
-import { UserProfile, BiometricData, ClassType } from "@/types/biometric";
+import { UserProfile, BiometricData, ClassType, TriageResponse } from "@/types/biometric";
 
 const GAME_STATE_KEY = "habittus_game_state";
 const USER_PROFILE_KEY = "habittus_user_profile";
@@ -91,9 +91,13 @@ export function useGameState() {
     }
   };
 
-  const createNewGame = async (characterName: string, characterClass: string) => {
+  const createNewGame = async (
+    characterName: string,
+    characterClass: string,
+    bioMonitorOverride?: BioMonitor
+  ) => {
     const character = createDefaultCharacter(characterName, characterClass);
-    const bioMonitor = createDefaultBioMonitor();
+    const bioMonitor = bioMonitorOverride || createDefaultBioMonitor();
     const newState = createDefaultGameState(character, bioMonitor);
     await saveGameState(newState);
     return newState;
@@ -368,21 +372,33 @@ export function useGameState() {
     baseClass: ClassType;
     initialStats: any;
     pillarStats?: any;
+    triage?: TriageResponse;
   }) => {
     try {
+      // Calcula BioMonitor inicial com base na triagem (se disponível)
+      const triage = data.triage;
+      const initialBioMonitor: BioMonitor = {
+        ram: Math.max(0, Math.min(100, Math.round(((triage?.hoursOfFocusPerDay || 0) * 10) + ((triage?.hoursStudyPerWeek || 0) * 1.5))))),
+        hardware: Math.max(0, Math.min(100, Math.round(((triage?.currentTrainingFrequency || 0) * 12) + (data.biometrics.bodyFatPercent < 20 ? 10 : 0))))),
+        cool: Math.max(0, Math.min(100, Math.round(((triage?.averageSleepHours || 0) * 5) - ((triage?.stressLevel || 5) * 3))))),
+        credits: Math.max(0, Math.round((triage?.monthlyIncome || 0) - Math.min((triage?.totalDebt || 0), (triage?.monthlyIncome || 0)))) ,
+        totalXp: 0,
+        totalGold: 100,
+      };
+
       const userProfile: UserProfile = {
         id: `user-${Date.now()}`,
         name: data.characterName,
         characterName: data.characterName,
         biometrics: data.biometrics,
         stats: {
-          strength: data.initialStats.strength || 50,
-          agility: data.initialStats.agility || 50,
-          constitution: data.initialStats.constitution || 50,
-          intelligence: data.initialStats.intelligence || 50,
-          wisdom: data.initialStats.wisdom || 50,
-          charisma: data.initialStats.charisma || 50,
-          willpower: data.initialStats.willpower || 50,
+          strength: data.initialStats.strength ?? 50,
+          agility: data.initialStats.agility ?? 50,
+          constitution: data.initialStats.constitution ?? 50,
+          intelligence: data.initialStats.intelligence ?? 50,
+          wisdom: data.initialStats.wisdom ?? 50,
+          charisma: data.initialStats.charisma ?? 50,
+          willpower: data.initialStats.willpower ?? 50,
         },
         pillarStats: data.pillarStats || {
           health: 50,
@@ -423,8 +439,8 @@ export function useGameState() {
       await AsyncStorage.setItem(USER_PROFILE_KEY, JSON.stringify(userProfile));
       setUserProfile(userProfile);
       
-      // Also create a new game state for compatibility
-      await createNewGame(data.characterName, data.baseClass);
+      // Cria um novo estado de jogo com BioMonitor inicial calculado
+      await createNewGame(data.characterName, data.baseClass, initialBioMonitor);
     } catch (error) {
       console.error("[GameState] Error saving user profile:", error);
       throw error;

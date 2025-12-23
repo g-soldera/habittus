@@ -9,8 +9,10 @@ interface AvatarProps {
   style?: any;
   characterClass?: string;
   weight?: number;
+  heightCm?: number;
   targetWeight?: number;
   level?: number;
+  bodyFatPercent?: number;
 }
 
 /**
@@ -25,6 +27,7 @@ export function Avatar({
   style, 
   characterClass = 'netrunner',
   weight,
+  heightCm,
   targetWeight,
   level = 1
 }: AvatarProps) {
@@ -39,6 +42,20 @@ export function Avatar({
         return 'lorelei'; // Elegante para negociador
       case 'techie':
         return 'pixel-art'; // Retro para maker
+      case 'cyborg':
+        return 'bottts';
+      case 'hacker':
+        return 'adventurer';
+      case 'gladiador':
+        return 'pixel-art';
+      case 'ninja':
+        return 'adventurer-neutral';
+      case 'tita':
+        return 'bottts-neutral';
+      case 'mestre':
+        return 'lorelei';
+      case 'ser-supremo':
+        return 'adventurer';
       default:
         return 'adventurer-neutral';
     }
@@ -61,6 +78,16 @@ export function Avatar({
     }
   }, [weight, targetWeight]);
 
+  // Ajusta a espessura do anel com base em IMC (indício do físico)
+  const ringWidth = useMemo(() => {
+    if (!weight || !heightCm) return 3;
+    const heightM = heightCm / 100;
+    const bmi = weight / (heightM * heightM);
+    if (bmi < 18.5) return 2; // magro
+    if (bmi >= 30) return 5; // sobrepeso/obeso
+    return 3; // normal
+  }, [weight, heightCm]);
+
   const avatarUrl = useMemo(() => {
     // DiceBear v7 API com background baseado na classe
     const bgColors: Record<string, string> = {
@@ -68,6 +95,13 @@ export function Avatar({
       netrunner: '00d9ff,1a1f3a', // Cyan/Dark
       fixer: '39ff14,ffff00', // Verde/Amarelo
       techie: 'ff8c00,b537f2', // Laranja/Roxo
+      cyborg: 'b537f2,00d9ff',
+      hacker: '00d9ff,ffff00',
+      gladiador: 'ff8c00,39ff14',
+      ninja: '1a1f3a,00d9ff',
+      tita: 'ff006e,ff8c00',
+      mestre: 'b537f2,39ff14',
+      'ser-supremo': '00d9ff,ff006e',
     };
 
     const bg = bgColors[characterClass] || bgColors.netrunner;
@@ -93,7 +127,7 @@ export function Avatar({
             width: size,
             height: size,
             borderRadius: size / 2,
-            borderWidth: 3,
+            borderWidth: ringWidth,
             borderColor: ringColor,
             shadowColor: ringColor,
           },
