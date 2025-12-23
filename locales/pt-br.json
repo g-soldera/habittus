@@ -1,0 +1,114 @@
+{
+  "common": {
+    "confirm": "Confirmar",
+    "cancel": "Cancelar",
+    "delete": "Deletar",
+    "save": "Salvar",
+    "loading": "Carregando...",
+    "error": "Erro",
+    "success": "Sucesso",
+    "warning": "Aviso"
+  },
+  "navigation": {
+    "home": "Início",
+    "gigs": "Missões",
+    "shop": "Loja",
+    "profile": "Perfil",
+    "settings": "Configurações"
+  },
+  "dashboard": {
+    "greeting": "Bem-vindo",
+    "loginStreak": "🔥 SEQUÊNCIA DE LOGIN",
+    "shopDiscount": "desconto na loja",
+    "nextMission": "⚡ PRÓXIMA MISSÃO",
+    "xpProgress": "PROGRESSO DE XP"
+  },
+  "bioMonitor": {
+    "title": "BIO-MONITOR",
+    "ram": "RAM",
+    "hardware": "HARDWARE",
+    "cool": "COOL",
+    "credits": "CRÉDITOS",
+    "xp": "XP",
+    "gold": "GOLD"
+  },
+  "settings": {
+    "title": "Configurações",
+    "music": "Música",
+    "sfx": "Efeitos Sonoros",
+    "musicVolume": "Volume da Música",
+    "sfxVolume": "Volume dos Efeitos",
+    "language": "Idioma",
+    "resetGame": "RESETAR JOGO",
+    "resetConfirm": "Tem certeza que deseja resetar o jogo? Esta ação não pode ser desfeita.",
+    "resetButton": "Resetar",
+    "resetWarning": "Aviso"
+  },
+  "triage": {
+    "title": "Triagem",
+    "step": "Passo",
+    "next": "Próximo",
+    "back": "Voltar",
+    "finish": "Finalizar",
+    "basicInfo": "Informações Básicas",
+    "physicalData": "Dados Físicos",
+    "lifestyle": "Estilo de Vida",
+    "nutrition": "Nutrição",
+    "studyWork": "Estudo & Trabalho",
+    "finances": "Finanças",
+    "confirmation": "Confirmação",
+    "name": "Nome",
+    "age": "Idade",
+    "gender": "Gênero",
+    "height": "Altura (cm)",
+    "weight": "Peso (kg)",
+    "trainingFrequency": "Frequência de Treino",
+    "studyHours": "Horas de Estudo/Semana",
+    "sleepQuality": "Qualidade do Sono",
+    "sleepHours": "Horas de Sono/Noite",
+    "dietType": "Tipo de Dieta",
+    "monthlyIncome": "Renda Mensal",
+    "debt": "Dívidas",
+    "male": "Masculino",
+    "female": "Feminino",
+    "other": "Outro"
+  },
+  "profile": {
+    "title": "Perfil",
+    "character": "Personagem",
+    "level": "Nível",
+    "class": "Classe",
+    "stats": "Estatísticas",
+    "gigsCompleted": "Missões Completadas",
+    "totalXp": "XP Total",
+    "totalGold": "Ouro Total"
+  },
+  "gigs": {
+    "title": "Missões",
+    "addCustom": "Adicionar Missão",
+    "complete": "Completar",
+    "reward": "Recompensa",
+    "difficulty": "Dificuldade",
+    "noGigs": "Nenhuma missão disponível"
+  },
+  "shop": {
+    "title": "Loja",
+    "buy": "Comprar",
+    "sell": "Vender",
+    "inventory": "Inventário",
+    "price": "Preço",
+    "quantity": "Quantidade",
+    "insufficientFunds": "Fundos insuficientes"
+  },
+  "alerts": {
+    "criticalRam": "RAM Crítica",
+    "lowHardware": "HARDWARE Baixo",
+    "overheating": "Superaquecimento",
+    "debtWarning": "Alerta de Dívida"
+  },
+  "errors": {
+    "invalidInput": "Entrada inválida",
+    "loadingFailed": "Falha ao carregar",
+    "saveFailed": "Falha ao salvar"
+  }
+}

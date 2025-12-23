@@ -9,11 +9,13 @@ import { ThemedView } from "@/components/themed-view";
 import { CyberpunkColors } from "@/constants/theme";
 import { useGameState } from "@/hooks/use-game-state";
 import { useAudio } from "@/hooks/use-audio";
+import { useTranslation } from "@/hooks/use-translation";
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { resetGame } = useGameState();
+  const { t, changeLanguage, currentLanguage } = useTranslation();
   const { 
     musicEnabled, 
     sfxEnabled, 
@@ -25,16 +27,14 @@ export default function SettingsScreen() {
     setSFXVolume: updateSFXVolume 
   } = useAudio();
 
-  const [language, setLanguage] = useState("pt-BR");
-
   const handleReset = () => {
     Alert.alert(
-      "Resetar Jogo",
-      "Tem certeza que deseja resetar o jogo? Esta ação não pode ser desfeita.",
+      t("settings.resetWarning"),
+      t("settings.resetConfirm"),
       [
-        { text: "Cancelar", onPress: () => {}, style: "cancel" },
+        { text: t("common.cancel"), onPress: () => {}, style: "cancel" },
         {
-          text: "Resetar",
+          text: t("settings.resetButton"),
           onPress: async () => {
             await resetGame();
             router.replace("/triage");
@@ -59,20 +59,20 @@ export default function SettingsScreen() {
         {/* Header */}
         <View style={styles.header}>
           <ThemedText type="title" style={styles.title}>
-            ⚙️ CONFIGURAÇÕES
+            ⚙️ {t("settings.title").toUpperCase()}
           </ThemedText>
         </View>
 
         {/* Audio Settings */}
         <View style={styles.section}>
           <ThemedText type="subtitle" style={styles.sectionTitle}>
-            🎵 ÁUDIO
+            🎵 {t("settings.music").toUpperCase()}
           </ThemedText>
 
           {/* Background Music */}
           <View style={styles.settingRow}>
             <View style={styles.settingLabel}>
-              <ThemedText style={styles.settingText}>Música de Fundo</ThemedText>
+              <ThemedText style={styles.settingText}>{t("settings.music")}</ThemedText>
               <ThemedText style={styles.settingDescription}>
                 Rock cyberpunk ambiente
               </ThemedText>
@@ -89,7 +89,7 @@ export default function SettingsScreen() {
           {/* Music Volume */}
           {musicEnabled && (
             <View style={styles.sliderContainer}>
-              <ThemedText style={styles.sliderLabel}>Volume da Música</ThemedText>
+              <ThemedText style={styles.sliderLabel}>{t("settings.musicVolume")}</ThemedText>
               <Slider
                 style={styles.slider}
                 minimumValue={0}
@@ -108,7 +108,7 @@ export default function SettingsScreen() {
           {/* Sound Effects */}
           <View style={styles.settingRow}>
             <View style={styles.settingLabel}>
-              <ThemedText style={styles.settingText}>Efeitos Sonoros</ThemedText>
+              <ThemedText style={styles.settingText}>{t("settings.sfx")}</ThemedText>
               <ThemedText style={styles.settingDescription}>
                 Sons de clique e ações
               </ThemedText>
@@ -125,7 +125,7 @@ export default function SettingsScreen() {
           {/* SFX Volume */}
           {sfxEnabled && (
             <View style={styles.sliderContainer}>
-              <ThemedText style={styles.sliderLabel}>Volume dos Efeitos</ThemedText>
+              <ThemedText style={styles.sliderLabel}>{t("settings.sfxVolume")}</ThemedText>
               <Slider
                 style={styles.slider}
                 minimumValue={0}
@@ -145,21 +145,21 @@ export default function SettingsScreen() {
         {/* Language Settings */}
         <View style={styles.section}>
           <ThemedText type="subtitle" style={styles.sectionTitle}>
-            🌍 IDIOMA
+            🌍 {t("settings.language").toUpperCase()}
           </ThemedText>
 
           <View style={styles.languageButtons}>
             <Pressable
               style={[
                 styles.languageButton,
-                language === "pt-BR" && styles.languageButtonActive,
+                currentLanguage === "pt-br" && styles.languageButtonActive,
               ]}
-              onPress={() => setLanguage("pt-BR")}
+              onPress={() => changeLanguage("pt-br")}
               testID="settings-lang-ptbr"
             >
               <ThemedText style={[
                 styles.languageButtonText,
-                language === "pt-BR" && styles.languageButtonTextActive,
+                currentLanguage === "pt-br" && styles.languageButtonTextActive,
               ]}>
                 🇧🇷 PT-BR
               </ThemedText>
@@ -168,14 +168,14 @@ export default function SettingsScreen() {
             <Pressable
               style={[
                 styles.languageButton,
-                language === "en-US" && styles.languageButtonActive,
+                currentLanguage === "en-us" && styles.languageButtonActive,
               ]}
-              onPress={() => setLanguage("en-US")}
+              onPress={() => changeLanguage("en-us")}
               testID="settings-lang-enus"
             >
               <ThemedText style={[
                 styles.languageButtonText,
-                language === "en-US" && styles.languageButtonTextActive,
+                currentLanguage === "en-us" && styles.languageButtonTextActive,
               ]}>
                 🇺🇸 EN-US
               </ThemedText>
@@ -186,7 +186,7 @@ export default function SettingsScreen() {
         {/* Danger Zone */}
         <View style={styles.section}>
           <ThemedText type="subtitle" style={[styles.sectionTitle, styles.dangerTitle]}>
-            ⚠️ ZONA DE PERIGO
+            ⚠️ {t("common.warning").toUpperCase()}
           </ThemedText>
 
           <Pressable
@@ -194,7 +194,7 @@ export default function SettingsScreen() {
             onPress={handleReset}
             testID="settings-reset-game"
           >
-            <ThemedText style={styles.resetButtonText}>🔄 RESETAR JOGO</ThemedText>
+            <ThemedText style={styles.resetButtonText}>🔄 {t("settings.resetGame")}</ThemedText>
           </Pressable>
           <ThemedText style={styles.resetWarning}>
             Atenção: Esta ação apaga todos os dados e não pode ser desfeita!
