@@ -185,16 +185,6 @@ export function useAudio() {
     saveSettings(newSettings);
   };
 
-  const toggleMusic = () => {
-    const newSettings = { ...settings, musicEnabled: !settings.musicEnabled };
-    saveSettings(newSettings);
-  };
-
-  const toggleSFX = () => {
-    const newSettings = { ...settings, sfxEnabled: !settings.sfxEnabled };
-    saveSettings(newSettings);
-  };
-
   // Cleanup on unmount
   useEffect(() => {
     return () => {
