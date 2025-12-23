@@ -1,7 +1,14 @@
 import { useRouter, useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+  Easing,
+} from "react-native-reanimated";
 
 import { BioMonitorComponent } from "@/components/bio-monitor";
 import { ClassWarningsPanel } from "@/components/class-warnings";
@@ -10,12 +17,31 @@ import { ThemedView } from "@/components/themed-view";
 import { CyberpunkColors } from "@/constants/theme";
 import { useGameState } from "@/hooks/use-game-state";
 import { useClassWarnings } from "@/hooks/use-class-warnings";
+import { CyberpunkGridBg, ScanlineOverlay } from "@/components/cyberpunk-effects";
 
 export default function DashboardScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { gameState, loading } = useGameState();
   const warnings = useClassWarnings();
+  const pulseOpacity = useSharedValue(0.8);
+
+  // Pulse animation para o streak
+  useEffect(() => {
+    pulseOpacity.value = withRepeat(
+      withTiming(1, {
+        duration: 2000,
+        easing: Easing.inOut(Easing.ease),
+      }),
+      -1,
+      true
+    );
+  }, []);
+
+  const pulseStyle = useAnimatedStyle(() => ({
+    opacity: pulseOpacity.value,
+  }));
+
   // Check if game state exists, if not go to character creation
   useFocusEffect(
     useCallback(() => {
@@ -97,7 +123,7 @@ export default function DashboardScreen() {
         </View>
 
         {/* Streak Counter */}
-        <View style={styles.streakContainer}>
+        <Animated.View style={[styles.streakContainer, pulseStyle]}>
           <View style={styles.streakGlow}>
             <ThemedText style={styles.streakLabel}>🔥 LOGIN STREAK</ThemedText>
             <ThemedText style={styles.streakValue}>{gameState.character.loginStreak}</ThemedText>
@@ -105,7 +131,7 @@ export default function DashboardScreen() {
               {Math.round(streakBonus * 100)}% desconto na loja
             </ThemedText>
           </View>
-        </View>
+        </Animated.View>
 
         {/* Bio-Monitor */}
         <BioMonitorComponent stats={gameState.bioMonitor} />

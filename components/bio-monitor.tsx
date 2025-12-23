@@ -1,4 +1,10 @@
 import { View, StyleSheet } from "react-native";
+import { useEffect } from "react";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from "react-native-reanimated";
 import { ThemedText } from "./themed-text";
 import { CyberpunkColors } from "@/constants/theme";
 import { BioMonitor } from "@/types";
@@ -9,6 +15,16 @@ interface BioMonitorProps {
 
 export function BioMonitorComponent({ stats }: BioMonitorProps) {
   const StatBar = ({ label, value, color }: { label: string; value: number; color: string }) => {
+    const animatedWidth = useSharedValue(0);
+
+    useEffect(() => {
+      animatedWidth.value = withSpring(value, { damping: 5, mass: 1 });
+    }, [value]);
+
+    const animatedStyle = useAnimatedStyle(() => ({
+      width: `${Math.min(animatedWidth.value, 100)}%`,
+    }));
+
     const id = `bio-stat-${label.toLowerCase()}`;
     return (
       <View
@@ -27,13 +43,13 @@ export function BioMonitorComponent({ stats }: BioMonitorProps) {
           </ThemedText>
         </View>
         <View style={styles.barBackground} testID={`${id}-bar-bg`}>
-          <View
+          <Animated.View
             style={[
               styles.barFill,
               {
-                width: `${Math.min(value, 100)}%`,
                 backgroundColor: color,
               },
+              animatedStyle,
             ]}
             testID={`${id}-bar-fill`}
           />

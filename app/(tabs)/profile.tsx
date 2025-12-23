@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { ClassStatus } from "@/components/class-status";
+import { Avatar } from "@/components/avatar";
 import { CyberpunkColors } from "@/constants/theme";
 import { useGameState } from "@/hooks/use-game-state";
 import { CLASS_DESCRIPTIONS } from "@/types";
@@ -42,6 +43,7 @@ export default function ProfileScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Character Info */}
         <View style={styles.characterCard}>
+          <Avatar userId={gameState.character.id} size={100} style={{ alignSelf: 'center', marginBottom: 16 }} />
           <ThemedText type="title" style={styles.characterName}>
             {gameState.character.name}
           </ThemedText>
