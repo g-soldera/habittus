@@ -30,7 +30,7 @@ export default function ProfileScreen() {
   const handleReset = () => {
     if (confirm("Tem certeza que deseja resetar o jogo? Esta ação não pode ser desfeita.")) {
       resetGame();
-      router.replace("/(tabs)/character-creation");
+      router.replace("/triage");
     }
   };
 
