@@ -17,7 +17,8 @@ import { ThemedView } from "@/components/themed-view";
 import { CyberpunkColors } from "@/constants/theme";
 import { useGameState } from "@/hooks/use-game-state";
 import { useClassWarnings } from "@/hooks/use-class-warnings";
-import { CyberpunkGridBg, ScanlineOverlay } from "@/components/cyberpunk-effects";
+import { CyberpunkGrid } from "@/components/cyberpunk-grid";
+import { FadeIn, SlideIn, NeonBorder } from "@/components/visual-effects";
 
 export default function DashboardScreen() {
   const router = useRouter();
@@ -77,16 +78,24 @@ export default function DashboardScreen() {
         },
       ]}
     >
+      {/* Background animado */}
+      <CyberpunkGrid />
+      
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         {/* Class Warnings */}
-        {warnings.length > 0 && <ClassWarningsPanel warnings={warnings} />}
+        {warnings.length > 0 && (
+          <FadeIn duration={600}>
+            <ClassWarningsPanel warnings={warnings} />
+          </FadeIn>
+        )}
 
         {/* Header with Class Badge */}
-        <View style={styles.header}>
-          <View style={{ flex: 1 }}>
+        <SlideIn direction="top" duration={500}>
+          <View style={styles.header}>
+            <View style={{ flex: 1 }}>
             <ThemedText type="title" style={styles.greeting}>
               {gameState.character.name}
             </ThemedText>
@@ -103,9 +112,11 @@ export default function DashboardScreen() {
             </ThemedText>
           </View>
         </View>
+        </SlideIn>
 
         {/* XP Progress Bar */}
-        <View style={styles.xpProgressContainer}>
+        <FadeIn duration={700} delay={200}>
+          <View style={styles.xpProgressContainer}>
           <View style={styles.xpProgressHeader}>
             <ThemedText style={styles.xpProgressLabel}>XP PROGRESS</ThemedText>
             <ThemedText style={styles.xpProgressText}>
