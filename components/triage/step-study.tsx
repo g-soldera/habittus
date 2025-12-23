@@ -16,7 +16,7 @@ export function TriageStepStudy({
   setHoursOfFocusPerDay: (v: string) => void;
 }) {
   return (
-    <ThemedView accessible={true} accessibilityRole="form">
+    <ThemedView accessible={true}>
       <ThemedText type="title">Estudo & Produtividade 📚</ThemedText>
 
       <ThemedText style={{ marginTop: 12 }}>Horas de Estudo por Semana</ThemedText>

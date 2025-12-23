@@ -20,7 +20,7 @@ export function TriageStepFinance({
   setAverageSleepHours: (v: string) => void;
 }) {
   return (
-    <ThemedView accessible={true} accessibilityRole="form">
+    <ThemedView accessible={true}>
       <ThemedText type="title">Finanças & Hábitos 💰</ThemedText>
 
       <ThemedText style={{ marginTop: 12 }}>Renda Mensal (R$)</ThemedText>

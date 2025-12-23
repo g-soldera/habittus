@@ -21,7 +21,7 @@ export function TriageStepBasic({
   setGender: (g: Gender) => void;
 }) {
   return (
-    <ThemedView accessible={true} accessibilityRole="form">
+    <ThemedView accessible={true}>
       <ThemedText type="title">Bem-vindo ao Habittus! 🎮</ThemedText>
       <ThemedText style={{ marginTop: 8 }}>Vamos criar seu personagem. Comece com seus dados básicos.</ThemedText>
 

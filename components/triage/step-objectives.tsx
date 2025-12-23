@@ -15,7 +15,7 @@ export function TriageStepObjectives({
   pillarOptions: { label: string; value: Pillar }[];
 }) {
   return (
-    <ThemedView accessible={true} accessibilityRole="form">
+    <ThemedView accessible={true}>
       <ThemedText type="title">Seus Objetivos 🎯</ThemedText>
       <ThemedText>Selecione os pilares da vida que deseja melhorar.</ThemedText>
 

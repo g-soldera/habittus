@@ -20,7 +20,7 @@ export function TriageStepBiometrics({
   setBodyFatPercent: (v: string) => void;
 }) {
   return (
-    <ThemedView accessible={true} accessibilityRole="form">
+    <ThemedView accessible={true}>
       <ThemedText type="title">Dados Biométricos 📏</ThemedText>
       <ThemedText>Insira suas medidas para calcular seu TMB e TDEE.</ThemedText>
 

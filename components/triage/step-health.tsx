@@ -16,7 +16,7 @@ export function TriageStepHealth({
   setTrainingType: (v: any) => void;
 }) {
   return (
-    <ThemedView accessible={true} accessibilityRole="form">
+    <ThemedView accessible={true}>
       <ThemedText type="title">Saúde Física 💪</ThemedText>
 
       <ThemedText style={{ marginTop: 12 }}>Frequência de Treino (dias/semana)</ThemedText>

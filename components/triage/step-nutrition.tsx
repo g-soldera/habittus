@@ -16,7 +16,7 @@ export function TriageStepNutrition({
   setMealsPerDay: (v: string) => void;
 }) {
   return (
-    <ThemedView accessible={true} accessibilityRole="form">
+    <ThemedView accessible={true}>
       <ThemedText type="title">Nutrição 🍎</ThemedText>
 
       <ThemedText style={{ marginTop: 12 }}>Tipo de Dieta</ThemedText>
