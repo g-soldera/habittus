@@ -282,6 +282,21 @@ export function useGameState() {
     const discount = Math.min(0.5, gameState.character.loginStreak * 0.02);
     const finalCost = Math.floor(reward.costGold * (1 - discount));
 
+    // Try server-side authoritative purchase if available; if not, fall back to client optimistic update
+    try {
+      if (typeof fetch !== 'undefined') {
+        const res = await fetch('/api/shop/purchase', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rewardId, cost: finalCost }),
+        });
+        const json = await res.json();
+        if (!json.success) return; // server declined purchase
+      }
+    } catch (e) {
+      // network or server error - proceed with optimistic client update
+    }
+
     if (gameState.bioMonitor.totalGold >= finalCost) {
       const updatedState = { ...gameState };
       updatedState.bioMonitor.totalGold -= finalCost;

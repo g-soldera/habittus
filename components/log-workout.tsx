@@ -33,42 +33,149 @@ export function LogWorkout({ onSave }: { onSave: (payload: any) => void }) {
 
   return (
     <ThemedView style={styles.container} testID="log-workout" accessible accessibilityLabel="Log de Treino">
-      <ThemedText type="title" testID="log-workout-title">Log de Treino</ThemedText>
+      <View style={styles.header}>
+        <ThemedText style={styles.emoji}>💪</ThemedText>
+        <ThemedText type="title" testID="log-workout-title">TREINO</ThemedText>
+      </View>
 
       <ThemedText style={styles.label}>Tipo</ThemedText>
       <View style={styles.row}>
-        {['strength', 'cardio', 'functional', 'yoga'].map(t => (
-          <Pressable key={t} testID={`log-workout-type-${t}`} onPress={() => setType(t as any)} style={[styles.typeButton, type === t && styles.typeButtonActive]} accessibilityRole="button" accessibilityLabel={`Tipo ${t}`}>
-            <ThemedText>{t}</ThemedText>
+        {[
+          { value: 'strength' as const, label: '⚔️ Força' },
+          { value: 'cardio' as const, label: '🏃 Cardio' },
+          { value: 'functional' as const, label: '🤸 Funcional' },
+          { value: 'yoga' as const, label: '🧘 Yoga' },
+        ].map(({ value, label }) => (
+          <Pressable 
+            key={value} 
+            testID={`log-workout-type-${value}`} 
+            onPress={() => setType(value)} 
+            style={[styles.typeButton, type === value && styles.typeButtonActive]} 
+            accessibilityRole="button" 
+            accessibilityLabel={label}
+          >
+            <ThemedText style={[styles.typeButtonText, type === value && styles.typeButtonTextActive]}>
+              {label}
+            </ThemedText>
           </Pressable>
         ))}
       </View>
 
       <ThemedText style={styles.label}>Duração (min)</ThemedText>
-      <TextInput style={styles.input} keyboardType="numeric" value={duration} onChangeText={setDuration} testID="log-workout-duration" accessibilityLabel="Duração (min)" />
+      <TextInput 
+        style={styles.input} 
+        keyboardType="numeric" 
+        value={duration} 
+        onChangeText={setDuration} 
+        testID="log-workout-duration" 
+        accessibilityLabel="Duração (min)"
+        placeholderTextColor={CyberpunkColors.textDisabled}
+      />
 
       <ThemedText style={styles.label}>Intensidade</ThemedText>
       <View style={styles.row}>
-        {['low', 'medium', 'high'].map(i => (
-          <Pressable key={i} testID={`log-workout-intensity-${i}`} onPress={() => setIntensity(i as any)} style={[styles.typeButton, intensity === i && styles.typeButtonActive]} accessibilityRole="button" accessibilityLabel={`Intensidade ${i}`}>
-            <ThemedText>{i}</ThemedText>
+        {[
+          { value: 'low' as const, label: '🟢 Baixa' },
+          { value: 'medium' as const, label: '🟡 Média' },
+          { value: 'high' as const, label: '🔴 Alta' },
+        ].map(({ value, label }) => (
+          <Pressable 
+            key={value} 
+            testID={`log-workout-intensity-${value}`} 
+            onPress={() => setIntensity(value)} 
+            style={[styles.typeButton, intensity === value && styles.typeButtonActive]} 
+            accessibilityRole="button" 
+            accessibilityLabel={label}
+          >
+            <ThemedText style={[styles.typeButtonText, intensity === value && styles.typeButtonTextActive]}>
+              {label}
+            </ThemedText>
           </Pressable>
         ))}
       </View>
 
       <Pressable style={styles.saveButton} onPress={handleSave} testID="log-workout-save" accessibilityRole="button" accessibilityLabel="Salvar treino">
-        <ThemedText style={{ color: '#000' }}>Salvar</ThemedText>
+        <ThemedText style={styles.saveButtonText}>✓ SALVAR XP</ThemedText>
       </Pressable>
     </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 12, borderRadius: 8, borderWidth: 2, borderColor: CyberpunkColors.cyan },
-  label: { marginTop: 8, marginBottom: 6, color: CyberpunkColors.cyan },
-  input: { borderWidth: 1, borderColor: CyberpunkColors.cyan, borderRadius: 6, padding: 8, color: CyberpunkColors.cyan },
-  row: { flexDirection: 'row', gap: 8, marginBottom: 8 },
-  typeButton: { padding: 8, borderWidth: 1, borderColor: CyberpunkColors.cyan, borderRadius: 6 },
-  typeButtonActive: { backgroundColor: CyberpunkColors.cyan },
-  saveButton: { marginTop: 12, backgroundColor: CyberpunkColors.green, padding: 12, borderRadius: 6, alignItems: 'center' },
+  container: { 
+    padding: 16, 
+    borderRadius: 8, 
+    borderWidth: 2, 
+    borderColor: CyberpunkColors.cyan,
+    backgroundColor: CyberpunkColors.cardBg,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    gap: 12,
+  },
+  emoji: {
+    fontSize: 32,
+  },
+  label: { 
+    marginTop: 12, 
+    marginBottom: 8, 
+    color: CyberpunkColors.cyan,
+    fontSize: 12,
+    fontWeight: '600',
+    fontFamily: 'Courier New',
+  },
+  input: { 
+    borderWidth: 1, 
+    borderColor: CyberpunkColors.cyan, 
+    borderRadius: 6, 
+    padding: 10,
+    color: CyberpunkColors.cyan,
+    fontFamily: 'monospace',
+    marginBottom: 8,
+  },
+  row: { 
+    flexDirection: 'row', 
+    gap: 6, 
+    marginBottom: 12,
+    flexWrap: 'wrap',
+  },
+  typeButton: { 
+    flex: 1,
+    minWidth: '48%',
+    padding: 10, 
+    borderWidth: 1, 
+    borderColor: CyberpunkColors.cyan, 
+    borderRadius: 6,
+    backgroundColor: CyberpunkColors.inputBg,
+    alignItems: 'center',
+  },
+  typeButtonActive: { 
+    backgroundColor: CyberpunkColors.cyan,
+    borderColor: CyberpunkColors.cyan,
+  },
+  typeButtonText: {
+    fontSize: 11,
+    color: CyberpunkColors.cyan,
+    fontWeight: '600',
+  },
+  typeButtonTextActive: {
+    color: CyberpunkColors.black,
+  },
+  saveButton: { 
+    marginTop: 16, 
+    backgroundColor: CyberpunkColors.green, 
+    padding: 14, 
+    borderRadius: 6, 
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: CyberpunkColors.green,
+  },
+  saveButtonText: {
+    color: CyberpunkColors.black,
+    fontWeight: 'bold',
+    fontSize: 14,
+    fontFamily: 'Courier New',
+  },
 });

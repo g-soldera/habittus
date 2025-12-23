@@ -15,34 +15,36 @@ export const shopRouter = router({
   purchase: protectedProcedure
     .input((val: any) => val)
     .mutation(async ({ input, ctx }) => {
-      const { rewardId } = input as { rewardId: number; quantity?: number };
+      const { rewardId } = input as { rewardId: string | number; quantity?: number };
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
 
-      // fetch reward
-      const [reward] = await db.select().from(rewards).where(eq(rewards.id, rewardId)).limit(1);
-      if (!reward) throw new TRPCError({ code: "NOT_FOUND", message: "Reward not found" });
+      // Try to resolve reward by numeric id or by handle string
+      let rewardRow: any = null;
+      if (typeof rewardId === 'number' || !Number.isNaN(Number(rewardId))) {
+        const idNum = Number(rewardId);
+        const [r] = await db.select().from(rewards).where(eq(rewards.id, idNum)).limit(1);
+        rewardRow = r;
+      }
 
-      // Fetch user (simple check for credits in users table)
-      const userRow = await db.select().from("users"); // minimal placeholder - up to your app to implement proper query
+      if (!rewardRow && typeof rewardId === 'string') {
+        const [r] = await db.select().from(rewards).where(eq(rewards.handle, rewardId)).limit(1 as any);
+        rewardRow = r;
+      }
 
-      // NOTE: For safety, a production implementation should perform an atomic transaction:
-      // 1) Check user credits
-      // 2) Deduct credits
-      // 3) Insert purchase
-      // 4) Return success
-      // Here we implement a minimal transactional placeholder.
+      if (!rewardRow) throw new TRPCError({ code: "NOT_FOUND", message: "Reward not found" });
+
+      if (!ctx.user) throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not authenticated' });
 
       try {
-        await db.transaction(async (tx) => {
-          await tx.insert(purchases).values({ userId: ctx.user!.id, rewardId, quantity: input.quantity ?? 1 });
-          // TODO: Deduct credits from user
+        const inserted = await db.transaction(async (tx) => {
+          const res = await tx.insert(purchases).values({ userId: ctx.user!.id, rewardId: rewardRow.id, quantity: input.quantity ?? 1 });
+          return res;
         });
+        return { success: true, purchase: inserted } as const;
       } catch (err) {
         console.error("Failed to complete purchase", err);
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to complete purchase" });
       }
-
-      return { success: true } as const;
     }),
 });

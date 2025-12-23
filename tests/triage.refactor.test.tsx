@@ -10,6 +10,17 @@ vi.mock('@/hooks/use-game-state', () => ({
   }),
 }));
 
+// Mock classifier to predictable values for test
+vi.mock('@/lib/biometric-calculator', () => ({
+  calculateTMB: () => 1600,
+  calculateTDEE: () => 2000,
+  classifyUser: (_triage: any, _biometrics: any) => ({
+    baseClass: 'netrunner',
+    statBoosts: { intelligence: 60 },
+    pillarBoosts: {},
+  }),
+}));
+
 import TriageScreen from '@/app/triage';
 import { Alert } from 'react-native';
 

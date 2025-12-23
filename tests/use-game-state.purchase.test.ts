@@ -13,6 +13,13 @@ describe('useGameState - purchaseReward', () => {
   beforeEach(() => {
     (AsyncStorage.getItem as any).mockReset();
     (AsyncStorage.setItem as any).mockReset();
+    // Ensure network fetch does not interfere with client-only tests
+    // If global fetch exists in the runner, stub it to reject so client fallback is used
+    try {
+      vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('no network')));
+    } catch (e) {
+      // environments without stub support may throw - ignore
+    }
   });
 
   it('deducts gold and adds item to inventory when affordable', async () => {

@@ -27,4 +27,30 @@ describe("shop.list", () => {
     const list = await caller.shop.list();
     expect(list).toEqual([]);
   });
+
+  it('allows purchase when DB transaction succeeds', async () => {
+    // Mock DB to simulate reward lookup and transaction
+    const dbMock: any = {
+      select: () => ({
+        from: () => ({
+          where: () => ({
+            limit: () => [
+              { id: 1, handle: 'r1', title: 'Test Reward', priceCredits: 50 },
+            ],
+          }),
+        }),
+      }),
+      transaction: async (fn: any) => {
+        return await fn({ insert: () => ({ values: () => ({ id: 123 }) }) });
+      },
+    };
+
+    const dbModule = await import('../../server/db');
+    vi.spyOn(dbModule, 'getDb').mockResolvedValue(dbMock as any);
+
+    const ctx = createCtx();
+    const caller = appRouter.createCaller(ctx as any);
+    const res = await caller.shop.purchase({ rewardId: 'r1', quantity: 1 } as any);
+    expect(res).toHaveProperty('success', true);
+  });
 });

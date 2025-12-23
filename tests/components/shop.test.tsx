@@ -1,6 +1,6 @@
 import React from 'react';
 import { vi } from 'vitest';
-import { render, fireEvent } from '@testing-library/react-native';
+import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import ShopScreen from '@/app/(tabs)/shop';
 
 vi.mock('@/hooks/use-game-state', () => ({
@@ -22,13 +22,13 @@ vi.mock('@/hooks/use-game-state', () => ({
 }));
 
 describe('ShopScreen', () => {
-  it('calls purchaseReward when buy pressed', async () => {
+  it('calls purchaseReward when Buy pressed', async () => {
     const { getByTestId } = render(<ShopScreen />);
 
     const buyButton = getByTestId('reward-r1-buy');
     fireEvent.press(buyButton);
 
     const mocked = (await import('@/hooks/use-game-state')).useGameState();
-    expect(mocked.purchaseReward).toHaveBeenCalledWith('r1');
+    await waitFor(() => expect(mocked.purchaseReward).toHaveBeenCalledWith('r1'));
   });
 });
