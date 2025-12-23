@@ -10,7 +10,7 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 
-import { BioMonitorComponent } from "@/components/bio-monitor";
+import { BioMonitorEnhanced } from "@/components/bio-monitor-enhanced";
 import { ClassWarningsPanel } from "@/components/class-warnings";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
@@ -162,7 +162,12 @@ export default function DashboardScreen() {
 
         {/* Bio-Monitor */}
         <SlideIn direction="left" duration={600}>
-          <BioMonitorComponent stats={gameState.bioMonitor} />
+          <BioMonitorEnhanced 
+            ram={gameState.bioMonitor.ram} 
+            hardware={gameState.bioMonitor.hardware} 
+            cool={gameState.bioMonitor.cool} 
+            credits={gameState.bioMonitor.credits} 
+          />
         </SlideIn>
 
         {/* Next Gig */}
