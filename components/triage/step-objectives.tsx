@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Pressable } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { CyberpunkColors } from '@/constants/theme';
+import { CyberButton } from '@/components/cyber-button';
 import type { Pillar } from '@/types/biometric';
 
 export function TriageStepObjectives({
@@ -19,33 +20,35 @@ export function TriageStepObjectives({
       <ThemedText type="title">Seus Objetivos 🎯</ThemedText>
       <ThemedText>Selecione os pilares da vida que deseja melhorar.</ThemedText>
 
-      <View style={{ marginTop: 12 }}>
-        {pillarOptions.map(option => {
-          const isActive = objectives.includes(option.value);
-          return (
-            <Pressable
-              key={option.value}
-              testID={`triage-objective-${option.value}`}
-              style={{
-                padding: 12,
-                borderWidth: 2,
-                borderColor: isActive ? CyberpunkColors.green : CyberpunkColors.cyan,
-                marginBottom: 8,
-                backgroundColor: isActive ? CyberpunkColors.cardBg : CyberpunkColors.inputBg,
-                borderRadius: 8,
-              }}
-              onPress={() => toggleObjective(option.value)}
-              accessibilityRole="button"
-            >
-              <ThemedText style={{ color: isActive ? CyberpunkColors.green : CyberpunkColors.textSecondary, fontWeight: isActive ? '700' as any : '600' as any }}>
-                {option.label}
-              </ThemedText>
-            </Pressable>
-          );
-        })}
+      <View style={styles.objectivesGrid}>
+        {pillarOptions.map(option => (
+          <CyberButton
+            key={option.value}
+            testID={`triage-objective-${option.value}`}
+            onPress={() => toggleObjective(option.value)}
+            active={objectives.includes(option.value)}
+            variant="secondary"
+            size="md"
+            fullWidth={true}
+            style={styles.objectiveButton}
+            accessibilityLabel={option.label}
+          >
+            {option.label}
+          </CyberButton>
+        ))}
       </View>
     </ThemedView>
   );
 }
+
+const styles = StyleSheet.create({
+  objectivesGrid: {
+    marginTop: 12,
+    gap: 12,
+  },
+  objectiveButton: {
+    marginBottom: 8,
+  },
+});
 
 export default TriageStepObjectives;

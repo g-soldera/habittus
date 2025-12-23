@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, TextInput, Pressable, StyleSheet } from 'react-native';
+import { View, TextInput, StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { CyberpunkColors } from '@/constants/theme';
+import { CyberButton } from '@/components/cyber-button';
 import type { Gender } from '@/types/biometric';
 
 export function TriageStepBasic({
@@ -52,40 +53,28 @@ export function TriageStepBasic({
 
       <ThemedText style={styles.label}>Sexo</ThemedText>
       <View style={styles.genderContainer}>
-        <Pressable
+        <CyberButton
           testID="triage-gender-male"
-          accessibilityRole="button"
           onPress={() => setGender('male')}
-          accessible={true}
-          style={[
-            styles.genderButton,
-            gender === 'male' && styles.genderButtonActive,
-          ]}
+          active={gender === 'male'}
+          variant="secondary"
+          size="md"
+          fullWidth={true}
+          accessibilityLabel="Masculino"
         >
-          <ThemedText style={[
-            styles.genderButtonText,
-            gender === 'male' && styles.genderButtonTextActive,
-          ]}>
-            ♂️ Masculino
-          </ThemedText>
-        </Pressable>
-        <Pressable
+          ♂️ Masculino
+        </CyberButton>
+        <CyberButton
           testID="triage-gender-female"
-          accessibilityRole="button"
           onPress={() => setGender('female')}
-          accessible={true}
-          style={[
-            styles.genderButton,
-            gender === 'female' && styles.genderButtonActive,
-          ]}
+          active={gender === 'female'}
+          variant="secondary"
+          size="md"
+          fullWidth={true}
+          accessibilityLabel="Feminino"
         >
-          <ThemedText style={[
-            styles.genderButtonText,
-            gender === 'female' && styles.genderButtonTextActive,
-          ]}>
-            ♀️ Feminino
-          </ThemedText>
-        </Pressable>
+          ♀️ Feminino
+        </CyberButton>
       </View>
     </ThemedView>
   );
@@ -118,33 +107,7 @@ const styles = StyleSheet.create({
   genderContainer: {
     flexDirection: 'row',
     gap: 12,
-  },
-  genderButton: {
-    flex: 1,
-    padding: 16,
-    borderWidth: 2,
-    borderColor: CyberpunkColors.darkGray,
-    backgroundColor: CyberpunkColors.inputBg,
-    borderRadius: 6,
-    alignItems: 'center',
-  },
-  genderButtonActive: {
-    borderColor: CyberpunkColors.magenta,
-    backgroundColor: CyberpunkColors.cardBg,
-    shadowColor: CyberpunkColors.magenta,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  genderButtonText: {
-    fontSize: 16,
-    color: CyberpunkColors.textSecondary,
-    fontWeight: '600',
-  },
-  genderButtonTextActive: {
-    color: CyberpunkColors.magenta,
-    fontWeight: 'bold',
+    marginBottom: 16,
   },
 });
 

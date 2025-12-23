@@ -1,8 +1,9 @@
 import React from 'react';
-import { TextInput, View, Pressable, StyleSheet } from 'react-native';
+import { TextInput, View, StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { CyberpunkColors } from '@/constants/theme';
+import { CyberButton } from '@/components/cyber-button';
 
 const DIET_OPTIONS = [
   { value: 'balanced', label: '⚖️ Balanceada', emoji: '⚖️' },
@@ -31,26 +32,19 @@ export function TriageStepNutrition({
       <ThemedText style={styles.label}>Tipo de Dieta</ThemedText>
       <View style={styles.dietGrid}>
         {DIET_OPTIONS.map((diet) => (
-          <Pressable
+          <CyberButton
             key={diet.value}
             testID={`triage-diet-${diet.value}`}
-            accessibilityRole="button"
             onPress={() => setDietType(diet.value)}
-            style={[
-              styles.dietButton,
-              dietType === diet.value && styles.dietButtonActive,
-            ]}
+            active={dietType === diet.value}
+            variant="secondary"
+            size="sm"
+            icon={diet.emoji}
+            style={styles.dietButton}
+            accessibilityLabel={diet.label}
           >
-            <ThemedText style={styles.dietEmoji}>{diet.emoji}</ThemedText>
-            <ThemedText
-              style={[
-                styles.dietButtonText,
-                dietType === diet.value && styles.dietButtonTextActive,
-              ]}
-            >
-              {diet.label}
-            </ThemedText>
-          </Pressable>
+            {diet.label}
+          </CyberButton>
         ))}
       </View>
 
@@ -95,36 +89,9 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   dietButton: {
-    width: '30%',
-    minWidth: 100,
-    padding: 12,
-    borderWidth: 2,
-    borderColor: CyberpunkColors.darkGray,
-    backgroundColor: CyberpunkColors.inputBg,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  dietButtonActive: {
-    borderColor: CyberpunkColors.green,
-    backgroundColor: CyberpunkColors.cardBg,
-    shadowColor: CyberpunkColors.green,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  dietEmoji: {
-    fontSize: 24,
-    marginBottom: 4,
-  },
-  dietButtonText: {
-    fontSize: 12,
-    color: CyberpunkColors.textSecondary,
-    textAlign: 'center',
-  },
-  dietButtonTextActive: {
-    color: CyberpunkColors.green,
-    fontWeight: 'bold',
+    width: '31%',
+    minWidth: 95,
+    marginBottom: 8,
   },
 });
 
