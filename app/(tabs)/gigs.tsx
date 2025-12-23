@@ -44,10 +44,13 @@ export default function GigsScreen() {
   const handlePayBounty = async (bountyId: string) => {
     const amount = parseInt(paymentAmount[bountyId] || "0");
     if (amount > 0) {
+      console.log(`[GigsScreen] Pagando bounty ${bountyId} com R$${amount}`);
       await payBounty(bountyId, amount);
       setPaymentAmount({ ...paymentAmount, [bountyId]: "" });
       setRefreshing(true);
       setTimeout(() => setRefreshing(false), 300);
+    } else {
+      console.warn(`[GigsScreen] Valor inválido para pagamento: ${paymentAmount[bountyId]}`);
     }
   };
 
@@ -99,6 +102,7 @@ export default function GigsScreen() {
   const renderBountyCard = ({ item }: { item: Bounty }) => {
     const progress = ((item.totalValue - item.remainingValue) / item.totalValue) * 100;
     const isDefeated = item.remainingValue <= 0;
+    const totalPaid = item.paidDates.reduce((sum, p) => sum + p.amount, 0);
 
     return (
       <View style={[styles.card, isDefeated && styles.cardDefeated]} testID={`bounty-${item.id}`}>
@@ -113,12 +117,28 @@ export default function GigsScreen() {
         </View>
         <ThemedText style={styles.bountyDescription}>{item.description}</ThemedText>
 
+        {/* Payment Stats */}
+        <View style={styles.paymentStats}>
+          <View style={styles.statItem}>
+            <ThemedText style={styles.statLabel}>Total Pago:</ThemedText>
+            <ThemedText style={[styles.statValue, { color: CyberpunkColors.green }]}>
+              R$ {totalPaid}
+            </ThemedText>
+          </View>
+          <View style={styles.statItem}>
+            <ThemedText style={styles.statLabel}>Pagamentos:</ThemedText>
+            <ThemedText style={styles.statValue}>
+              {item.paidDates.length}x
+            </ThemedText>
+          </View>
+        </View>
+
         {/* HP Bar */}
         <View style={styles.hpContainer}>
           <View style={styles.hpHeader}>
-            <ThemedText style={styles.hpLabel}>HP:</ThemedText>
-            <ThemedText style={[styles.hpValue, { color: progress < 33 ? CyberpunkColors.red : CyberpunkColors.green }]}>
-              R$ {item.remainingValue}
+            <ThemedText style={styles.hpLabel}>HP Restante:</ThemedText>
+            <ThemedText style={[styles.hpValue, { color: progress < 33 ? CyberpunkColors.green : CyberpunkColors.red }]}>
+              R$ {item.remainingValue} / {item.totalValue}
             </ThemedText>
           </View>
           <View style={styles.hpBar}>
@@ -126,12 +146,13 @@ export default function GigsScreen() {
               style={[
                 styles.hpFill,
                 {
-                  width: `${progress}%`,
-                  backgroundColor: progress < 33 ? CyberpunkColors.red : CyberpunkColors.green,
+                  width: `${Math.max(100 - progress, 0)}%`,
+                  backgroundColor: progress < 33 ? CyberpunkColors.red : progress < 66 ? CyberpunkColors.orange : CyberpunkColors.green,
                 },
               ]}
             />
           </View>
+          <ThemedText style={styles.progressText}>{Math.round(progress)}% quitado</ThemedText>
         </View>
 
         {!isDefeated && (
@@ -433,6 +454,39 @@ const styles = StyleSheet.create({
   hpFill: {
     height: "100%",
     borderRadius: 4,
+  },
+  progressText: {
+    fontSize: 10,
+    color: CyberpunkColors.textDisabled,
+    fontFamily: "Courier New",
+    marginTop: 4,
+    textAlign: "center",
+  },
+  paymentStats: {
+    flexDirection: "row",
+    gap: 12,
+    marginBottom: 12,
+    backgroundColor: CyberpunkColors.inputBg,
+    borderWidth: 1,
+    borderColor: CyberpunkColors.darkGray,
+    borderRadius: 4,
+    padding: 8,
+  },
+  statItem: {
+    flex: 1,
+  },
+  statLabel: {
+    fontSize: 9,
+    color: CyberpunkColors.textDisabled,
+    fontFamily: "Courier New",
+    textTransform: "uppercase",
+  },
+  statValue: {
+    fontSize: 13,
+    color: CyberpunkColors.cyan,
+    fontWeight: "bold",
+    fontFamily: "Courier New",
+    marginTop: 2,
   },
   paymentContainer: {
     flexDirection: "row",

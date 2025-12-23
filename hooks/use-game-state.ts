@@ -163,13 +163,20 @@ export function useGameState() {
     if (bounty && amount > 0) {
       const goldCost = amount; // 1 Gold = R$ 1
       if (updatedState.bioMonitor.totalGold >= goldCost) {
+        const previousRemaining = bounty.remainingValue;
         bounty.remainingValue = Math.max(0, bounty.remainingValue - amount);
         bounty.paidDates.push({ date: Date.now(), amount });
         updatedState.bioMonitor.totalGold -= goldCost;
         updatedState.bioMonitor.credits += amount; // Credits increase with payment
 
+        console.log(`[PayBounty] ${bounty.name}: R$${previousRemaining} → R$${bounty.remainingValue} (pagou R$${amount})`);
+        console.log(`[PayBounty] Total de pagamentos: ${bounty.paidDates.length}`);
+
         updatedState.lastUpdatedAt = Date.now();
         await saveGameState(updatedState);
+        setGameState(updatedState); // Force UI update
+      } else {
+        console.warn(`[PayBounty] Gold insuficiente! Necessário: ${goldCost}, Disponível: ${updatedState.bioMonitor.totalGold}`);
       }
     }
   };
