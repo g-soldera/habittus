@@ -50,8 +50,12 @@ export function TriageStepBasic({
 
       <ThemedText style={{ marginTop: 12 }}>Sexo</ThemedText>
       <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-        <ThemedView testID="triage-gender-male" accessibilityRole="button" onTouchStart={() => setGender('male')} accessible={true}>Masculino</ThemedView>
-        <ThemedView testID="triage-gender-female" accessibilityRole="button" onTouchStart={() => setGender('female')} accessible={true}>Feminino</ThemedView>
+        <Pressable testID="triage-gender-male" accessibilityRole="button" onPress={() => setGender('male')} accessible={true} style={{ padding: 8, borderWidth: 1, borderColor: CyberpunkColors.cyan, borderRadius: 6 }}>
+          <ThemedText>Masculino</ThemedText>
+        </Pressable>
+        <Pressable testID="triage-gender-female" accessibilityRole="button" onPress={() => setGender('female')} accessible={true} style={{ padding: 8, borderWidth: 1, borderColor: CyberpunkColors.cyan, borderRadius: 6 }}>
+          <ThemedText>Feminino</ThemedText>
+        </Pressable>
       </View>
     </ThemedView>
   );
