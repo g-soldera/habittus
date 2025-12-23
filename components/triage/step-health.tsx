@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Pressable, TextInput } from 'react-native';
+import { View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { CyberpunkColors } from '@/constants/theme';
+import { CyberpunkInput } from '@/components/cyberpunk-input';
+import { CyberpunkButton } from '@/components/cyberpunk-button';
 
 export function TriageStepHealth({
   trainingFrequency,
@@ -15,19 +16,38 @@ export function TriageStepHealth({
   trainingType: any;
   setTrainingType: (v: any) => void;
 }) {
+  const trainingTypes = [
+    { value: 'strength', label: 'Força', icon: '🏋️' },
+    { value: 'cardio', label: 'Cardio', icon: '🏃' },
+    { value: 'functional', label: 'Funcional', icon: '🤸' },
+    { value: 'yoga', label: 'Yoga', icon: '🧘' },
+  ];
+
   return (
     <ThemedView accessible={true}>
       <ThemedText type="title">Saúde Física 💪</ThemedText>
 
-      <ThemedText style={{ marginTop: 12 }}>Frequência de Treino (dias/semana)</ThemedText>
-      <TextInput testID="triage-training-frequency" style={{ borderWidth: 1, borderColor: CyberpunkColors.cyan, padding: 8, marginTop: 6 }} value={trainingFrequency} onChangeText={setTrainingFrequency} keyboardType="numeric" />
+      <ThemedText style={{ marginTop: 16, marginBottom: 8 }}>Frequência de Treino (dias/semana)</ThemedText>
+      <CyberpunkInput 
+        testID="triage-training-frequency" 
+        placeholder="Ex: 3"
+        value={trainingFrequency} 
+        onChangeText={setTrainingFrequency} 
+        keyboardType="numeric" 
+      />
 
-      <ThemedText style={{ marginTop: 12 }}>Tipo de Treino</ThemedText>
-      <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-        {['strength', 'cardio', 'functional', 'yoga'].map(type => (
-          <Pressable key={type} testID={`triage-training-${type}`} onPress={() => setTrainingType(type as any)} style={{ padding: 8, borderWidth: 1, borderColor: CyberpunkColors.cyan, marginRight: 8 }} accessibilityRole="button" accessible={true}>
-            <ThemedText>{type}</ThemedText>
-          </Pressable>
+      <ThemedText style={{ marginTop: 16, marginBottom: 8 }}>Tipo de Treino</ThemedText>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+        {trainingTypes.map(type => (
+          <View key={type.value} style={{ flex: 1, minWidth: '45%' }}>
+            <CyberpunkButton
+              testID={`triage-training-${type.value}`}
+              label={type.label}
+              icon={type.icon}
+              selected={trainingType === type.value}
+              onPress={() => setTrainingType(type.value as any)}
+            />
+          </View>
         ))}
       </View>
     </ThemedView>
