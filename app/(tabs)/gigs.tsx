@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback } from "react";
 
 import { ThemedText } from "@/components/themed-text";
@@ -14,6 +14,7 @@ type TabType = "gigs" | "bounties";
 
 export default function GigsScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { gameState, loading, completeGig, payBounty } = useGameState();
   const [activeTab, setActiveTab] = useState<TabType>("gigs");
   const [paymentAmount, setPaymentAmount] = useState<Record<string, string>>({});
@@ -203,6 +204,20 @@ export default function GigsScreen() {
             BOUNTIES
           </ThemedText>
         </Pressable>
+        <Pressable
+          style={styles.addButton}
+          onPress={() => {
+            if (activeTab === "gigs") {
+              router.push("/add-custom-gig");
+            } else {
+              router.push("/add-custom-bounty");
+            }
+          }}
+          accessibilityRole="button"
+          accessibilityLabel={activeTab === "gigs" ? "Adicionar gig customizada" : "Adicionar bounty"}
+        >
+          <ThemedText style={styles.addButtonText}>➕</ThemedText>
+        </Pressable>
       </View>
 
       {/* Content */}
@@ -240,6 +255,7 @@ const styles = StyleSheet.create({
     borderBottomColor: CyberpunkColors.cyan,
     marginHorizontal: 16,
     marginBottom: 16,
+    alignItems: "center",
   },
   tab: {
     flex: 1,
@@ -258,6 +274,20 @@ const styles = StyleSheet.create({
   },
   tabTextActive: {
     color: CyberpunkColors.magenta,
+    fontWeight: "bold",
+  },
+  addButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderWidth: 2,
+    borderColor: CyberpunkColors.cyan,
+    borderRadius: 4,
+    backgroundColor: CyberpunkColors.cardBg,
+    marginBottom: 8,
+  },
+  addButtonText: {
+    fontSize: 16,
+    color: CyberpunkColors.cyan,
     fontWeight: "bold",
   },
   listContent: {

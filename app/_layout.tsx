@@ -91,6 +91,8 @@ export default function RootLayout() {
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen name="modal" options={{ presentation: "modal", title: "Modal" }} />
                 <Stack.Screen name="oauth/callback" options={{ headerShown: false }} />
+                <Stack.Screen name="add-custom-gig" options={{ title: "Criar Gig Customizada", headerShown: true }} />
+                <Stack.Screen name="add-custom-bounty" options={{ title: "Registrar Bounty", headerShown: true }} />
               </Stack>
               <StatusBar style="auto" />
             </ThemeProvider>
