@@ -83,6 +83,11 @@ export default function RootLayout() {
   const content = (
     <I18nextProvider i18n={i18n}>
       <GestureHandlerRootView style={{ flex: 1 }}>
+        {!i18nReady ? (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0a0e27' }}>
+            <ActivityIndicator size="large" color="#00d9ff" />
+          </View>
+        ) : (
         <trpc.Provider client={trpcClient} queryClient={queryClient}>
           <QueryClientProvider client={queryClient}>
             <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
@@ -98,13 +103,10 @@ export default function RootLayout() {
             </ThemeProvider>
           </QueryClientProvider>
         </trpc.Provider>
+        )}
       </GestureHandlerRootView>
     </I18nextProvider>
   );
-
-  if (!i18nReady) {
-    return null;
-  }
 
   const shouldOverrideSafeArea = Platform.OS === "web";
 

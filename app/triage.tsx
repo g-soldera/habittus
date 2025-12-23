@@ -33,12 +33,8 @@ export default function TriageScreen() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
 
-  // If a profile already exists, this is not the first run: redirect to dashboard
-  useEffect(() => {
-    if (!loadingProfile && userProfile) {
-      router.replace('/(tabs)');
-    }
-  }, [loadingProfile, userProfile, router]);
+  // Nota: Removemos o redirect automático para evitar piscar
+  // O usuário pode voltar manualmente pela navegação se necessário
 
   // Step 1: Basic Info
   const [characterName, setCharacterName] = useState('');

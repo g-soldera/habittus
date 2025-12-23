@@ -132,37 +132,46 @@ export default function DashboardScreen() {
             />
           </View>
         </View>
+        </FadeIn>
 
         {/* Streak Counter */}
-        <Animated.View style={[styles.streakContainer, pulseStyle]}>
-          <View style={styles.streakGlow}>
-            <ThemedText style={styles.streakLabel}>🔥 LOGIN STREAK</ThemedText>
-            <ThemedText style={styles.streakValue}>{gameState.character.loginStreak}</ThemedText>
-            <ThemedText style={styles.streakBonus}>
-              {Math.round(streakBonus * 100)}% desconto na loja
-            </ThemedText>
-          </View>
-        </Animated.View>
+        <FadeIn duration={800} delay={300}>
+          <Animated.View style={[styles.streakContainer, pulseStyle]}>
+            <View style={styles.streakGlow}>
+              <ThemedText style={styles.streakLabel}>🔥 LOGIN STREAK</ThemedText>
+              <ThemedText style={styles.streakValue}>{gameState.character.loginStreak}</ThemedText>
+              <ThemedText style={styles.streakBonus}>
+                {Math.round(streakBonus * 100)}% desconto na loja
+              </ThemedText>
+            </View>
+          </Animated.View>
+        </FadeIn>
 
         {/* Bio-Monitor */}
-        <BioMonitorComponent stats={gameState.bioMonitor} />
+        <SlideIn direction="left" duration={600}>
+          <BioMonitorComponent stats={gameState.bioMonitor} />
+        </SlideIn>
 
         {/* Next Gig */}
         {nextGig && (
-          <View style={styles.nextGigContainer}>
-            <ThemedText style={styles.nextGigLabel}>⚡ PRÓXIMA MISSÃO</ThemedText>
-            <Pressable 
-              style={styles.nextGigCard}
-              onPress={() => router.navigate({pathname: "/(tabs)/gigs"} as any)}
-            >
-              <ThemedText type="defaultSemiBold" style={styles.nextGigName}>
-                {nextGig.name}
-              </ThemedText>
-              <ThemedText style={styles.nextGigReward}>
-                +{nextGig.xpReward} XP / +{nextGig.goldReward} GOLD
-              </ThemedText>
-            </Pressable>
-          </View>
+          <SlideIn direction="bottom" duration={700}>
+            <View style={styles.nextGigContainer}>
+              <ThemedText style={styles.nextGigLabel}>⚡ PRÓXIMA MISSÃO</ThemedText>
+              <NeonBorder color={CyberpunkColors.cyan}>
+                <Pressable 
+                  style={styles.nextGigCard}
+                  onPress={() => router.navigate({pathname: "/(tabs)/gigs"} as any)}
+                >
+                  <ThemedText type="defaultSemiBold" style={styles.nextGigName}>
+                    {nextGig.name}
+                  </ThemedText>
+                  <ThemedText style={styles.nextGigReward}>
+                    +{nextGig.xpReward} XP / +{nextGig.goldReward} GOLD
+                  </ThemedText>
+                </Pressable>
+              </NeonBorder>
+            </View>
+          </SlideIn>
         )}
       </ScrollView>
     </ThemedView>

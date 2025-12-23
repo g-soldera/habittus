@@ -353,7 +353,10 @@ export function useGameState() {
   const resetGame = async () => {
     try {
       await AsyncStorage.removeItem(GAME_STATE_KEY);
+      await AsyncStorage.removeItem(USER_PROFILE_KEY);
       setGameState(null);
+      setUserProfile(null);
+      console.log('[GameState] Game reset successfully');
     } catch (error) {
       console.error("[GameState] Error resetting game:", error);
     }
