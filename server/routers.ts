@@ -16,6 +16,7 @@ export const appRouter = router({
       } as const;
     }),
   }),
+  shop: require("./shop").shopRouter,
 
   // TODO: add feature routers here, e.g.
   // todo: router({
