@@ -1,4 +1,4 @@
-import { Audio } from 'expo-av';
+import * as Haptics from 'expo-haptics';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -12,7 +12,7 @@ interface AudioSettings {
 }
 
 const DEFAULT_SETTINGS: AudioSettings = {
-  musicEnabled: true,
+  musicEnabled: false, // Disabled by default since expo-av is deprecated
   sfxEnabled: true,
   musicVolume: 0.3,
   sfxVolume: 0.5,
@@ -20,40 +20,12 @@ const DEFAULT_SETTINGS: AudioSettings = {
 
 export function useAudio() {
   const [settings, setSettings] = useState<AudioSettings>(DEFAULT_SETTINGS);
-  const [backgroundMusic, setBackgroundMusic] = useState<Audio.Sound | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Load settings
   useEffect(() => {
     loadSettings();
   }, []);
-
-  // Setup audio mode
-  useEffect(() => {
-    Audio.setAudioModeAsync({
-      playsInSilentModeIOS: true,
-      staysActiveInBackground: true,
-      shouldDuckAndroid: true,
-    });
-  }, []);
-
-  // Load background music
-  useEffect(() => {
-    if (settings.musicEnabled && !backgroundMusic) {
-      loadBackgroundMusic();
-    } else if (!settings.musicEnabled && backgroundMusic) {
-      backgroundMusic.stopAsync();
-      backgroundMusic.unloadAsync();
-      setBackgroundMusic(null);
-    }
-  }, [settings.musicEnabled]);
-
-  // Update music volume
-  useEffect(() => {
-    if (backgroundMusic) {
-      backgroundMusic.setVolumeAsync(settings.musicVolume);
-    }
-  }, [settings.musicVolume, backgroundMusic]);
 
   const loadSettings = async () => {
     try {
@@ -77,32 +49,11 @@ export function useAudio() {
     }
   };
 
-  const loadBackgroundMusic = async () => {
-    try {
-      // Using a copyright-free cyberpunk/rock track from Free Music Archive
-      // You can replace this with any public domain or licensed track
-      const { sound } = await Audio.Sound.createAsync(
-        { uri: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Dee_Yan-Key/Tales_of_the_Realm/Dee_Yan-Key_-_01_-_Cyberpunk_Moonlight.mp3' },
-        { 
-          shouldPlay: true, 
-          isLooping: true, 
-          volume: settings.musicVolume 
-        }
-      );
-      setBackgroundMusic(sound);
-    } catch (error) {
-      console.error('[Audio] Error loading background music:', error);
-    }
-  };
-
   const playSFX = async (type: 'click' | 'success' | 'error' | 'purchase') => {
     if (!settings.sfxEnabled) return;
 
     try {
-      // Using expo-haptics as fallback for sounds
-      const Haptics = await import('expo-haptics');
-      
-      const hapticMap: Record<string, any> = {
+      const hapticMap = {
         click: Haptics.ImpactFeedbackStyle.Light,
         success: Haptics.ImpactFeedbackStyle.Medium,
         error: Haptics.NotificationFeedbackType.Error,

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View, Pressable, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Slider from '@react-native-community/slider';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -55,45 +54,20 @@ export default function SettingsScreen() {
             🔊 AUDIO
           </ThemedText>
 
-          {/* Background Music Toggle */}
+          {/* Background Music Toggle - Disabled */}
           <View style={styles.settingRow}>
-            <ThemedText style={styles.settingLabel}>Background Music</ThemedText>
-            <Pressable
-              style={[
-                styles.toggle,
-                settings.musicEnabled && styles.toggleActive,
-              ]}
-              onPress={() => updateSettings({ musicEnabled: !settings.musicEnabled })}
-              testID="settings-music-toggle"
-            >
-              <View
-                style={[
-                  styles.toggleThumb,
-                  settings.musicEnabled && styles.toggleThumbActive,
-                ]}
-              />
-            </Pressable>
-          </View>
-
-          {/* Music Volume */}
-          {settings.musicEnabled && (
-            <View style={styles.settingRow}>
-              <ThemedText style={styles.settingLabel}>
-                Music Volume: {Math.round(settings.musicVolume * 100)}%
+            <View style={{ flex: 1 }}>
+              <ThemedText style={styles.settingLabel}>Background Music</ThemedText>
+              <ThemedText style={styles.disabledNote}>
+                (Em breve - expo-av deprecado)
               </ThemedText>
-              <Slider
-                style={styles.slider}
-                minimumValue={0}
-                maximumValue={1}
-                value={settings.musicVolume}
-                onValueChange={(value) => updateSettings({ musicVolume: value })}
-                minimumTrackTintColor={CyberpunkColors.cyan}
-                maximumTrackTintColor={CyberpunkColors.darkGray}
-                thumbTintColor={CyberpunkColors.magenta}
-                testID="settings-music-volume"
-              />
             </View>
-          )}
+            <View
+              style={[styles.toggle, styles.toggleDisabled]}
+            >
+              <View style={styles.toggleThumb} />
+            </View>
+          </View>
 
           {/* SFX Toggle */}
           <View style={styles.settingRow}>
@@ -115,25 +89,19 @@ export default function SettingsScreen() {
             </Pressable>
           </View>
 
-          {/* SFX Volume */}
-          {settings.sfxEnabled && (
-            <View style={styles.settingRow}>
+          {/* SFX Volume - Disabled (haptics only) */}
+          <View style={styles.settingRow}>
+            <View style={{ flex: 1 }}>
               <ThemedText style={styles.settingLabel}>
-                SFX Volume: {Math.round(settings.sfxVolume * 100)}%
+                SFX Volume (Haptic apenas)
               </ThemedText>
-              <Slider
-                style={styles.slider}
-                minimumValue={0}
-                maximumValue={1}
-                value={settings.sfxVolume}
-                onValueChange={(value) => updateSettings({ sfxVolume: value })}
-                minimumTrackTintColor={CyberpunkColors.cyan}
-                maximumTrackTintColor={CyberpunkColors.darkGray}
-                thumbTintColor={CyberpunkColors.magenta}
-                testID="settings-sfx-volume"
-              />
             </View>
-          )}
+            <View
+              style={[styles.toggle, styles.toggleDisabled]}
+            >
+              <View style={[styles.toggleThumb, styles.toggleThumbActive]} />
+            </View>
+          </View>
         </View>
 
         {/* Game Settings */}
@@ -231,6 +199,17 @@ const styles = StyleSheet.create({
   toggleThumbActive: {
     backgroundColor: CyberpunkColors.magenta,
     alignSelf: 'flex-end',
+  },
+  disabledNote: {
+    fontSize: 10,
+    color: CyberpunkColors.darkGray,
+    fontStyle: 'italic',
+    marginTop: 2,
+  },
+  toggleDisabled: {
+    backgroundColor: CyberpunkColors.darkBg,
+    borderColor: CyberpunkColors.darkGray,
+    opacity: 0.5,
   },
   slider: {
     width: '100%',
