@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Pressable, ScrollView, StyleSheet, View, Switch } from "react-native";
+import { Alert, Pressable, ScrollView, StyleSheet, View, Switch } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import Slider from "@react-native-community/slider";
@@ -28,10 +28,21 @@ export default function SettingsScreen() {
   const [language, setLanguage] = useState("pt-BR");
 
   const handleReset = () => {
-    if (confirm("Tem certeza que deseja resetar o jogo? Esta ação não pode ser desfeita.")) {
-      resetGame();
-      router.replace("/triage");
-    }
+    Alert.alert(
+      "Resetar Jogo",
+      "Tem certeza que deseja resetar o jogo? Esta ação não pode ser desfeita.",
+      [
+        { text: "Cancelar", onPress: () => {}, style: "cancel" },
+        {
+          text: "Resetar",
+          onPress: async () => {
+            await resetGame();
+            router.replace("/triage");
+          },
+          style: "destructive",
+        },
+      ]
+    );
   };
 
   return (

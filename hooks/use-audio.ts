@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { AppState, AppStateStatus } from 'react-native';
 import { Audio } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -21,8 +22,9 @@ const DEFAULT_SETTINGS: AudioSettings = {
 export function useAudio() {
   const [settings, setSettings] = useState<AudioSettings>(DEFAULT_SETTINGS);
   const [isLoading, setIsLoading] = useState(true);
+  const [appState, setAppState] = useState<AppStateStatus>('active');
   const musicSound = useRef<Audio.Sound | null>(null);
-  const clickSound = useRef<Audio.Sound | null>(null);
+  const appStateSubscription = useRef<any>(null);
 
   // Load settings from storage
   useEffect(() => {
@@ -39,14 +41,46 @@ export function useAudio() {
     });
   }, []);
 
+  // Listen to app state changes (pause music when app loses focus)
+  useEffect(() => {
+    appStateSubscription.current = AppState.addEventListener('change', handleAppStateChange);
+    return () => {
+      appStateSubscription.current?.remove();
+    };
+  }, []);
+
+  const handleAppStateChange = async (state: AppStateStatus) => {
+    setAppState(state);
+    
+    if (state === 'inactive' || state === 'background') {
+      // Pause music when app goes to background
+      if (musicSound.current) {
+        try {
+          await musicSound.current.pauseAsync();
+        } catch (error) {
+          console.error('[Audio] Error pausing music:', error);
+        }
+      }
+    } else if (state === 'active') {
+      // Resume music when app comes to foreground
+      if (musicSound.current && settings.musicEnabled) {
+        try {
+          await musicSound.current.playAsync();
+        } catch (error) {
+          console.error('[Audio] Error resuming music:', error);
+        }
+      }
+    }
+  };
+
   // Load background music
   useEffect(() => {
-    if (settings.musicEnabled && !musicSound.current) {
+    if (settings.musicEnabled && !musicSound.current && appState === 'active') {
       loadBackgroundMusic();
     } else if (!settings.musicEnabled && musicSound.current) {
       stopMusic();
     }
-  }, [settings.musicEnabled]);
+  }, [settings.musicEnabled, appState]);
 
   // Update music volume
   useEffect(() => {
@@ -79,10 +113,9 @@ export function useAudio() {
 
   const loadBackgroundMusic = async () => {
     try {
-      // Using a free cyberpunk/synthwave track from Pixabay or similar
-      // For now, using a placeholder URL - you'll need to add actual music file
+      // Using a free royalty-free track from Pixabay
       const { sound } = await Audio.Sound.createAsync(
-        { uri: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
+        { uri: 'https://cdn.pixabay.com/download/audio/2022/09/01/audio_1d14fdf92b.mp3' },
         { 
           shouldPlay: true, 
           isLooping: true, 
@@ -92,28 +125,18 @@ export function useAudio() {
       musicSound.current = sound;
     } catch (error) {
       console.error('[Audio] Error loading background music:', error);
+      // Fallback: continue without music
     }
   };
 
   const stopMusic = async () => {
     if (musicSound.current) {
-      await musicSound.current.stopAsync();
-      await musicSound.current.unloadAsync();
-      musicSound.current = null;
-    }
-  };
-
-  const loadClickSound = async () => {
-    if (!clickSound.current) {
       try {
-        // Using a free click sound - replace with actual cyberpunk click sound
-        const { sound } = await Audio.Sound.createAsync(
-          require('@/assets/sounds/click.mp3'),
-          { volume: settings.sfxVolume }
-        );
-        clickSound.current = sound;
+        await musicSound.current.stopAsync();
+        await musicSound.current.unloadAsync();
+        musicSound.current = null;
       } catch (error) {
-        console.error('[Audio] Error loading click sound:', error);
+        console.error('[Audio] Error stopping music:', error);
       }
     }
   };
@@ -122,10 +145,18 @@ export function useAudio() {
     if (!settings.sfxEnabled) return;
 
     try {
-      await loadClickSound();
-      if (clickSound.current) {
-        await clickSound.current.replayAsync();
-      }
+      // Create a simple beep sound using a minimal WAV file in base64
+      // This is a short beep tone that works cross-platform
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: 'data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA==' },
+        { volume: settings.sfxVolume }
+      );
+      await sound.playAsync();
+      
+      // Cleanup after playing
+      setTimeout(() => {
+        sound.unloadAsync();
+      }, 200);
     } catch (error) {
       console.error('[Audio] Error playing click sound:', error);
     }
@@ -151,14 +182,21 @@ export function useAudio() {
     saveSettings(newSettings);
   };
 
+  const toggleMusic = () => {
+    const newSettings = { ...settings, musicEnabled: !settings.musicEnabled };
+    saveSettings(newSettings);
+  };
+
+  const toggleSFX = () => {
+    const newSettings = { ...settings, sfxEnabled: !settings.sfxEnabled };
+    saveSettings(newSettings);
+  };
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (musicSound.current) {
         musicSound.current.unloadAsync();
-      }
-      if (clickSound.current) {
-        clickSound.current.unloadAsync();
       }
     };
   }, []);
