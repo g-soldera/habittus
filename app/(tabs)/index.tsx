@@ -122,30 +122,6 @@ export default function DashboardScreen() {
             </View>
           </View>
         )}
-
-        {/* Quick Actions */}
-        <View style={styles.actionsContainer}>
-          <Pressable
-            style={styles.actionButton}
-            onPress={() => router.navigate({pathname: "/(tabs)/gigs"} as any)}
-          >
-            <ThemedText style={styles.actionButtonText}>GIGS</ThemedText>
-          </Pressable>
-
-          <Pressable
-            style={styles.actionButton}
-            onPress={() => router.navigate({pathname: "/(tabs)/shop"} as any)}
-          >
-            <ThemedText style={styles.actionButtonText}>LOJA</ThemedText>
-          </Pressable>
-
-          <Pressable
-            style={styles.actionButton}
-            onPress={() => router.navigate({pathname: "/(tabs)/profile"} as any)}
-          >
-            <ThemedText style={styles.actionButtonText}>PERFIL</ThemedText>
-          </Pressable>
-        </View>
       </ScrollView>
     </ThemedView>
   );

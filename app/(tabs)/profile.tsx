@@ -1,5 +1,4 @@
-import { useRouter } from "expo-router";
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ThemedText } from "@/components/themed-text";
@@ -10,9 +9,8 @@ import { useGameState } from "@/hooks/use-game-state";
 import { CLASS_DESCRIPTIONS } from "@/types";
 
 export default function ProfileScreen() {
-  const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { gameState, loading, resetGame } = useGameState();
+  const { gameState, loading } = useGameState();
 
   if (loading || !gameState) {
     return (
@@ -27,12 +25,7 @@ export default function ProfileScreen() {
     0
   );
 
-  const handleReset = () => {
-    if (confirm("Tem certeza que deseja resetar o jogo? Esta ação não pode ser desfeita.")) {
-      resetGame();
-      router.replace("/triage");
-    }
-  };
+  // Reset moved to settings screen
 
   return (
     <ThemedView
@@ -148,12 +141,6 @@ export default function ProfileScreen() {
           )}
         </View>
 
-        {/* Actions */}
-        <View style={styles.actionsContainer}>
-          <Pressable style={styles.resetButton} onPress={handleReset}>
-            <ThemedText style={styles.resetButtonText}>RESETAR JOGO</ThemedText>
-          </Pressable>
-        </View>
       </ScrollView>
     </ThemedView>
   );
