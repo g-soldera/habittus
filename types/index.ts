@@ -5,6 +5,16 @@ export interface Character {
   id: string;
   name: string;
   class: CharacterClass;
+  level?: number;
+  stats?: Partial<{
+    strength: number;
+    agility: number;
+    constitution: number;
+    intelligence: number;
+    wisdom: number;
+    charisma: number;
+    willpower: number;
+  }>;
   createdAt: number;
   lastLoginAt: number;
   loginStreak: number;

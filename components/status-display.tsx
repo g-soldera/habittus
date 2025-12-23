@@ -68,7 +68,7 @@ export function StatusDisplay({ stats, maxValue = 100 }: StatusDisplayProps) {
                 accessibilityValue={{
                   min: 0,
                   max: maxValue,
-                  current: value,
+                  now: value,
                 }}
               />
             </View>

@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { renderHook, act } from '@testing-library/react-hooks';
 import { useGameState } from '@/hooks/use-game-state';
+import { ClassType } from '@/types/biometric';
 
 vi.mock('@react-native-async-storage/async-storage', () => ({
   getItem: vi.fn(),
@@ -48,8 +49,9 @@ describe('useGameState evaluateClassUnlocks', () => {
       await result.current.logWorkout(30, 'moderate', 200);
     });
 
-    const unlocked = await act(async () => {
-      return await result.current.evaluateClassUnlocks();
+    let unlocked: ClassType | null = null;
+    await act(async () => {
+      unlocked = await result.current.evaluateClassUnlocks();
     });
 
     expect(unlocked).toBe('cyborg');

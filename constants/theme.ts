@@ -29,6 +29,8 @@ export const CyberpunkColors = {
   warning: "#ffff00",
   error: "#ff0055",
   info: "#00d9ff",
+  red: "#ff0055",
+  orange: "#ff8c00",
 
   // Additional
   darkGray: "#4a5568",

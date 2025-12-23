@@ -438,6 +438,7 @@ export function useGameState() {
     logStudy,
     logMeal,
     logWater,
+    evaluateClassUnlocks,
   };
 }
 
