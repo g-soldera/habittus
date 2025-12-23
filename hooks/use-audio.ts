@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
-import { Audio } from 'expo-av';
+import { Audio } from 'expo-audio';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AUDIO_SETTINGS_KEY = 'habittus_audio_settings';
@@ -114,14 +114,16 @@ export function useAudio() {
   const loadBackgroundMusic = async () => {
     try {
       // Using a free royalty-free track from Pixabay
-      const { sound } = await Audio.Sound.createAsync(
-        { uri: 'https://cdn.pixabay.com/download/audio/2022/09/01/audio_1d14fdf92b.mp3' },
-        { 
-          shouldPlay: true, 
-          isLooping: true, 
-          volume: settings.musicVolume 
-        }
-      );
+      const audioSource = {
+        uri: 'https://cdn.pixabay.com/download/audio/2022/09/01/audio_1d14fdf92b.mp3',
+      };
+
+      const sound = new Audio.Sound();
+      await sound.loadAsync(audioSource);
+      await sound.setIsLoopingAsync(true);
+      await sound.setVolumeAsync(settings.musicVolume);
+      await sound.playAsync();
+      
       musicSound.current = sound;
     } catch (error) {
       console.error('[Audio] Error loading background music:', error);
@@ -132,7 +134,7 @@ export function useAudio() {
   const stopMusic = async () => {
     if (musicSound.current) {
       try {
-        await musicSound.current.stopAsync();
+        await musicSound.current.pauseAsync();
         await musicSound.current.unloadAsync();
         musicSound.current = null;
       } catch (error) {
@@ -147,10 +149,11 @@ export function useAudio() {
     try {
       // Create a simple beep sound using a minimal WAV file in base64
       // This is a short beep tone that works cross-platform
-      const { sound } = await Audio.Sound.createAsync(
-        { uri: 'data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA==' },
-        { volume: settings.sfxVolume }
-      );
+      const sound = new Audio.Sound();
+      await sound.loadAsync({
+        uri: 'data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA==',
+      });
+      await sound.setVolumeAsync(settings.sfxVolume);
       await sound.playAsync();
       
       // Cleanup after playing
