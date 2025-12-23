@@ -1,58 +1,120 @@
-# Habittus MVP - Todo List
+# Habittus - Backlog Prioritário (Atualizado)
 
-## Phase 1: Core Infrastructure
-- [x] Criar estrutura de tipos TypeScript (User, Gig, Bounty, Reward, etc.)
-- [x] Implementar sistema de armazenamento local (AsyncStorage hooks)
-- [x] Criar mocks JSON para dados iniciais
-- [x] Implementar sistema de tema Cyberpunk (cores, tipografia)
+> Esta versão do `todo.md` foi atualizada a partir da auditoria das histórias técnicas (`TECHNICAL_STORIES.md`) e do código atual. As tarefas estão organizadas por épico, com prioridade e próximos passos claros. Marque itens concluídos quando comitar e abra PR por épico.
 
-## Phase 2: Character Creation & Onboarding
-- [x] Criar tela de Character Creation (nome + classe)
-- [x] Validar inputs (nome não vazio, classe obrigatória)
-- [x] Salvar personagem em AsyncStorage
-- [x] Navegação automática para Dashboard após criação
+---
 
-## Phase 3: Dashboard (Bio-Monitor)
-- [x] Criar tela Dashboard com Bio-Monitor
-- [x] Implementar barras de progresso (RAM, Hardware, Cool, Credits)
-- [x] Exibir Streak Counter
-- [x] Mostrar próxima Gig pendente
-- [x] Implementar Quick Actions (botões para Gigs, Shop, Profile)
+## Epic: Triagem e Onboarding (Prioridade: Alta) ✅
 
-## Phase 4: Gigs Management
-- [x] Criar tela Gigs com abas (Daily Gigs / Bounties)
-- [x] Listar Daily Gigs com checkbox
-- [x] Implementar lógica de conclusão de Gig (XP, Gold, atualizar Bio-Monitor)
-- [x] Implementar Streak logic (incrementar se todas as Gigs completadas)
-- [ ] Criar tela Gig Detail
-- [x] Listar Bounties (dívidas) com barra de HP
-- [ ] Criar tela Bounty Detail
-- [x] Implementar sistema de pagamento de Bounty (reduz HP, aumenta Credits)
+- [X] Tela `triage.tsx` com 7 etapas implementada (validações básicas)
+- [X] Cálculo de TMB/TDEE (em `lib/biometric-calculator.ts`)
+- [X] Classificação automática de classe (função `classifyUser`)
+- [X] Persistência de perfil (salvar perfil e criar GameState)
+- [X] Redirecionamento para Dashboard ao finalizar triagem
+- [X] Redirecionamento automático para Dashboard para usuários existentes (implementado)
+- [ ] Testes E2E cobrindo fluxo de onboarding (Criar teste Playwright: onboarding -> triage -> dashboard)
+- [ ] Acessibilidade: revisar labels, roles e foco (priorizar triage)
 
-## Phase 5: Shop & Rewards
-- [x] Criar tela Shop com lista de itens
-- [x] Implementar cálculo de desconto Street Cred (Streak * 0.02, cap 50%)
-- [x] Implementar sistema de compra (deduz Gold, adiciona ao inventário)
-- [x] Criar tela Add Custom Reward
-- [x] Validar inputs (nome, descrição, custo)
-- [x] Salvar recompensas customizadas em AsyncStorage
+---
 
-## Phase 6: Profile & Settings
-- [x] Criar tela Profile com estatísticas gerais
-- [x] Exibir nome, classe, XP total, Gold total, Gigs completadas
-- [x] Implementar botão de reset (para teste)
-- [ ] Criar tela Settings (placeholder para futuras opções)
+## Epic: Status RPG & Cálculos (Prioridade: Alta) ✅
 
-## Phase 7: Branding & Polish
-- [ ] Gerar logo customizado (Cyberpunk style)
-- [ ] Atualizar app.config.ts com branding
-- [x] Aplicar tema Cyberpunk em todos os componentes
-- [ ] Adicionar animações e feedback visual (haptic, glitch effects)
-- [ ] Testar navegação end-to-end
+- [X] Funções TMB/TDEE, BMI, peso e bodyfat (implementadas)
+- [X] Cálculo de XP e decay básico (implementado)
+- [X] Função `checkClassUnlock` (implementada)
+- [ ] Documentar fórmulas e expectativas numéricas (README / comentários)
+- [ ] Testes unitários adicionais para fórmulas críticas (adicionar cobertura)
 
-## Phase 8: Testing & Delivery
-- [ ] Testar fluxos principais (onboarding, gigs, shop, streak)
-- [ ] Validar persistência de dados em AsyncStorage
-- [ ] Testar em diferentes tamanhos de tela
-- [ ] Criar checkpoint final
-- [ ] Documentar instruções de execução
+---
+
+## Epic: Rastreamento (Prioridade: Alta → Média)
+
+- [X] Rastreamento de treinos (gigs / logs básicos)
+- [X] Rastreamento de água (implementado)
+- [X] Integração dos componentes de tracking com `use-game-state` (persistência e aplicação de XP) — **feito**
+- [X] Funções de cálculo de XP/efeitos (`lib/tracking.ts`) e testes unitários (adicionados)
+- [ ] Rastreamento de nutrição (LogNutrition.tsx) — **usar integração já pronta**
+- [ ] Rastreamento de estudo (LogStudy.tsx) — **usar integração já pronta**
+- [ ] Task manager (TaskManager.tsx) — **faltando**
+- [ ] FinanceTracker (Dashboard financeiro) — **faltando**
+
+Próximo passo: adicionar testes E2E para garantir que logging → dashboard/status funcione como esperado e adicionar unit tests para `use-game-state` logging methods.
+
+---
+
+## Epic: Personagem e Visual (Prioridade: Média)
+
+- [ ] `CharacterDisplay.tsx` e sprites 16-bit
+- [ ] Mudança de silhueta por peso
+- [ ] Aura / brilho por status
+- [ ] Equipamentos e inventário visual
+
+Próximo passo: design assets & implementar placeholder visual responsivo.
+
+---
+
+## Epic: Shop & Recompensas (Prioridade: Alta)
+
+- [X] Tela `shop` e compra básica (deduz Gold, adiciona inventário)
+- [X] Criação de recompensas customizadas (`Add Custom Reward`)
+- [ ] Exibir desconto dinâmico no UI (melhorar visual atual)
+- [ ] Melhorar inventário (consumíveis, expiração)
+
+---
+
+## Epic: Streak & Progressão (Prioridade: Alta)
+
+- [X] Streak counter e increment (básico)
+- [X] Milestones básicos (definidos no documento)
+- [ ] Penalidade de streak quebrada (applyStreakPenalty)
+- [ ] Milestones automáticos e notificações (integração com notifications)
+
+---
+
+## Epic: Dashboard, Perfil e Estatísticas (Prioridade: Média)
+
+- [X] Dashboard básico (Bio-Monitor, Streak, Quick Actions)
+- [X] Profile (dados gerais)
+- [ ] Tela de `Statistics.tsx` com gráficos
+- [ ] Exportar CSV e filtros (7/30/90/1y)
+
+---
+
+## Epic: Notificações & In-App (Prioridade: Média)
+
+- [ ] Local notifications agendadas (expo-notifications)
+- [ ] In-app toasts/notifications (NotificationToast.tsx)
+- [ ] Customização de horários de lembrete
+
+---
+
+## Epic: Persistência & Sync (Prioridade: Alta)
+
+- [X] AsyncStorage para GameState (implementado)
+- [X] AsyncStorage para user profile (implementado)
+- [ ] Export / Import (backup & restore)
+- [ ] Versionamento e migrações de dados
+
+---
+
+## Infra & Qualidade
+
+- [X] ESLint a11y configurado
+- [X] Playwright scaffold (até o momento vazio)
+- [X] Vitest configurado (unit tests)
+- [ ] Expansão da suíte E2E (priorizar onboarding + navegação)
+- [ ] Corrigir violações de acessibilidade encontradas pelo linter
+- [ ] Checklists de PR por épico (commits atômicos, descrição, testes)
+
+---
+
+## Notas de Processo e Próximos Passos Imediatos (minhas ações propostas)
+
+1. Corrigir fluxo de first-run/returning user (feito) — abrir PR: `epic/onboarding-redirect` ✅
+2. Adicionar testes unitários para funções biométricas (feito) — abrir PR: `test/biometric` ✅
+3. Criar checklist E2E para onboarding e implementar teste Playwright (próximo)
+4. Planejar EPICS e abrir PRs por épico com commits atômicos (priorizar Triagem, Rastreamento Nutrição e Personagem)
+
+---
+
+Se concordar, vou começar criando PRs pequenos e atômicos seguindo a ordem acima (Triagem fixes → Testes → E2E onboarding → Rastreamento Nutrição).

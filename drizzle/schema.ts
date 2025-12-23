@@ -25,4 +25,29 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
+// Rewards table
+export const rewards = mysqlTable("rewards", {
+  id: int("id").autoincrement().primaryKey(),
+  handle: varchar("handle", { length: 64 }).notNull().unique(),
+  title: text("title").notNull(),
+  description: text("description"),
+  priceCredits: int("priceCredits").notNull().default(0),
+  effect: text("effect"),
+  isActive: int("isActive").notNull().default(1),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export const purchases = mysqlTable("purchases", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  rewardId: int("rewardId").notNull(),
+  quantity: int("quantity").notNull().default(1),
+  metadata: text("metadata"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type RewardRow = typeof rewards.$inferSelect;
+export type PurchaseRow = typeof purchases.$inferSelect;
+
 // TODO: Add your tables here

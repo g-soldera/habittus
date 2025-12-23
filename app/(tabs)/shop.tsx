@@ -46,16 +46,16 @@ export default function ShopScreen() {
     const canAfford = gameState.bioMonitor.totalGold >= discountedPrice;
 
     return (
-      <View style={[styles.card, !canAfford && styles.cardDisabled]}>
+      <View style={[styles.card, !canAfford && styles.cardDisabled]} testID={`reward-${item.id}-card`}>
         <View style={styles.cardContent}>
-          <ThemedText type="defaultSemiBold" style={styles.rewardName}>
+          <ThemedText type="defaultSemiBold" style={styles.rewardName} testID={`reward-${item.id}-name`}>
             {item.name}
           </ThemedText>
-          <ThemedText style={styles.rewardDescription}>{item.description}</ThemedText>
+          <ThemedText style={styles.rewardDescription} testID={`reward-${item.id}-description`}>{item.description}</ThemedText>
 
           <View style={styles.priceRow}>
             {streakDiscount > 0 && (
-              <ThemedText style={styles.originalPrice}>
+              <ThemedText style={styles.originalPrice} testID={`reward-${item.id}-original`}>
                 {item.costGold}
               </ThemedText>
             )}
@@ -64,11 +64,12 @@ export default function ShopScreen() {
                 styles.price,
                 !canAfford && styles.priceDisabled,
               ]}
+              testID={`reward-${item.id}-price`}
             >
               {discountedPrice} GOLD
             </ThemedText>
             {streakDiscount > 0 && (
-              <ThemedText style={styles.discount}>
+              <ThemedText style={styles.discount} testID={`reward-${item.id}-discount`}>
                 -{Math.round(streakDiscount * 100)}%
               </ThemedText>
             )}
@@ -78,7 +79,10 @@ export default function ShopScreen() {
         <Pressable
           style={[styles.buyButton, !canAfford && styles.buyButtonDisabled]}
           onPress={() => handlePurchase(item.id)}
+          accessibilityRole="button"
+          accessibilityLabel={canAfford ? `Comprar ${item.name}` : `Sem gold ${item.name}`}
           disabled={!canAfford}
+          testID={`reward-${item.id}-buy`}
         >
           <ThemedText style={styles.buyButtonText}>
             {canAfford ? "COMPRAR" : "SEM GOLD"}
@@ -101,10 +105,10 @@ export default function ShopScreen() {
       {/* Header */}
       <View style={styles.header}>
         <View>
-          <ThemedText type="subtitle" style={styles.title}>
+          <ThemedText type="subtitle" style={styles.title} testID="shop-title">
             BLACK MARKET
           </ThemedText>
-          <ThemedText style={styles.goldDisplay}>
+          <ThemedText style={styles.goldDisplay} testID="shop-gold-value">
             {gameState.bioMonitor.totalGold} GOLD
           </ThemedText>
         </View>
@@ -124,12 +128,14 @@ export default function ShopScreen() {
         <Pressable
           style={[styles.categoryButton, !selectedCategory && styles.categoryButtonActive]}
           onPress={() => setSelectedCategory(null)}
+          testID="shop-category-all"
         >
           <ThemedText
             style={[
               styles.categoryButtonText,
               !selectedCategory && styles.categoryButtonTextActive,
             ]}
+            testID="shop-category-all-label"
           >
             TODOS
           </ThemedText>
@@ -142,12 +148,16 @@ export default function ShopScreen() {
               selectedCategory === cat && styles.categoryButtonActive,
             ]}
             onPress={() => setSelectedCategory(cat)}
+            accessibilityRole="button"
+            accessibilityLabel={`Filtrar por categoria ${cat}`}
+            testID={`shop-category-${cat}`}
           >
             <ThemedText
               style={[
                 styles.categoryButtonText,
                 selectedCategory === cat && styles.categoryButtonTextActive,
               ]}
+              testID={`shop-category-${cat}-label`}
             >
               {cat.toUpperCase()}
             </ThemedText>
@@ -159,8 +169,11 @@ export default function ShopScreen() {
       <Pressable
         style={styles.addRewardButton}
         onPress={() => router.navigate({pathname: "/add-reward"} as any)}
+        accessibilityRole="button"
+        accessibilityLabel="Adicionar recompensa"
+        testID="shop-add-reward"
       >
-        <ThemedText style={styles.addRewardButtonText}>+ ADICIONAR RECOMPENSA</ThemedText>
+        <ThemedText style={styles.addRewardButtonText} testID="shop-add-reward-label">+ ADICIONAR RECOMPENSA</ThemedText>
       </Pressable>
 
       {/* Rewards List */}

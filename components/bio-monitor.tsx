@@ -8,29 +8,43 @@ interface BioMonitorProps {
 }
 
 export function BioMonitorComponent({ stats }: BioMonitorProps) {
-  const StatBar = ({ label, value, color }: { label: string; value: number; color: string }) => (
-    <View style={styles.statContainer}>
-      <View style={styles.statHeader}>
-        <ThemedText style={styles.statLabel}>{label}</ThemedText>
-        <ThemedText style={[styles.statValue, { color }]}>{value}%</ThemedText>
+  const StatBar = ({ label, value, color }: { label: string; value: number; color: string }) => {
+    const id = `bio-stat-${label.toLowerCase()}`;
+    return (
+      <View
+        style={styles.statContainer}
+        testID={`${id}-container`}
+        accessible
+        accessibilityLabel={`${label} ${value}%`}
+        accessibilityValue={{ min: 0, now: value, max: 100 }}
+      >
+        <View style={styles.statHeader}>
+          <ThemedText style={styles.statLabel} testID={`${id}-label`}>
+            {label}
+          </ThemedText>
+          <ThemedText style={[styles.statValue, { color }]} testID={`${id}-value`}>
+            {value}%
+          </ThemedText>
+        </View>
+        <View style={styles.barBackground} testID={`${id}-bar-bg`}>
+          <View
+            style={[
+              styles.barFill,
+              {
+                width: `${Math.min(value, 100)}%`,
+                backgroundColor: color,
+              },
+            ]}
+            testID={`${id}-bar-fill`}
+          />
+        </View>
       </View>
-      <View style={styles.barBackground}>
-        <View
-          style={[
-            styles.barFill,
-            {
-              width: `${Math.min(value, 100)}%`,
-              backgroundColor: color,
-            },
-          ]}
-        />
-      </View>
-    </View>
-  );
+    );
+  };
 
   return (
-    <View style={styles.container}>
-      <ThemedText type="subtitle" style={styles.title}>
+    <View style={styles.container} testID="bio-monitor" accessible accessibilityRole="summary" accessibilityLabel="Bio Monitor">
+      <ThemedText type="subtitle" style={styles.title} testID="bio-monitor-title">
         BIO-MONITOR
       </ThemedText>
 
@@ -39,20 +53,32 @@ export function BioMonitorComponent({ stats }: BioMonitorProps) {
       <StatBar label="COOL" value={stats.cool} color={CyberpunkColors.magenta} />
 
       {/* Credits display */}
-      <View style={styles.creditsContainer}>
-        <ThemedText style={styles.creditsLabel}>CREDITS</ThemedText>
-        <ThemedText style={styles.creditsValue}>{stats.credits}</ThemedText>
+      <View style={styles.creditsContainer} testID="bio-credits-container" accessible accessibilityLabel={`Credits ${stats.credits}`}>
+        <ThemedText style={styles.creditsLabel} testID="bio-credits-label">
+          CREDITS
+        </ThemedText>
+        <ThemedText style={styles.creditsValue} testID="bio-credits-value">
+          {stats.credits}
+        </ThemedText>
       </View>
 
       {/* XP and Gold display */}
-      <View style={styles.statsRow}>
-        <View style={styles.statBox}>
-          <ThemedText style={styles.statBoxLabel}>XP</ThemedText>
-          <ThemedText style={styles.statBoxValue}>{stats.totalXp}</ThemedText>
+      <View style={styles.statsRow} testID="bio-stats-row">
+        <View style={styles.statBox} testID="bio-xp-box" accessible accessibilityLabel={`XP ${stats.totalXp}`}>
+          <ThemedText style={styles.statBoxLabel} testID="bio-xp-label">
+            XP
+          </ThemedText>
+          <ThemedText style={styles.statBoxValue} testID="bio-xp-value">
+            {stats.totalXp}
+          </ThemedText>
         </View>
-        <View style={styles.statBox}>
-          <ThemedText style={styles.statBoxLabel}>GOLD</ThemedText>
-          <ThemedText style={styles.statBoxValue}>{stats.totalGold}</ThemedText>
+        <View style={styles.statBox} testID="bio-gold-box" accessible accessibilityLabel={`Gold ${stats.totalGold}`}>
+          <ThemedText style={styles.statBoxLabel} testID="bio-gold-label">
+            GOLD
+          </ThemedText>
+          <ThemedText style={styles.statBoxValue} testID="bio-gold-value">
+            {stats.totalGold}
+          </ThemedText>
         </View>
       </View>
     </View>

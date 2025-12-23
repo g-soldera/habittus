@@ -68,6 +68,19 @@ async function startServer() {
     }),
   );
 
+  // Convenience REST route to support simple fetch() client calls for shop purchases
+  app.post('/api/shop/purchase', async (req, res) => {
+    try {
+      const ctx = await createContext({ req, res } as any);
+      const caller = appRouter.createCaller(ctx as any);
+      const result = await caller.shop.purchase(req.body as any);
+      res.json(result);
+    } catch (err: any) {
+      console.error('shop purchase failed', err);
+      res.status(500).json({ success: false, reason: err?.message || 'unknown' });
+    }
+  });
+
   const preferredPort = parseInt(process.env.PORT || "3000");
   const port = await findAvailablePort(preferredPort);
 

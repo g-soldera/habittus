@@ -8,6 +8,12 @@ import {
   DEFAULT_GIGS,
   DEFAULT_REWARDS,
 } from "@/lib/mock-data";
+import {
+  createTrainingLog,
+  createMealLog,
+  createStudyLog,
+  createWaterLog,
+} from '@/lib/tracking';
 import { GameState, Gig, Bounty, Reward, InventoryItem, BioMonitor } from "@/types";
 import { UserProfile, BiometricData, ClassType } from "@/types/biometric";
 
@@ -18,9 +24,14 @@ export function useGameState() {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Load game state from AsyncStorage
+  // User profile state (persisted separately)
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+
+  // Load game state and user profile from AsyncStorage
   useEffect(() => {
     loadGameState();
+    loadUserProfile();
   }, []);
 
   const loadGameState = async () => {
@@ -29,6 +40,22 @@ export function useGameState() {
       if (stored) {
         const state = JSON.parse(stored) as GameState;
         setGameState(state);
+
+        // If saved state is stale, apply daily decay automatically
+        try {
+          const MS_PER_DAY = 1000 * 60 * 60 * 24;
+          const days = Math.floor((Date.now() - (state.lastUpdatedAt || 0)) / MS_PER_DAY);
+          if (days > 0) {
+            const { applyDailyDecay: applyDecay } = await import('@/lib/status');
+            const newBio = applyDecay(state.bioMonitor, days);
+            state.bioMonitor = newBio;
+            state.lastUpdatedAt = Date.now();
+            await AsyncStorage.setItem(GAME_STATE_KEY, JSON.stringify(state));
+            setGameState(state);
+          }
+        } catch (err) {
+          console.error('[GameState] Error applying startup decay:', err);
+        }
       } else {
         setGameState(null);
       }
@@ -36,6 +63,22 @@ export function useGameState() {
       console.error("[GameState] Error loading state:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadUserProfile = async () => {
+    try {
+      const stored = await AsyncStorage.getItem(USER_PROFILE_KEY);
+      if (stored) {
+        const profile = JSON.parse(stored) as UserProfile;
+        setUserProfile(profile);
+      } else {
+        setUserProfile(null);
+      }
+    } catch (error) {
+      console.error("[GameState] Error loading user profile:", error);
+    } finally {
+      setLoadingProfile(false);
     }
   };
 
@@ -131,6 +174,104 @@ export function useGameState() {
     }
   };
 
+  const logWorkout = async (durationMinutes: number, intensity: 'low' | 'moderate' | 'high' = 'moderate', caloriesBurned?: number) => {
+    if (!gameState) return;
+    const updatedState = { ...gameState } as GameState;
+    const entry = createTrainingLog(durationMinutes, intensity, caloriesBurned);
+    updatedState.trainings = updatedState.trainings || [];
+    updatedState.trainings.push(entry);
+    // Apply XP and small hardware boost
+    updatedState.bioMonitor.totalXp += entry.xpGained;
+    updatedState.bioMonitor.hardware = Math.min(100, updatedState.bioMonitor.hardware + Math.round(entry.xpGained / 10));
+
+    updatedState.lastUpdatedAt = Date.now();
+    await saveGameState(updatedState);
+  };
+
+  const logStudy = async (hours: number, subject?: string) => {
+    if (!gameState) return;
+    const updatedState = { ...gameState } as GameState;
+    const entry = createStudyLog(hours, subject);
+    updatedState.studies = updatedState.studies || [];
+    updatedState.studies.push(entry);
+    updatedState.bioMonitor.totalXp += entry.xpGained;
+    updatedState.bioMonitor.ram = Math.min(100, updatedState.bioMonitor.ram + Math.round(entry.xpGained / 25));
+    updatedState.lastUpdatedAt = Date.now();
+    await saveGameState(updatedState);
+  };
+
+  const logMeal = async (calories: number, name?: string) => {
+    if (!gameState) return;
+    const updatedState = { ...gameState } as GameState;
+    const entry = createMealLog(calories, name);
+    updatedState.meals = updatedState.meals || [];
+    updatedState.meals.push(entry);
+    updatedState.bioMonitor.totalXp += entry.xpGained;
+    // Small credits reward for logging nutrition
+    updatedState.bioMonitor.credits += Math.round(calories / 200);
+    updatedState.lastUpdatedAt = Date.now();
+    await saveGameState(updatedState);
+  };
+
+  const logWater = async (ml: number) => {
+    if (!gameState) return;
+    const updatedState = { ...gameState } as GameState;
+    const entry = createWaterLog(ml);
+    updatedState.waterLogs = updatedState.waterLogs || [];
+    updatedState.waterLogs.push(entry);
+    // Apply RAM boost immediately
+    updatedState.bioMonitor.ram = Math.min(100, updatedState.bioMonitor.ram + (entry.ramBoost || 0));
+    updatedState.lastUpdatedAt = Date.now();
+    await saveGameState(updatedState);
+  };
+
+  // Apply daily decay to bioMonitor (can be called by scheduler or UI)
+  const applyDailyDecay = async (days = 1) => {
+    if (!gameState) return;
+    const updatedState = { ...gameState } as GameState;
+    const newBio = (await import('@/lib/status')).applyDailyDecay(updatedState.bioMonitor, days);
+    updatedState.bioMonitor = newBio;
+    updatedState.lastUpdatedAt = Date.now();
+    await saveGameState(updatedState);
+    return updatedState;
+  };
+
+  /**
+   * Check for class unlocks based on userProfile stats and training history.
+   * If a new class is unlocked, add to userProfile.unlockedClasses and optionally set currentClass.
+   */
+  const evaluateClassUnlocks = async () => {
+    try {
+      if (!userProfile || !gameState) return null;
+
+      // derive trainings counts from gameState.trainings
+      const trainingsCount: Record<string, number> = {};
+      (gameState.trainings || []).forEach(t => {
+        const key = (t as any).intensity ? (t as any).intensity : (t as any).type || 'unknown';
+        // prefer using type if available
+        const type = (t as any).type || key;
+        trainingsCount[type] = (trainingsCount[type] || 0) + 1;
+      });
+
+      const { checkClassUnlock } = await import('@/lib/biometric-calculator');
+      const newClass = checkClassUnlock(userProfile.stats as any, userProfile.streak || 0, trainingsCount);
+
+      if (newClass && !userProfile.unlockedClasses.includes(newClass)) {
+        const updatedProfile = { ...userProfile };
+        updatedProfile.unlockedClasses = [...updatedProfile.unlockedClasses, newClass];
+        updatedProfile.currentClass = newClass;
+        await AsyncStorage.setItem(USER_PROFILE_KEY, JSON.stringify(updatedProfile));
+        setUserProfile(updatedProfile);
+        return newClass;
+      }
+
+      return null;
+    } catch (error) {
+      console.error('[GameState] Error evaluating class unlocks', error);
+      return null;
+    }
+  };
+
   const purchaseReward = async (rewardId: string) => {
     if (!gameState) return;
 
@@ -140,6 +281,21 @@ export function useGameState() {
     // Calculate discount based on streak
     const discount = Math.min(0.5, gameState.character.loginStreak * 0.02);
     const finalCost = Math.floor(reward.costGold * (1 - discount));
+
+    // Try server-side authoritative purchase if available; if not, fall back to client optimistic update
+    try {
+      if (typeof fetch !== 'undefined') {
+        const res = await fetch('/api/shop/purchase', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rewardId, cost: finalCost }),
+        });
+        const json = await res.json();
+        if (!json.success) return; // server declined purchase
+      }
+    } catch (e) {
+      // network or server error - proceed with optimistic client update
+    }
 
     if (gameState.bioMonitor.totalGold >= finalCost) {
       const updatedState = { ...gameState };
@@ -255,6 +411,7 @@ export function useGameState() {
       };
 
       await AsyncStorage.setItem(USER_PROFILE_KEY, JSON.stringify(userProfile));
+      setUserProfile(userProfile);
       
       // Also create a new game state for compatibility
       await createNewGame(data.characterName, data.baseClass);
@@ -267,6 +424,8 @@ export function useGameState() {
   return {
     gameState,
     loading,
+    userProfile,
+    loadingProfile,
     createNewGame,
     completeGig,
     payBounty,
@@ -275,5 +434,10 @@ export function useGameState() {
     resetGame,
     saveGameState,
     saveUserProfile,
+    logWorkout,
+    logStudy,
+    logMeal,
+    logWater,
   };
 }
+

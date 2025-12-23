@@ -59,9 +59,10 @@ export default function GigsScreen() {
   const renderGigCard = ({ item }: { item: Gig }) => {
     const completed = isGigCompletedToday(item);
     return (
-      <View style={[styles.card, completed && styles.cardCompleted]}>
+      <View style={[styles.card, completed && styles.cardCompleted]} testID={`gig-${item.id}`}>
         <View style={styles.cardHeader}>
           <View style={styles.cardTitle}>
+            <ThemedText style={styles.gigIcon}>💼</ThemedText>
             <ThemedText type="defaultSemiBold" style={styles.gigName}>
               {item.name}
             </ThemedText>
@@ -70,15 +71,24 @@ export default function GigsScreen() {
         </View>
         <ThemedText style={styles.gigDescription}>{item.description}</ThemedText>
         <View style={styles.rewardRow}>
-          <ThemedText style={styles.reward}>+{item.xpReward} XP</ThemedText>
-          <ThemedText style={styles.reward}>+{item.goldReward} GOLD</ThemedText>
+          <View style={styles.rewardBadge}>
+            <ThemedText style={styles.rewardLabel}>XP</ThemedText>
+            <ThemedText style={styles.rewardValue}>+{item.xpReward}</ThemedText>
+          </View>
+          <View style={styles.rewardBadge}>
+            <ThemedText style={styles.rewardLabel}>GOLD</ThemedText>
+            <ThemedText style={styles.rewardValue}>+{item.goldReward}</ThemedText>
+          </View>
         </View>
         {!completed && (
           <Pressable
             style={styles.completeButton}
             onPress={() => handleCompleteGig(item.id)}
+            accessibilityRole="button"
+            accessibilityLabel={`Completar ${item.name}`}
+            testID={`gig-${item.id}-complete`}
           >
-            <ThemedText style={styles.completeButtonText}>COMPLETAR</ThemedText>
+            <ThemedText style={styles.completeButtonText}>✓ COMPLETAR</ThemedText>
           </Pressable>
         )}
       </View>
@@ -90,9 +100,10 @@ export default function GigsScreen() {
     const isDefeated = item.remainingValue <= 0;
 
     return (
-      <View style={[styles.card, isDefeated && styles.cardDefeated]}>
+      <View style={[styles.card, isDefeated && styles.cardDefeated]} testID={`bounty-${item.id}`}>
         <View style={styles.cardHeader}>
           <View style={styles.cardTitle}>
+            <ThemedText style={styles.bountyIcon}>👹</ThemedText>
             <ThemedText type="defaultSemiBold" style={styles.bountyName}>
               {item.name}
             </ThemedText>
@@ -103,14 +114,19 @@ export default function GigsScreen() {
 
         {/* HP Bar */}
         <View style={styles.hpContainer}>
-          <ThemedText style={styles.hpLabel}>HP: R$ {item.remainingValue}</ThemedText>
+          <View style={styles.hpHeader}>
+            <ThemedText style={styles.hpLabel}>HP:</ThemedText>
+            <ThemedText style={[styles.hpValue, { color: progress < 33 ? CyberpunkColors.red : CyberpunkColors.green }]}>
+              R$ {item.remainingValue}
+            </ThemedText>
+          </View>
           <View style={styles.hpBar}>
             <View
               style={[
                 styles.hpFill,
                 {
                   width: `${progress}%`,
-                  backgroundColor: progress < 33 ? CyberpunkColors.error : CyberpunkColors.green,
+                  backgroundColor: progress < 33 ? CyberpunkColors.red : CyberpunkColors.green,
                 },
               ]}
             />
@@ -121,19 +137,23 @@ export default function GigsScreen() {
           <View style={styles.paymentContainer}>
             <TextInput
               style={styles.paymentInput}
-              placeholder="Valor (R$)"
+              placeholder="R$ a pagar"
               placeholderTextColor={CyberpunkColors.textDisabled}
               keyboardType="numeric"
               value={paymentAmount[item.id] || ""}
               onChangeText={(text) =>
                 setPaymentAmount({ ...paymentAmount, [item.id]: text })
               }
+              testID={`bounty-${item.id}-input`}
             />
             <Pressable
               style={styles.payButton}
               onPress={() => handlePayBounty(item.id)}
+              accessibilityRole="button"
+              accessibilityLabel={`Pagar ${item.name}`}
+              testID={`bounty-${item.id}-pay`}
             >
-              <ThemedText style={styles.payButtonText}>PAGAR</ThemedText>
+              <ThemedText style={styles.payButtonText}>$ PAGAR</ThemedText>
             </Pressable>
           </View>
         )}
@@ -156,6 +176,8 @@ export default function GigsScreen() {
         <Pressable
           style={[styles.tab, activeTab === "gigs" && styles.tabActive]}
           onPress={() => setActiveTab("gigs")}
+          accessibilityRole="button"
+          accessibilityLabel="Abrir aba Gigs"
         >
           <ThemedText
             style={[
@@ -169,6 +191,8 @@ export default function GigsScreen() {
         <Pressable
           style={[styles.tab, activeTab === "bounties" && styles.tabActive]}
           onPress={() => setActiveTab("bounties")}
+          accessibilityRole="button"
+          accessibilityLabel="Abrir aba Bounties"
         >
           <ThemedText
             style={[
@@ -261,16 +285,25 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
     alignItems: "center",
+    gap: 8,
+  },
+  gigIcon: {
+    fontSize: 24,
   },
   gigName: {
     fontSize: 16,
     color: CyberpunkColors.cyan,
+    flex: 1,
+  },
+  bountyIcon: {
+    fontSize: 24,
   },
   bountyName: {
     fontSize: 16,
     color: CyberpunkColors.magenta,
+    flex: 1,
   },
   completedBadge: {
     fontSize: 20,
@@ -285,19 +318,40 @@ const styles = StyleSheet.create({
   gigDescription: {
     fontSize: 12,
     color: CyberpunkColors.textSecondary,
-    marginBottom: 8,
+    marginBottom: 12,
     fontFamily: "Courier New",
   },
   bountyDescription: {
     fontSize: 12,
     color: CyberpunkColors.textSecondary,
-    marginBottom: 8,
+    marginBottom: 12,
     fontFamily: "Courier New",
   },
   rewardRow: {
     flexDirection: "row",
-    gap: 12,
+    gap: 8,
     marginBottom: 12,
+  },
+  rewardBadge: {
+    flex: 1,
+    backgroundColor: CyberpunkColors.inputBg,
+    borderWidth: 1,
+    borderColor: CyberpunkColors.green,
+    borderRadius: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 6,
+    alignItems: "center",
+  },
+  rewardLabel: {
+    fontSize: 10,
+    color: CyberpunkColors.textSecondary,
+    fontFamily: "Courier New",
+  },
+  rewardValue: {
+    fontSize: 14,
+    color: CyberpunkColors.green,
+    fontWeight: "bold",
+    fontFamily: "Courier New",
   },
   reward: {
     fontSize: 12,
@@ -307,13 +361,15 @@ const styles = StyleSheet.create({
   },
   completeButton: {
     backgroundColor: CyberpunkColors.green,
-    paddingVertical: 8,
+    paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 4,
     alignItems: "center",
+    borderWidth: 2,
+    borderColor: CyberpunkColors.green,
   },
   completeButtonText: {
-    color: CyberpunkColors.darkBg,
+    color: CyberpunkColors.black,
     fontSize: 12,
     fontWeight: "bold",
     fontFamily: "Courier New",
@@ -321,10 +377,19 @@ const styles = StyleSheet.create({
   hpContainer: {
     marginBottom: 12,
   },
-  hpLabel: {
-    fontSize: 12,
-    color: CyberpunkColors.textSecondary,
+  hpHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 4,
+  },
+  hpLabel: {
+    fontSize: 11,
+    color: CyberpunkColors.textSecondary,
+    fontFamily: "Courier New",
+  },
+  hpValue: {
+    fontSize: 11,
+    fontWeight: "bold",
     fontFamily: "Courier New",
   },
   hpBar: {
@@ -350,7 +415,7 @@ const styles = StyleSheet.create({
     borderColor: CyberpunkColors.cyan,
     borderRadius: 4,
     paddingHorizontal: 8,
-    paddingVertical: 6,
+    paddingVertical: 8,
     color: CyberpunkColors.textPrimary,
     fontSize: 12,
     fontFamily: "Courier New",
@@ -358,10 +423,12 @@ const styles = StyleSheet.create({
   payButton: {
     backgroundColor: CyberpunkColors.magenta,
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 8,
     borderRadius: 4,
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 2,
+    borderColor: CyberpunkColors.magenta,
   },
   payButtonText: {
     color: CyberpunkColors.darkBg,
