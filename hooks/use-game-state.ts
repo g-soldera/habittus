@@ -378,10 +378,31 @@ export function useGameState() {
       // Calcula BioMonitor inicial com base na triagem (se disponível)
       const triage = data.triage;
       const initialBioMonitor: BioMonitor = {
-        ram: Math.max(0, Math.min(100, Math.round(((triage?.hoursOfFocusPerDay || 0) * 10) + ((triage?.hoursStudyPerWeek || 0) * 1.5))))),
-        hardware: Math.max(0, Math.min(100, Math.round(((triage?.currentTrainingFrequency || 0) * 12) + (data.biometrics.bodyFatPercent < 20 ? 10 : 0))))),
-        cool: Math.max(0, Math.min(100, Math.round(((triage?.averageSleepHours || 0) * 5) - ((triage?.stressLevel || 5) * 3))))),
-        credits: Math.max(0, Math.round((triage?.monthlyIncome || 0) - Math.min((triage?.totalDebt || 0), (triage?.monthlyIncome || 0)))) ,
+        ram: Math.max(
+          0,
+          Math.min(
+            100,
+            Math.round(((triage?.hoursOfFocusPerDay || 0) * 10) + ((triage?.hoursStudyPerWeek || 0) * 1.5))
+          )
+        ),
+        hardware: Math.max(
+          0,
+          Math.min(
+            100,
+            Math.round(((triage?.currentTrainingFrequency || 0) * 12) + (data.biometrics.bodyFatPercent < 20 ? 10 : 0))
+          )
+        ),
+        cool: Math.max(
+          0,
+          Math.min(
+            100,
+            Math.round(((triage?.averageSleepHours || 0) * 5) - ((triage?.stressLevel || 5) * 3))
+          )
+        ),
+        credits: Math.max(
+          0,
+          Math.round((triage?.monthlyIncome || 0) - Math.min((triage?.totalDebt || 0), (triage?.monthlyIncome || 0)))
+        ),
         totalXp: 0,
         totalGold: 100,
       };
