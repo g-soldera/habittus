@@ -3,7 +3,7 @@ import { View, StyleSheet, Pressable, ScrollView, ActivityIndicator } from 'reac
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
 import { CyberpunkColors } from '@/constants/theme';
-import { Audio } from 'expo-av';
+import * as Audio from 'expo-audio';
 
 interface Track {
   id: string;
@@ -75,8 +75,9 @@ export function Jukebox() {
         await soundRef.current.unloadAsync();
       }
 
-      // Carregar nova faixa
-      const { sound } = await Audio.Sound.createAsync({ uri: track.url });
+      // Carregar nova faixa usando expo-audio
+      const sound = new Audio.Sound();
+      await sound.loadAsync({ uri: track.url });
       soundRef.current = sound;
 
       // Configurar volume e reproduzir
