@@ -124,7 +124,7 @@ function calculateRealisticInitialStats(
   triage: TriageResponse,
   biometrics: BiometricData,
   classBoosts: Partial<UserStats>
-): Partial<UserStats> {
+): UserStats {
   const stats: UserStats = {
     strength: 30, // Baseline baixo
     agility: 30,
