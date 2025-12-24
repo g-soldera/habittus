@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { CyberpunkColors } from '@/constants/theme';
+import { useHaptics } from '@/hooks/use-haptics';
 
 export interface CyberButtonProps {
   onPress?: () => void;
@@ -37,6 +38,12 @@ export function CyberButton({
 }: CyberButtonProps) {
   const isDisabled = disabled;
   const isActive = active && !isDisabled;
+  const haptics = useHaptics();
+
+  const handlePress = () => {
+    haptics.lightTap();
+    onPress?.();
+  };
 
   // Determina cores baseado no estado e variante
   const getColors = () => {
@@ -105,7 +112,7 @@ export function CyberButton({
 
   return (
     <Pressable
-      onPress={onPress}
+      onPress={handlePress}
       disabled={isDisabled}
       testID={testID}
       accessibilityRole="button"

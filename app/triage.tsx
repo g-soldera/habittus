@@ -14,6 +14,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { CyberpunkColors } from '@/constants/theme';
 import { useGameState } from '@/hooks/use-game-state';
+import { useHaptics } from '@/hooks/use-haptics';
 import { classifyUser, calculateTMB, calculateTDEE } from '@/lib/biometric-calculator';
 import { TriageResponse, Gender, Pillar, BiometricData } from '@/types/biometric';
 
@@ -30,6 +31,7 @@ export default function TriageScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { saveUserProfile, userProfile, loadingProfile } = useGameState();
+  const haptics = useHaptics();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
 
@@ -339,7 +341,10 @@ export default function TriageScreen() {
           {step > 1 && (
             <Pressable
               style={styles.backButton}
-              onPress={() => setStep(step - 1)}
+              onPress={() => {
+                haptics.lightTap();
+                setStep(step - 1);
+              }}
               accessibilityRole="button"
               accessibilityLabel="Voltar"
               testID="triage-back-button"
@@ -350,7 +355,14 @@ export default function TriageScreen() {
 
           <Pressable
             style={[styles.nextButton, loading && styles.nextButtonDisabled]}
-            onPress={handleNext}
+            onPress={() => {
+              if (step === 7) {
+                haptics.successFeedback();
+              } else {
+                haptics.lightTap();
+              }
+              handleNext();
+            }}
             accessibilityRole="button"
             accessibilityLabel={step === 7 ? 'Criar Personagem' : 'Próximo'}
             testID="triage-next-button"
