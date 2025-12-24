@@ -39,20 +39,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="music"
-        options={{
-          title: "Music",
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="music.note" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="tracking"
-        options={{
-          title: "Tracking",
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="chart.bar.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
         name="shop"
         options={{
           title: "Shop",
@@ -71,6 +57,24 @@ export default function TabLayout() {
         options={{
           title: "Settings",
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="gear" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="music"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="tracking"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="character-creation"
+        options={{
+          href: null,
         }}
       />
     </Tabs>

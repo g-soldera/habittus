@@ -53,8 +53,8 @@ export function AnimatedStreak({ streak, bonus }: AnimatedStreakProps) {
     <View style={styles.container}>
       <Animated.View style={[styles.glow, glowStyle]} />
       <Animated.View style={[styles.streakBox, scaleStyle]}>
-        <ThemedText style={styles.emoji}>🔥</ThemedText>
         <ThemedText style={styles.value}>{streak}</ThemedText>
+        <ThemedText style={styles.label}>DIAS</ThemedText>
       </Animated.View>
       <View style={styles.bonusBox}>
         <ThemedText style={styles.bonusText}>{Math.round(bonus * 100)}% OFF</ThemedText>
@@ -93,15 +93,18 @@ const styles = StyleSheet.create({
     shadowRadius: 15,
     elevation: 15,
   },
-  emoji: {
-    fontSize: 48,
-    marginBottom: 4,
-  },
   value: {
-    fontSize: 32,
+    fontSize: 48,
     fontWeight: 'bold',
     color: CyberpunkColors.orange,
     fontFamily: 'Courier New',
+  },
+  label: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: CyberpunkColors.cyan,
+    fontFamily: 'Courier New',
+    marginTop: 4,
   },
   bonusBox: {
     marginTop: 16,

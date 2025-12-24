@@ -49,13 +49,13 @@ export default function TriageScreen() {
   // Step 3: Objectives (7 Pillars)
   const [objectives, setObjectives] = useState<Pillar[]>([]);
   const pillarOptions: { label: string; value: Pillar }[] = [
-    { label: '💪 Saúde Física', value: 'health' },
-    { label: '🍎 Nutrição', value: 'nutrition' },
-    { label: '📚 Estudo', value: 'study' },
-    { label: '✅ Produtividade', value: 'productivity' },
-    { label: '💰 Finanças', value: 'finance' },
-    { label: '🎯 Hábitos', value: 'habits' },
-    { label: '👥 Social', value: 'social' },
+    { label: 'Saúde Física', value: 'health' },
+    { label: 'Nutrição', value: 'nutrition' },
+    { label: 'Estudo', value: 'study' },
+    { label: 'Produtividade', value: 'productivity' },
+    { label: 'Finanças', value: 'finance' },
+    { label: 'Hábitos', value: 'habits' },
+    { label: 'Social', value: 'social' },
   ];
 
   // Step 4: Health Details
@@ -202,7 +202,7 @@ export default function TriageScreen() {
         return (
           <ThemedView style={styles.stepContainer}>
             <ThemedText type="title" style={styles.stepTitle}>
-              Bem-vindo ao Habittus! 🎮
+              Bem-vindo ao Habittus!
             </ThemedText>
 
             <TriageStepBasic

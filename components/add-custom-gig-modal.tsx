@@ -41,10 +41,10 @@ export function AddCustomGigModal({ onClose }: AddCustomGigProps) {
   ];
 
   const categoryEmojis: Record<string, string> = {
-    study: "📚",
-    training: "💪",
-    meditation: "🧘",
-    saving: "💰",
+    study: "",
+    training: "",
+    meditation: "",
+    saving: "",
   };
 
   const handleAddGig = async () => {
@@ -98,7 +98,7 @@ export function AddCustomGigModal({ onClose }: AddCustomGigProps) {
         {/* Header */}
         <View style={styles.header}>
           <ThemedText type="title" style={styles.title}>
-            ➕ CRIAR GIG CUSTOMIZADA
+            CRIAR GIG CUSTOMIZADA
           </ThemedText>
           <ThemedText style={styles.subtitle}>
             Defina sua própria missão e recompensas

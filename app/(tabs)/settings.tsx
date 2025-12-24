@@ -10,6 +10,7 @@ import { CyberpunkColors } from "@/constants/theme";
 import { useGameState } from "@/hooks/use-game-state";
 import { useAudio } from "@/hooks/use-audio";
 import { useTranslation } from "@/hooks/use-translation";
+import { Jukebox } from "@/components/jukebox";
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
@@ -59,93 +60,19 @@ export default function SettingsScreen() {
         {/* Header */}
         <View style={styles.header}>
           <ThemedText type="title" style={styles.title}>
-            ⚙️ {t("settings.title").toUpperCase()}
+            {t("settings.title").toUpperCase()}
           </ThemedText>
         </View>
 
-        {/* Audio Settings */}
+        {/* Jukebox */}
         <View style={styles.section}>
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
-            🎵 {t("settings.music").toUpperCase()}
-          </ThemedText>
-
-          {/* Background Music */}
-          <View style={styles.settingRow}>
-            <View style={styles.settingLabel}>
-              <ThemedText style={styles.settingText}>{t("settings.music")}</ThemedText>
-              <ThemedText style={styles.settingDescription}>
-                Rock cyberpunk ambiente
-              </ThemedText>
-            </View>
-            <Switch
-              value={musicEnabled}
-              onValueChange={toggleMusic}
-              trackColor={{ false: CyberpunkColors.darkGray, true: CyberpunkColors.cyan }}
-              thumbColor={musicEnabled ? CyberpunkColors.magenta : CyberpunkColors.textDisabled}
-              testID="settings-music-toggle"
-            />
-          </View>
-
-          {/* Music Volume */}
-          {musicEnabled && (
-            <View style={styles.sliderContainer}>
-              <ThemedText style={styles.sliderLabel}>{t("settings.musicVolume")}</ThemedText>
-              <Slider
-                style={styles.slider}
-                minimumValue={0}
-                maximumValue={1}
-                value={musicVolume}
-                onValueChange={updateMusicVolume}
-                minimumTrackTintColor={CyberpunkColors.cyan}
-                maximumTrackTintColor={CyberpunkColors.darkGray}
-                thumbTintColor={CyberpunkColors.magenta}
-                testID="settings-music-volume"
-              />
-              <ThemedText style={styles.volumeValue}>{Math.round(musicVolume * 100)}%</ThemedText>
-            </View>
-          )}
-
-          {/* Sound Effects */}
-          <View style={styles.settingRow}>
-            <View style={styles.settingLabel}>
-              <ThemedText style={styles.settingText}>{t("settings.sfx")}</ThemedText>
-              <ThemedText style={styles.settingDescription}>
-                Sons de clique e ações
-              </ThemedText>
-            </View>
-            <Switch
-              value={sfxEnabled}
-              onValueChange={toggleSFX}
-              trackColor={{ false: CyberpunkColors.darkGray, true: CyberpunkColors.cyan }}
-              thumbColor={sfxEnabled ? CyberpunkColors.magenta : CyberpunkColors.textDisabled}
-              testID="settings-sfx-toggle"
-            />
-          </View>
-
-          {/* SFX Volume */}
-          {sfxEnabled && (
-            <View style={styles.sliderContainer}>
-              <ThemedText style={styles.sliderLabel}>{t("settings.sfxVolume")}</ThemedText>
-              <Slider
-                style={styles.slider}
-                minimumValue={0}
-                maximumValue={1}
-                value={sfxVolume}
-                onValueChange={updateSFXVolume}
-                minimumTrackTintColor={CyberpunkColors.green}
-                maximumTrackTintColor={CyberpunkColors.darkGray}
-                thumbTintColor={CyberpunkColors.magenta}
-                testID="settings-sfx-volume"
-              />
-              <ThemedText style={styles.volumeValue}>{Math.round(sfxVolume * 100)}%</ThemedText>
-            </View>
-          )}
+          <Jukebox />
         </View>
 
         {/* Language Settings */}
         <View style={styles.section}>
           <ThemedText type="subtitle" style={styles.sectionTitle}>
-            🌍 {t("settings.language").toUpperCase()}
+            {t("settings.language").toUpperCase()}
           </ThemedText>
 
           <View style={styles.languageButtons}>
@@ -161,7 +88,7 @@ export default function SettingsScreen() {
                 styles.languageButtonText,
                 currentLanguage === "pt-br" && styles.languageButtonTextActive,
               ]}>
-                🇧🇷 PT-BR
+                PT-BR
               </ThemedText>
             </Pressable>
 
@@ -177,7 +104,7 @@ export default function SettingsScreen() {
                 styles.languageButtonText,
                 currentLanguage === "en-us" && styles.languageButtonTextActive,
               ]}>
-                🇺🇸 EN-US
+                EN-US
               </ThemedText>
             </Pressable>
           </View>
@@ -186,7 +113,7 @@ export default function SettingsScreen() {
         {/* Danger Zone */}
         <View style={styles.section}>
           <ThemedText type="subtitle" style={[styles.sectionTitle, styles.dangerTitle]}>
-            ⚠️ {t("common.warning").toUpperCase()}
+            {t("common.warning").toUpperCase()}
           </ThemedText>
 
           <Pressable
@@ -194,7 +121,7 @@ export default function SettingsScreen() {
             onPress={handleReset}
             testID="settings-reset-game"
           >
-            <ThemedText style={styles.resetButtonText}>🔄 {t("settings.resetGame")}</ThemedText>
+            <ThemedText style={styles.resetButtonText}>{t("settings.resetGame")}</ThemedText>
           </Pressable>
           <ThemedText style={styles.resetWarning}>
             Atenção: Esta ação apaga todos os dados e não pode ser desfeita!

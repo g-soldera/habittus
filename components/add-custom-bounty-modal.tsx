@@ -82,7 +82,7 @@ export function AddCustomBountyModal({ onClose }: AddCustomBountyProps) {
         {/* Header */}
         <View style={styles.header}>
           <ThemedText type="title" style={styles.title}>
-            ⚠️ REGISTRAR DÍVIDA
+            REGISTRAR DÍVIDA
           </ThemedText>
           <ThemedText style={styles.subtitle}>
             Acompanhe e pague suas obrigações financeiras
@@ -194,7 +194,7 @@ export function AddCustomBountyModal({ onClose }: AddCustomBountyProps) {
         {/* Warning */}
         <View style={styles.warningBox}>
           <ThemedText style={styles.warningText}>
-            💡 Registre dívidas reais para acompanhar seu progresso financeiro e
+            Registre dívidas reais para acompanhar seu progresso financeiro e
             ganhar motivação ao quitá-las!
           </ThemedText>
         </View>

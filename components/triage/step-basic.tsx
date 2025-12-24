@@ -59,10 +59,10 @@ export function TriageStepBasic({
           active={gender === 'male'}
           variant="secondary"
           size="md"
-          fullWidth={true}
           accessibilityLabel="Masculino"
+          style={{ flex: 1 }}
         >
-          ♂️ Masculino
+          Masculino
         </CyberButton>
         <CyberButton
           testID="triage-gender-female"
@@ -70,10 +70,10 @@ export function TriageStepBasic({
           active={gender === 'female'}
           variant="secondary"
           size="md"
-          fullWidth={true}
           accessibilityLabel="Feminino"
+          style={{ flex: 1 }}
         >
-          ♀️ Feminino
+          Feminino
         </CyberButton>
       </View>
     </ThemedView>

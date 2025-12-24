@@ -133,6 +133,11 @@ export function Jukebox() {
   };
 
   useEffect(() => {
+    // Autoplay primeira música ao carregar
+    if (tracks.length > 0 && !currentTrack) {
+      playTrack(tracks[0]);
+    }
+
     return () => {
       if (soundRef.current) {
         soundRef.current.unloadAsync();
@@ -147,16 +152,16 @@ export function Jukebox() {
     focus: CyberpunkColors.purple,
   };
 
-  const genreIcons = {
-    cyberpunk: '🔮',
-    synthwave: '🌅',
-    chillwave: '🌊',
-    focus: '🧘',
+  const genreLabels = {
+    cyberpunk: 'CYBERPUNK',
+    synthwave: 'SYNTHWAVE',
+    chillwave: 'CHILLWAVE',
+    focus: 'FOCUS',
   };
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText style={styles.title}>🎵 Jukebox Cyberpunk</ThemedText>
+      <ThemedText style={styles.title}>Jukebox Cyberpunk</ThemedText>
 
       {/* Now Playing */}
       {currentTrack ? (
@@ -174,19 +179,11 @@ export function Jukebox() {
             >
               <ThemedText
                 style={[
-                  styles.genreEmoji,
-                  { color: genreColors[currentTrack.genre] },
-                ]}
-              >
-                {genreIcons[currentTrack.genre]}
-              </ThemedText>
-              <ThemedText
-                style={[
                   styles.genreLabel,
                   { color: genreColors[currentTrack.genre] },
                 ]}
               >
-                {currentTrack.genre}
+                {genreLabels[currentTrack.genre]}
               </ThemedText>
             </View>
           </View>

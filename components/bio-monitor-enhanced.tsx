@@ -124,8 +124,8 @@ export function BioMonitorEnhanced({
               ]}
             >
               {getAlertLevel(value) === 'critical'
-                ? '⚠ Crítico'
-                : '⚠ Atenção'}
+                ? 'CRÍTICO'
+                : 'ATENÇÃO'}
             </ThemedText>
           )}
         </View>
@@ -135,7 +135,7 @@ export function BioMonitorEnhanced({
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText style={styles.title}>⚡ BioMonitor do Sistema</ThemedText>
+      <ThemedText style={styles.title}>BioMonitor do Sistema</ThemedText>
       <ThemedText style={styles.subtitle}>Toque em cada stat para mais informações</ThemedText>
 
       <View style={styles.grid}>
