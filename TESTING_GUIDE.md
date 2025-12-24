@@ -161,3 +161,27 @@ Workaround: Rodar testes específicos que funcionam
 
 **Data:** 22 de dezembro de 2025  
 **Versão:** 0.2.0 (Épicos: Triage, Tracking, Status, Shop)
+
+---
+
+# 🧪 Session 5 - Novas Features para Testar
+
+## 📱 Phase 6 - BioMonitor Melhorado
+**Rota:** `/` (Home Tab)
+- [ ] 4 barras (RAM, Hardware, Cool, Credits)
+- [ ] Cores dinâmicas (red < 20%, yellow 20-50%, green 50-80%, cyan > 80%)
+- [ ] Tooltips com "?" funcionam
+- [ ] Class Warnings Panel aparece quando stats críticos
+
+## 🎵 Phase 7 - Jukebox  
+**Rota:** `/(tabs)/music` (Nova tab!)
+- [ ] Playlist com 4 faixas
+- [ ] Play/Pause/Next/Previous funcionam
+- [ ] Gêneros exibem com cores (cyberpunk, synthwave, chillwave, focus)
+
+## 📊 Epic: Rastreamento
+**Rota:** `/(tabs)/tracking` (Nova tab!)
+- [ ] Task Manager: adicionar/completar/deletar tarefas
+- [ ] Finance Tracker: renda/gastos/saldo
+- [ ] Log Nutrition (existente): calorias vs meta
+- [ ] Log Study (existente): sessões de estudo
