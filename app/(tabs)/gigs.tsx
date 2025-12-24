@@ -11,8 +11,9 @@ import { useGameState } from "@/hooks/use-game-state";
 import { Gig, Bounty } from "@/types";
 import { SuccessFlash } from "@/components/particle-effects";
 import { useAudio } from "@/hooks/use-audio";
+import { TrackingTab } from "@/components/tracking-tab";
 
-type TabType = "gigs" | "bounties";
+type TabType = "gigs" | "bounties" | "tracking";
 
 export default function GigsScreen() {
   const insets = useSafeAreaInsets();
@@ -74,11 +75,10 @@ export default function GigsScreen() {
       <View style={[styles.card, completed && styles.cardCompleted]} testID={`gig-${item.id}`}>
         <View style={styles.cardHeader}>
           <View style={styles.cardTitle}>
-            <ThemedText style={styles.gigIcon}>💼</ThemedText>
             <ThemedText type="defaultSemiBold" style={styles.gigName}>
               {item.name}
             </ThemedText>
-            {completed && <ThemedText style={styles.completedBadge}>✓</ThemedText>}
+            {completed && <ThemedText style={styles.completedBadge}>OK</ThemedText>}
           </View>
         </View>
         <ThemedText style={styles.gigDescription}>{item.description}</ThemedText>
@@ -100,7 +100,7 @@ export default function GigsScreen() {
             accessibilityLabel={`Completar ${item.name}`}
             testID={`gig-${item.id}-complete`}
           >
-            <ThemedText style={styles.completeButtonText}>✓ COMPLETAR</ThemedText>
+            <ThemedText style={styles.completeButtonText}>COMPLETAR</ThemedText>
           </Pressable>
         )}
       </View>
@@ -116,11 +116,10 @@ export default function GigsScreen() {
       <View style={[styles.card, isDefeated && styles.cardDefeated]} testID={`bounty-${item.id}`}>
         <View style={styles.cardHeader}>
           <View style={styles.cardTitle}>
-            <ThemedText style={styles.bountyIcon}>👹</ThemedText>
             <ThemedText type="defaultSemiBold" style={styles.bountyName}>
               {item.name}
             </ThemedText>
-            {isDefeated && <ThemedText style={styles.defeatedBadge}>DERROTADO</ThemedText>}
+            {isDefeated && <ThemedText style={styles.defeatedBadge}>OK</ThemedText>}
           </View>
         </View>
         <ThemedText style={styles.bountyDescription}>{item.description}</ThemedText>
@@ -238,14 +237,14 @@ export default function GigsScreen() {
           onPress={() => {
             if (activeTab === "gigs") {
               router.push("/add-custom-gig");
-            } else {
+            } else if (activeTab === "bounties") {
               router.push("/add-custom-bounty");
             }
           }}
           accessibilityRole="button"
-          accessibilityLabel={activeTab === "gigs" ? "Adicionar gig customizada" : "Adicionar bounty"}
+          accessibilityLabel={activeTab === "gigs" ? "Adicionar gig customizada" : activeTab === "bounties" ? "Adicionar bounty" : ""}
         >
-          <ThemedText style={styles.addButtonText}>➕</ThemedText>
+          <ThemedText style={styles.addButtonText}>+</ThemedText>
         </Pressable>
       </View>
 
@@ -265,7 +264,7 @@ export default function GigsScreen() {
           showsVerticalScrollIndicator={false}
           extraData={gameState.lastUpdatedAt}
         />
-      ) : (
+      ) : activeTab === "bounties" ? (
         <FlatList
           data={gameState.bounties}
           keyExtractor={(item) => item.id}
@@ -275,6 +274,8 @@ export default function GigsScreen() {
           showsVerticalScrollIndicator={false}
           extraData={gameState.lastUpdatedAt}
         />
+      ) : (
+        <TrackingTab />
       )}
     </ThemedView>
   );
@@ -355,16 +356,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
   },
-  gigIcon: {
-    fontSize: 24,
-  },
   gigName: {
     fontSize: 16,
     color: CyberpunkColors.cyan,
     flex: 1,
-  },
-  bountyIcon: {
-    fontSize: 24,
   },
   bountyName: {
     fontSize: 16,
@@ -372,12 +367,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   completedBadge: {
-    fontSize: 20,
+    fontSize: 12,
     color: CyberpunkColors.green,
     fontWeight: "bold",
   },
   defeatedBadge: {
-    fontSize: 10,
+    fontSize: 12,
     color: CyberpunkColors.green,
     fontWeight: "bold",
   },
