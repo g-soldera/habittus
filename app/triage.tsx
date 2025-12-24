@@ -61,6 +61,7 @@ export default function TriageScreen() {
   // Step 4: Health Details
   const [trainingFrequency, setTrainingFrequency] = useState('0');
   const [trainingType, setTrainingType] = useState<'strength' | 'cardio' | 'functional' | 'yoga' | null>(null);
+  const [trainingTypes, setTrainingTypes] = useState<Array<{type: 'strength' | 'cardio' | 'functional' | 'yoga', frequency: number}>>([]);
 
   // Step 5: Nutrition Details
   const [dietType, setDietType] = useState('balanced');
@@ -123,6 +124,12 @@ export default function TriageScreen() {
     try {
       setLoading(true);
 
+      // Calcula frequência total de treino e tipo primário
+      const totalTrainingFrequency = trainingTypes.reduce((sum, t) => sum + t.frequency, 0);
+      const primaryType = trainingTypes.length > 0 
+        ? trainingTypes.reduce((max, t) => t.frequency > max.frequency ? t : max, trainingTypes[0]).type
+        : trainingType;
+
       // Calcula TMB e TDEE
       const tmb = calculateTMB(
         parseInt(weightKg),
@@ -131,14 +138,14 @@ export default function TriageScreen() {
         gender
       );
 
-      const activityLevel = parseInt(trainingFrequency) > 3 ? 'active' : parseInt(trainingFrequency) > 0 ? 'moderate' : 'sedentary';
+      const activityLevel = totalTrainingFrequency > 3 ? 'active' : totalTrainingFrequency > 0 ? 'moderate' : 'sedentary';
       const tdee = calculateTDEE(tmb, activityLevel);
 
       // Cria resposta de triagem
       const triageResponse: TriageResponse = {
         objectives,
-        currentTrainingFrequency: parseInt(trainingFrequency),
-        primaryTrainingType: trainingType,
+        currentTrainingFrequency: totalTrainingFrequency,
+        primaryTrainingType: primaryType,
         healthObjectives: [],
         nutritionObjectives: [],
         studyObjectives: [],
@@ -249,6 +256,8 @@ export default function TriageScreen() {
               setTrainingFrequency={setTrainingFrequency}
               trainingType={trainingType}
               setTrainingType={setTrainingType}
+              trainingTypes={trainingTypes}
+              setTrainingTypes={setTrainingTypes}
             />
           </ThemedView>
         );
