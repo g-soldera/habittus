@@ -143,7 +143,7 @@ export function BioMonitorEnhanced({
           label="RAM"
           value={ram}
           unit="%"
-          icon="🧠"
+          icon="RAM"
           tooltip={{
             title: 'RAM - Processamento Mental',
             description:
@@ -154,7 +154,7 @@ export function BioMonitorEnhanced({
           label="Hardware"
           value={hardware}
           unit="%"
-          icon="💪"
+          icon="HW"
           tooltip={{
             title: 'Hardware - Condicionamento Físico',
             description:
@@ -165,7 +165,7 @@ export function BioMonitorEnhanced({
           label="Cool"
           value={cool}
           unit="%"
-          icon="❄️"
+          icon="CL"
           tooltip={{
             title: 'Cool - Controle Emocional',
             description:
@@ -175,8 +175,8 @@ export function BioMonitorEnhanced({
         <StatBar
           label="Credits"
           value={credits}
-          unit=" ✨"
-          icon="💰"
+          unit=" C"
+          icon="CR"
           tooltip={{
             title: 'Credits - Recursos Financeiros',
             description:
@@ -208,12 +208,12 @@ function ClassWarningsPanel({
     const recs: string[] = [];
 
     if (ram < 30)
-      recs.push('📚 Aumente sessões de estudo - seu RAM está baixo');
+      recs.push('Aumente sessões de estudo - seu RAM está baixo');
     if (hardware < 30)
-      recs.push('🏋️ Treine mais - seu corpo precisa de força');
-    if (cool < 30) recs.push('😴 Durma mais - você está muito estressado');
+      recs.push('Treine mais - seu corpo precisa de força');
+    if (cool < 30) recs.push('Durma mais - você está muito estressado');
     if (ram < 50 && hardware < 50 && cool < 50)
-      recs.push('🆘 Você está sobrecarregado! Considere tirar um dia de descanso');
+      recs.push('Você está sobrecarregado! Considere tirar um dia de descanso');
 
     return recs;
   };
@@ -223,7 +223,7 @@ function ClassWarningsPanel({
   if (recommendations.length === 0) {
     return (
       <View style={[styles.warningPanel, styles.warningPanelOk]}>
-        <ThemedText style={styles.warningTitle}>✅ Tudo Funcionando Normalmente</ThemedText>
+        <ThemedText style={styles.warningTitle}>Tudo Funcionando Normalmente</ThemedText>
         <ThemedText style={styles.warningText}>
           Seus sistemas estão balanceados. Continue assim!
         </ThemedText>

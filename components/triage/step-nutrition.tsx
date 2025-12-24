@@ -6,12 +6,12 @@ import { CyberpunkColors } from '@/constants/theme';
 import { CyberButton } from '@/components/cyber-button';
 
 const DIET_OPTIONS = [
-  { value: 'balanced', label: '⚖️ Balanceada', emoji: '⚖️' },
-  { value: 'vegetarian', label: '🥗 Vegetariana', emoji: '🥗' },
-  { value: 'vegan', label: '🌱 Vegana', emoji: '🌱' },
-  { value: 'keto', label: '🥑 Keto', emoji: '🥑' },
-  { value: 'paleo', label: '🍖 Paleo', emoji: '🍖' },
-  { value: 'carnivore', label: '🥩 Carnívora', emoji: '🥩' },
+  { value: 'balanced', label: 'Balanceada' },
+  { value: 'vegetarian', label: 'Vegetariana' },
+  { value: 'vegan', label: 'Vegana' },
+  { value: 'keto', label: 'Keto' },
+  { value: 'paleo', label: 'Paleo' },
+  { value: 'carnivore', label: 'Carnívora' },
 ];
 
 export function TriageStepNutrition({
@@ -27,7 +27,7 @@ export function TriageStepNutrition({
 }) {
   return (
     <ThemedView accessible={true}>
-      <ThemedText type="title" style={styles.title}>Nutrição 🍎</ThemedText>
+      <ThemedText type="title" style={styles.title}>NUTRIÇÃO</ThemedText>
 
       <ThemedText style={styles.label}>Tipo de Dieta</ThemedText>
       <View style={styles.dietGrid}>
@@ -39,7 +39,6 @@ export function TriageStepNutrition({
             active={dietType === diet.value}
             variant="secondary"
             size="sm"
-            icon={diet.emoji}
             style={styles.dietButton}
             accessibilityLabel={diet.label}
           >

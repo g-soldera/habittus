@@ -12,17 +12,17 @@ interface ClassStatusProps {
 }
 
 const classEmojis: Record<ClassType, string> = {
-  netrunner: '🖥️',
-  solo: '⚔️',
-  fixer: '🔧',
-  techie: '⚙️',
-  cyborg: '🤖',
-  hacker: '🕵️',
-  gladiador: '🛡️',
-  ninja: '🥷',
-  tita: '👹',
-  mestre: '🧙',
-  'ser-supremo': '👑',
+  netrunner: 'NET',
+  solo: 'SOLO',
+  fixer: 'FIX',
+  techie: 'TECH',
+  cyborg: 'CYBORG',
+  hacker: 'HACK',
+  gladiador: 'GLAD',
+  ninja: 'NINJA',
+  tita: 'TITAN',
+  mestre: 'MSTR',
+  'ser-supremo': 'SUPR',
 };
 
 const classColors: Record<ClassType, string> = {

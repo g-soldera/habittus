@@ -21,7 +21,7 @@ export function TriageStepBiometrics({
 }) {
   return (
     <ThemedView accessible={true}>
-      <ThemedText type="title">Dados Biométricos 📏</ThemedText>
+      <ThemedText type="title">DADOS BIOMÉTRICOS</ThemedText>
       <ThemedText>Insira suas medidas para calcular seu TMB e TDEE.</ThemedText>
 
       <ThemedText style={{ marginTop: 12 }}>Altura (cm)</ThemedText>

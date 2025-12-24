@@ -112,7 +112,7 @@ export function TaskManager() {
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText style={styles.title}>📋 Tarefas do Dia</ThemedText>
+      <ThemedText style={styles.title}>TAREFAS DO DIA</ThemedText>
 
       {/* Progress Summary */}
       <View style={styles.progressSection}>

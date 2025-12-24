@@ -54,7 +54,7 @@ export function BioMonitorComponent({ stats }: BioMonitorProps) {
     }));
 
     const id = `bio-stat-${label.toLowerCase()}`;
-    const statusText = value >= 70 ? "✅" : value >= 40 ? "⚠️" : "🔴";
+    const statusText = value >= 70 ? "OK" : value >= 40 ? "WARN" : "CRIT";
     
     return (
       <Pressable

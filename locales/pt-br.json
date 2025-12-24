@@ -18,9 +18,9 @@
   },
   "dashboard": {
     "greeting": "Bem-vindo",
-    "loginStreak": "🔥 SEQUÊNCIA DE LOGIN",
+    "loginStreak": "SEQUÊNCIA DE LOGIN",
     "shopDiscount": "desconto na loja",
-    "nextMission": "⚡ PRÓXIMA MISSÃO",
+    "nextMission": "PRÓXIMA MISSÃO",
     "xpProgress": "PROGRESSO DE XP"
   },
   "bioMonitor": {

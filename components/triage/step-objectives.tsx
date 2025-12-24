@@ -17,7 +17,7 @@ export function TriageStepObjectives({
 }) {
   return (
     <ThemedView accessible={true}>
-      <ThemedText type="title">Seus Objetivos 🎯</ThemedText>
+      <ThemedText type="title">SEUS OBJETIVOS</ThemedText>
       <ThemedText>Selecione os pilares da vida que deseja melhorar.</ThemedText>
 
       <View style={styles.objectivesGrid}>

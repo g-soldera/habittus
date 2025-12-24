@@ -71,12 +71,6 @@ export default function TabLayout() {
           href: null,
         }}
       />
-      <Tabs.Screen
-        name="character-creation"
-        options={{
-          href: null,
-        }}
-      />
     </Tabs>
   );
 }

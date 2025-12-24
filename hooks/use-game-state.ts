@@ -460,8 +460,21 @@ export function useGameState() {
       await AsyncStorage.setItem(USER_PROFILE_KEY, JSON.stringify(userProfile));
       setUserProfile(userProfile);
       
-      // Cria um novo estado de jogo com BioMonitor inicial calculado
-      await createNewGame(data.characterName, data.baseClass, initialBioMonitor);
+      // Cria um novo estado de jogo com BioMonitor e stats iniciais calculados
+      const character = createDefaultCharacter(data.characterName, data.baseClass);
+      character.level = 1;
+      character.stats = {
+        strength: data.initialStats.strength || 30,
+        agility: data.initialStats.agility || 30,
+        constitution: data.initialStats.constitution || 30,
+        intelligence: data.initialStats.intelligence || 30,
+        wisdom: data.initialStats.wisdom || 30,
+        charisma: data.initialStats.charisma || 30,
+        willpower: data.initialStats.willpower || 30,
+      };
+      
+      const newState = createDefaultGameState(character, initialBioMonitor);
+      await saveGameState(newState);
     } catch (error) {
       console.error("[GameState] Error saving user profile:", error);
       throw error;

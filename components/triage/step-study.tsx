@@ -17,7 +17,7 @@ export function TriageStepStudy({
 }) {
   return (
     <ThemedView accessible={true}>
-      <ThemedText type="title">Estudo & Produtividade 📚</ThemedText>
+      <ThemedText type="title">ESTUDO & PRODUTIVIDADE</ThemedText>
 
       <ThemedText style={{ marginTop: 12 }}>Horas de Estudo por Semana</ThemedText>
       <TextInput testID="triage-hours-study" accessibilityLabel="Horas de estudo por semana" style={{ borderWidth: 2, borderColor: CyberpunkColors.cyan, padding: 12, marginTop: 6, backgroundColor: CyberpunkColors.inputBg, color: CyberpunkColors.textPrimary, borderRadius: 6 }} value={hoursStudyPerWeek} onChangeText={setHoursStudyPerWeek} keyboardType="numeric" placeholder="Ex: 10" placeholderTextColor={CyberpunkColors.textDisabled} />

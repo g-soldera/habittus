@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
-import { createAudioPlayer, setAudioModeAsync } from 'expo-audio';
-import type { AudioPlayer } from 'expo-audio';
+import { Audio } from 'expo-av';
+import type { AVPlaybackStatus } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AUDIO_SETTINGS_KEY = 'habittus_audio_settings';
@@ -24,7 +24,7 @@ export function useAudio() {
   const [settings, setSettings] = useState<AudioSettings>(DEFAULT_SETTINGS);
   const [isLoading, setIsLoading] = useState(true);
   const [appState, setAppState] = useState<AppStateStatus>('active');
-  const musicPlayer = useRef<AudioPlayer | null>(null);
+  const musicPlayer = useRef<Audio.Sound | null>(null);
   const appStateSubscription = useRef<any>(null);
 
   // Load settings from storage
@@ -34,10 +34,9 @@ export function useAudio() {
 
   // Setup audio mode
   useEffect(() => {
-    setAudioModeAsync({
-      allowsRecording: false,
-      playsInSilentMode: true,
-      shouldPlayInBackground: true,
+    Audio.setAudioModeAsync({
+      staysActiveInBackground: true,
+      playsInSilentModeIOS: true,
     });
   }, []);
 
@@ -56,7 +55,7 @@ export function useAudio() {
       // Pause music when app goes to background
       if (musicPlayer.current) {
         try {
-          musicPlayer.current.pause();
+          await musicPlayer.current.pauseAsync();
         } catch (error) {
           console.error('[Audio] Error pausing music:', error);
         }
@@ -65,7 +64,7 @@ export function useAudio() {
       // Resume music when app comes to foreground
       if (musicPlayer.current && settings.musicEnabled) {
         try {
-          musicPlayer.current.play();
+          await musicPlayer.current.playAsync();
         } catch (error) {
           console.error('[Audio] Error resuming music:', error);
         }
@@ -85,7 +84,7 @@ export function useAudio() {
   // Update music volume
   useEffect(() => {
     if (musicPlayer.current) {
-      musicPlayer.current.volume = settings.musicVolume;
+      musicPlayer.current.setVolumeAsync(settings.musicVolume);
     }
   }, [settings.musicVolume]);
 
@@ -116,12 +115,12 @@ export function useAudio() {
       // Using a free royalty-free track from Pixabay
       const audioSource = 'https://cdn.pixabay.com/download/audio/2022/09/01/audio_1d14fdf92b.mp3';
 
-      const player = createAudioPlayer(audioSource);
-      player.loop = true;
-      player.volume = settings.musicVolume;
-      player.play();
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: audioSource },
+        { shouldPlay: true, isLooping: true, volume: settings.musicVolume }
+      );
       
-      musicPlayer.current = player;
+      musicPlayer.current = sound;
     } catch (error) {
       console.error('[Audio] Error loading background music:', error);
       // Fallback: continue without music
@@ -131,8 +130,8 @@ export function useAudio() {
   const stopMusic = async () => {
     if (musicPlayer.current) {
       try {
-        musicPlayer.current.pause();
-        musicPlayer.current.remove();
+        await musicPlayer.current.stopAsync();
+        await musicPlayer.current.unloadAsync();
         musicPlayer.current = null;
       } catch (error) {
         console.error('[Audio] Error stopping music:', error);
@@ -146,13 +145,14 @@ export function useAudio() {
     try {
       // Create a simple beep sound using a minimal WAV file in base64
       // This is a short beep tone that works cross-platform
-      const player = createAudioPlayer('data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA==');
-      player.volume = settings.sfxVolume;
-      player.play();
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: 'data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA==' },
+        { shouldPlay: true, volume: settings.sfxVolume }
+      );
       
       // Cleanup after playing
-      setTimeout(() => {
-        player.remove();
+      setTimeout(async () => {
+        await sound.unloadAsync();
       }, 200);
     } catch (error) {
       console.error('[Audio] Error playing click sound:', error);
@@ -183,7 +183,7 @@ export function useAudio() {
   useEffect(() => {
     return () => {
       if (musicPlayer.current) {
-        musicPlayer.current.remove();
+        musicPlayer.current.unloadAsync();
       }
     };
   }, []);

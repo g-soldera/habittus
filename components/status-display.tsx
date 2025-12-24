@@ -19,13 +19,13 @@ interface StatusDisplayProps {
  */
 export function StatusDisplay({ stats, maxValue = 100 }: StatusDisplayProps) {
   const statEntries: Array<[keyof UserStats, string]> = [
-    ['strength', '💪 Força'],
-    ['agility', '⚡ Agilidade'],
-    ['constitution', '🛡️ Constituição'],
-    ['intelligence', '🧠 Inteligência'],
-    ['wisdom', '🧘 Sabedoria'],
-    ['charisma', '🎭 Carisma'],
-    ['willpower', '🔥 Vontade'],
+    ['strength', 'Força'],
+    ['agility', 'Agilidade'],
+    ['constitution', 'Constituição'],
+    ['intelligence', 'Inteligência'],
+    ['wisdom', 'Sabedoria'],
+    ['charisma', 'Carisma'],
+    ['willpower', 'Vontade'],
   ];
 
   const getBarColor = (value: number) => {

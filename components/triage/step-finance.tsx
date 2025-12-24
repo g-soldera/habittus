@@ -21,7 +21,7 @@ export function TriageStepFinance({
 }) {
   return (
     <ThemedView accessible={true}>
-      <ThemedText type="title">Finanças & Hábitos 💰</ThemedText>
+      <ThemedText type="title">FINANÇAS & HÁBITOS</ThemedText>
 
       <ThemedText style={{ marginTop: 12 }}>Renda Mensal (R$)</ThemedText>
       <TextInput testID="triage-monthly-income" accessibilityLabel="Renda mensal" style={{ borderWidth: 2, borderColor: CyberpunkColors.cyan, padding: 12, marginTop: 6, backgroundColor: CyberpunkColors.inputBg, color: CyberpunkColors.textPrimary, borderRadius: 6 }} value={monthlyIncome} onChangeText={setMonthlyIncome} keyboardType="numeric" placeholder="Ex: 4500" placeholderTextColor={CyberpunkColors.textDisabled} />

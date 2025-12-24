@@ -223,7 +223,6 @@ export function Jukebox() {
         </View>
       ) : (
         <View style={styles.emptyStateContainer}>
-          <ThemedText style={styles.emptyStateEmoji}>🎶</ThemedText>
           <ThemedText style={styles.emptyStateText}>
             Selecione uma faixa para começar
           </ThemedText>

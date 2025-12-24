@@ -151,7 +151,7 @@ export default function DashboardScreen() {
         <FadeIn duration={800} delay={300}>
           <Animated.View style={[styles.streakContainer, pulseStyle]}>
             <View style={styles.streakGlow}>
-              <ThemedText style={styles.streakLabel}>🔥 LOGIN STREAK</ThemedText>
+              <ThemedText style={styles.streakLabel}>LOGIN STREAK</ThemedText>
               <ThemedText style={styles.streakValue}>{gameState.character.loginStreak}</ThemedText>
               <ThemedText style={styles.streakBonus}>
                 {Math.round(streakBonus * 100)}% desconto na loja

@@ -22,11 +22,11 @@ export default function TrackingScreen() {
   const [activeTab, setActiveTab] = useState<TrackingTab>('tasks');
   const insets = useSafeAreaInsets();
 
-  const tabs: { id: TrackingTab; label: string; icon: string }[] = [
-    { id: 'tasks', label: 'Tarefas', icon: '📋' },
-    { id: 'nutrition', label: 'Nutrição', icon: '🍱' },
-    { id: 'study', label: 'Estudo', icon: '📚' },
-    { id: 'finance', label: 'Finanças', icon: '💰' },
+  const tabs: { id: TrackingTab; label: string }[] = [
+    { id: 'tasks', label: 'Tarefas' },
+    { id: 'nutrition', label: 'Nutrição' },
+    { id: 'study', label: 'Estudo' },
+    { id: 'finance', label: 'Finanças' },
   ];
 
   const renderTabContent = () => {
@@ -61,7 +61,7 @@ export default function TrackingScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <ThemedText style={styles.title}>🎯 Rastreamento</ThemedText>
+          <ThemedText style={styles.title}>RASTREAMENTO</ThemedText>
           <ThemedText style={styles.subtitle}>
             Monitore seu progresso em todas as áreas
           </ThemedText>

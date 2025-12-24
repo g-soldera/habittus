@@ -49,11 +49,11 @@ export function FinanceTracker() {
   };
 
   const categoryEmojis = {
-    salary: '💼',
-    bounty: '💰',
-    shop: '🛍️',
-    upgrade: '⚙️',
-    other: '📝',
+    salary: 'SAL',
+    bounty: 'BNT',
+    shop: 'SHP',
+    upgrade: 'UPG',
+    other: 'OTH',
   };
 
   const handleAddTransaction = () => {
@@ -95,7 +95,7 @@ export function FinanceTracker() {
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText style={styles.title}>💰 Finanças</ThemedText>
+      <ThemedText style={styles.title}>FINANÇAS</ThemedText>
 
       {/* Summary Cards */}
       <View style={styles.summaryGrid}>
@@ -141,7 +141,6 @@ export function FinanceTracker() {
               selectedType === 'income' && styles.typeButtonActive,
             ]}
           >
-            <ThemedText style={styles.typeEmoji}>📈</ThemedText>
             <ThemedText style={styles.typeLabel}>Renda</ThemedText>
           </Pressable>
           <Pressable
@@ -151,7 +150,6 @@ export function FinanceTracker() {
               selectedType === 'expense' && styles.typeButtonActive,
             ]}
           >
-            <ThemedText style={styles.typeEmoji}>📉</ThemedText>
             <ThemedText style={styles.typeLabel}>Gasto</ThemedText>
           </Pressable>
         </View>

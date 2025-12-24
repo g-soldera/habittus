@@ -23,7 +23,7 @@ export function TriageStepBasic({
 }) {
   return (
     <ThemedView accessible={true}>
-      <ThemedText type="title" style={styles.title}>Bem-vindo ao Habittus! 🎮</ThemedText>
+      <ThemedText type="title" style={styles.title}>BEM-VINDO AO HABITTUS</ThemedText>
       <ThemedText style={styles.subtitle}>
         Vamos criar seu personagem. Comece com seus dados básicos.
       </ThemedText>
