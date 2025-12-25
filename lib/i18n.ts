@@ -8,13 +8,13 @@ const LANGUAGE_KEY = 'habittus_language';
 
 // Detect system language
 const getSystemLanguage = (): string => {
-  // Default to pt-br for now
-  return 'pt-br';
+  // Default to pt for now
+  return 'pt';
 };
 
 const resources = {
-  'pt-br': { translation: ptBr },
-  'en-us': { translation: enUs },
+  'pt': { translation: ptBr },
+  'en': { translation: enUs },
 };
 
 const initializeI18n = async () => {
@@ -33,13 +33,16 @@ const initializeI18n = async () => {
   await i18n.use(initReactI18next).init({
     resources,
     lng: defaultLanguage,
-    fallbackLng: 'pt-br',
+    fallbackLng: 'pt',
     interpolation: {
       escapeValue: false,
     },
     react: {
       useSuspense: false,
     },
+    // Fix for nested JSON structure
+    keySeparator: '.',
+    nsSeparator: false,
   });
 
   console.log('[i18n] Initialized successfully. Current language:', i18n.language);

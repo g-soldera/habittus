@@ -29,14 +29,14 @@ export function useTranslation() {
   );
 
   const currentLanguage = useCallback(() => {
-    return i18nInstance.language || 'pt-br';
+    return i18nInstance.language || 'pt';
   }, [i18nInstance]);
 
   return {
     t,
     changeLanguage,
     currentLanguage: currentLanguage(),
-    availableLanguages: ['pt-br', 'en-us'],
+    availableLanguages: ['pt', 'en'],
     isReady,
   };
 }

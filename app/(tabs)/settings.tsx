@@ -87,14 +87,14 @@ export default function SettingsScreen() {
             <Pressable
               style={[
                 styles.languageButton,
-                currentLanguage === "pt-br" && styles.languageButtonActive,
+                currentLanguage === "pt" && styles.languageButtonActive,
               ]}
-              onPress={() => changeLanguage("pt-br")}
-              testID="settings-lang-ptbr"
+              onPress={() => changeLanguage("pt")}
+              testID="settings-lang-pt"
             >
               <ThemedText style={[
                 styles.languageButtonText,
-                currentLanguage === "pt-br" && styles.languageButtonTextActive,
+                currentLanguage === "pt" && styles.languageButtonTextActive,
               ]}>
                 PT-BR
               </ThemedText>
@@ -103,14 +103,14 @@ export default function SettingsScreen() {
             <Pressable
               style={[
                 styles.languageButton,
-                currentLanguage === "en-us" && styles.languageButtonActive,
+                currentLanguage === "en" && styles.languageButtonActive,
               ]}
-              onPress={() => changeLanguage("en-us")}
-              testID="settings-lang-enus"
+              onPress={() => changeLanguage("en")}
+              testID="settings-lang-en"
             >
               <ThemedText style={[
                 styles.languageButtonText,
-                currentLanguage === "en-us" && styles.languageButtonTextActive,
+                currentLanguage === "en" && styles.languageButtonTextActive,
               ]}>
                 EN-US
               </ThemedText>
