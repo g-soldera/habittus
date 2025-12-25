@@ -37,16 +37,26 @@ export default function SettingsScreen() {
   }, [isReady, currentLanguage, t]);
 
   const handleReset = () => {
+    console.log('[Settings] handleReset called');
+    console.log('[Settings] t("settings.resetWarning"):', t("settings.resetWarning"));
+    console.log('[Settings] t("settings.resetConfirm"):', t("settings.resetConfirm"));
+    
     Alert.alert(
-      t("settings.resetWarning"),
-      t("settings.resetConfirm"),
+      t("settings.resetWarning") || "Aviso",
+      t("settings.resetConfirm") || "Tem certeza que deseja resetar o jogo? Esta ação não pode ser desfeita.",
       [
-        { text: t("common.cancel"), onPress: () => {}, style: "cancel" },
+        { text: t("common.cancel") || "Cancelar", onPress: () => console.log('[Settings] Cancel pressed'), style: "cancel" },
         {
-          text: t("settings.resetButton"),
+          text: t("settings.resetButton") || "Resetar",
           onPress: async () => {
-            await resetGame();
-            router.replace("/triage");
+            console.log('[Settings] Reset confirmed, calling resetGame');
+            try {
+              await resetGame();
+              console.log('[Settings] resetGame completed, navigating to triage');
+              router.replace("/triage");
+            } catch (error) {
+              console.error('[Settings] Error during reset:', error);
+            }
           },
           style: "destructive",
         },
