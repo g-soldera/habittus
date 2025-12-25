@@ -16,7 +16,7 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { resetGame } = useGameState();
-  const { t, changeLanguage, currentLanguage } = useTranslation();
+  const { t, changeLanguage, currentLanguage, isReady } = useTranslation();
   const { 
     musicEnabled, 
     sfxEnabled, 
@@ -27,6 +27,14 @@ export default function SettingsScreen() {
     setMusicVolume: updateMusicVolume,
     setSFXVolume: updateSFXVolume 
   } = useAudio();
+
+  // Debug: log translation status
+  useEffect(() => {
+    console.log('[Settings] i18n ready:', isReady);
+    console.log('[Settings] current language:', currentLanguage);
+    console.log('[Settings] t("settings.title"):', t('settings.title'));
+    console.log('[Settings] t("common.warning"):', t('common.warning'));
+  }, [isReady, currentLanguage, t]);
 
   const handleReset = () => {
     Alert.alert(

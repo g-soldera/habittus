@@ -22,11 +22,13 @@ const initializeI18n = async () => {
 
   try {
     savedLanguage = await AsyncStorage.getItem(LANGUAGE_KEY);
+    console.log('[i18n] Saved language:', savedLanguage);
   } catch (error) {
     console.error('[i18n] Error loading language preference:', error);
   }
 
   const defaultLanguage = savedLanguage || getSystemLanguage();
+  console.log('[i18n] Initializing with language:', defaultLanguage);
 
   await i18n.use(initReactI18next).init({
     resources,
@@ -39,6 +41,9 @@ const initializeI18n = async () => {
       useSuspense: false,
     },
   });
+
+  console.log('[i18n] Initialized successfully. Current language:', i18n.language);
+  console.log('[i18n] Test translation - settings.title:', i18n.t('settings.title'));
 };
 
 export { initializeI18n, LANGUAGE_KEY };

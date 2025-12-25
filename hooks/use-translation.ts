@@ -6,7 +6,15 @@ import i18n from '@/lib/i18n';
 const LANGUAGE_KEY = 'habittus_language';
 
 export function useTranslation() {
-  const { t, i18n: i18nInstance } = useI18nTranslation();
+  const { t, i18n: i18nInstance, ready } = useI18nTranslation();
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    // Wait for i18n to be ready
+    if (ready && i18nInstance.language) {
+      setIsReady(true);
+    }
+  }, [ready, i18nInstance.language]);
 
   const changeLanguage = useCallback(
     async (language: string) => {
@@ -21,7 +29,7 @@ export function useTranslation() {
   );
 
   const currentLanguage = useCallback(() => {
-    return i18nInstance.language;
+    return i18nInstance.language || 'pt-br';
   }, [i18nInstance]);
 
   return {
@@ -29,5 +37,6 @@ export function useTranslation() {
     changeLanguage,
     currentLanguage: currentLanguage(),
     availableLanguages: ['pt-br', 'en-us'],
+    isReady,
   };
 }
