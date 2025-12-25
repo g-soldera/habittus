@@ -6,6 +6,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LANGUAGE_KEY = 'habittus_language';
 
+// Normalize any saved/system language to supported codes
+const normalizeLanguage = (lng?: string | null): string => {
+  if (!lng) return 'pt';
+  const lower = lng.toLowerCase();
+  if (lower.startsWith('pt')) return 'pt';
+  if (lower.startsWith('en')) return 'en';
+  return 'pt';
+};
+
 // Detect system language
 const getSystemLanguage = (): string => {
   // Default to pt for now
@@ -27,7 +36,7 @@ const initializeI18n = async () => {
     console.error('[i18n] Error loading language preference:', error);
   }
 
-  const defaultLanguage = savedLanguage || getSystemLanguage();
+  const defaultLanguage = normalizeLanguage(savedLanguage) || getSystemLanguage();
   console.log('[i18n] Initializing with language:', defaultLanguage);
 
   await i18n.use(initReactI18next).init({
